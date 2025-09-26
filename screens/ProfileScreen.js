@@ -1,17 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
 import { signOut } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, orderBy, getDocs } from 'firebase/firestore';
 import { auth, db } from '../firebase.config';
+import { ACHIEVEMENTS } from '../constants/achievements';
 
 export default function ProfileScreen() {
   const [userData, setUserData] = useState(null);
+  const [checkins, setCheckins] = useState([]);
+  const [checkinsCount, setCheckinsCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadUserData();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      loadUserData();
+    }, [])
+  );
 
   const loadUserData = async () => {
     try {
@@ -19,6 +25,19 @@ export default function ProfileScreen() {
       if (userDoc.exists()) {
         setUserData(userDoc.data());
       }
+
+      const checkinsQuery = query(
+        collection(db, 'checkins'),
+        where('userId', '==', auth.currentUser.uid),
+        orderBy('timestamp', 'desc')
+      );
+      const checkinsSnapshot = await getDocs(checkinsQuery);
+      const checkinsData = checkinsSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setCheckins(checkinsData.slice(0, 5));
+      setCheckinsCount(checkinsData.length);
     } catch (error) {
       console.error('Error loading user data:', error);
     } finally {
@@ -55,14 +74,11 @@ export default function ProfileScreen() {
     );
   }
 
-  const achievements = [
-    { id: 1, name: 'First Check-in', icon: 'beer', unlocked: false, description: 'Check in at your first brewery' },
-    { id: 2, name: 'Style Explorer', icon: 'compass', unlocked: false, description: 'Try 5 different beer styles' },
-    { id: 3, name: 'Social Butterfly', icon: 'account-group', unlocked: false, description: 'Visit 10 breweries' },
-    { id: 4, name: 'Beer Connoisseur', icon: 'trophy', unlocked: false, description: 'Reach level 5' },
-    { id: 5, name: 'Weekend Warrior', icon: 'calendar-weekend', unlocked: false, description: 'Check in 3 times in one weekend' },
-    { id: 6, name: 'Loyal Patron', icon: 'heart', unlocked: false, description: 'Visit the same brewery 5 times' },
-  ];
+  const userAchievements = userData?.achievements || [];
+  const achievements = ACHIEVEMENTS.map(achievement => ({
+    ...achievement,
+    unlocked: userAchievements.includes(achievement.id),
+  }));
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -84,10 +100,29 @@ export default function ProfileScreen() {
           <Text style={styles.statLabel}>Level</Text>
         </View>
         <View style={styles.statBox}>
-          <Text style={styles.statNumber}>0</Text>
+          <Text style={styles.statNumber}>{checkinsCount}</Text>
           <Text style={styles.statLabel}>Check-ins</Text>
         </View>
       </View>
+
+      {checkins.length > 0 && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Recent Check-ins</Text>
+          {checkins.map((checkin) => (
+            <View key={checkin.id} style={styles.checkinCard}>
+              <View style={styles.checkinHeader}>
+                <MaterialCommunityIcons name="beer" size={24} color="#D4922A" />
+                <View style={styles.checkinInfo}>
+                  <Text style={styles.checkinBrewery}>{checkin.breweryName}</Text>
+                  <Text style={styles.checkinDetails}>
+                    {checkin.timestamp?.toDate ? checkin.timestamp.toDate().toLocaleDateString() : 'N/A'} • +{checkin.points} pts • {checkin.method}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          ))}
+        </View>
+      )}
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Achievements</Text>
@@ -309,5 +344,33 @@ const styles = StyleSheet.create({
   },
   signOutText: {
     color: '#D32F2F',
+  },
+  checkinCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  checkinHeader: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  checkinInfo: {
+    flex: 1,
+  },
+  checkinBrewery: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#654321',
+    marginBottom: 4,
+  },
+  checkinDetails: {
+    fontSize: 12,
+    color: '#8B4513',
   },
 });

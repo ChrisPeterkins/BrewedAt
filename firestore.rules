@@ -1,0 +1,62 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+
+    // Users collection
+    match /users/{userId} {
+      // Anyone can read user profiles (for leaderboards, etc.)
+      allow read: if isSignedIn();
+
+      // Users can only create their own profile during signup
+      allow create: if isOwner(userId);
+
+      // Users can only update their own profile
+      // Prevent users from setting isAdmin to true
+      allow update: if isOwner(userId)
+                    && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAdmin']));
+
+      // Only admins can delete users
+      allow delete: if isAdmin();
+    }
+
+    // Events (breweries) collection
+    match /events/{eventId} {
+      // Anyone signed in can read events
+      allow read: if isSignedIn();
+
+      // Only admins can create, update, or delete events
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Check-ins collection
+    match /checkins/{checkinId} {
+      // Users can read their own check-ins
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+
+      // Users can create check-ins for themselves only
+      allow create: if isSignedIn()
+                    && request.resource.data.userId == request.auth.uid
+                    && request.resource.data.timestamp is timestamp;
+
+      // No one can update check-ins (immutable)
+      allow update: if false;
+
+      // Only admins can delete check-ins
+      allow delete: if isAdmin();
+    }
+  }
+}
