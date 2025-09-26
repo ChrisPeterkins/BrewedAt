@@ -31,10 +31,17 @@ yarn-error.*
 *.pem
 
 # local env files
+.env
 .env*.local
 
 # typescript
 *.tsbuildinfo
+
+# Firebase
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
 
 # generated native folders
 /ios
