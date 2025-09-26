@@ -7,18 +7,14 @@ import { collection, getDocs, doc, getDoc, updateDoc, increment, addDoc, query, 
 import { auth, db } from '../firebase.config';
 import { checkAchievements } from '../utils/achievementChecker';
 import { ACHIEVEMENTS } from '../constants/achievements';
-import CheckInSuccessModal from '../components/CheckInSuccessModal';
 
-export default function CheckInScreen() {
+export default function CheckInScreen({ navigation }) {
   const [location, setLocation] = useState(null);
   const [nearbyBreweries, setNearbyBreweries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [checkingIn, setCheckingIn] = useState(false);
   const [showQRScanner, setShowQRScanner] = useState(false);
-  const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [successData, setSuccessData] = useState(null);
   const successAnimation = new Animated.Value(0);
   const checkingInRef = useRef(false);
 
@@ -84,7 +80,6 @@ export default function CheckInScreen() {
 
   const requestCameraPermission = async () => {
     const { status } = await Camera.requestCameraPermissionsAsync();
-    setHasPermission(status === 'granted');
     if (status === 'granted') {
       setShowQRScanner(true);
       setScanned(false);
@@ -191,45 +186,38 @@ export default function CheckInScreen() {
       const updatedUserData = updatedUserDoc.data();
       const newAchievements = await checkAchievements(auth.currentUser.uid, updatedUserData);
 
+      console.log('New achievements:', newAchievements);
+
       if (newAchievements.length > 0) {
         await updateDoc(userRef, {
           achievements: arrayUnion(...newAchievements)
         });
       }
 
-      setSuccessData({
-        breweryName: brewery.name,
-        pointsEarned: brewery.pointsReward,
-        totalPoints: newPoints,
-        level: newLevel,
-        newAchievements: newAchievements
+      navigation.navigate('CheckInResult', {
+        success: true,
+        data: {
+          breweryName: brewery.name,
+          pointsEarned: brewery.pointsReward,
+          totalPoints: newPoints,
+          level: newLevel,
+          newAchievements: newAchievements
+        }
       });
-      setShowSuccessModal(true);
-
-      await requestLocationAndFindBreweries();
     } catch (error) {
       console.error('Error checking in:', error);
-      Alert.alert('Error', 'Could not complete check-in. Please try again.');
+      navigation.navigate('CheckInResult', {
+        success: false,
+        data: {
+          message: 'Could not complete check-in. Please try again.'
+        }
+      });
     } finally {
       checkingInRef.current = false;
       setCheckingIn(false);
     }
   };
 
-  const playSuccessAnimation = () => {
-    Animated.sequence([
-      Animated.timing(successAnimation, {
-        toValue: 1,
-        duration: 500,
-        useNativeDriver: true,
-      }),
-      Animated.timing(successAnimation, {
-        toValue: 0,
-        duration: 500,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  };
 
   const renderBrewery = ({ item }) => {
     const distance = location
@@ -434,18 +422,6 @@ export default function CheckInScreen() {
           </CameraView>
         </View>
       </Modal>
-
-      {successData && (
-        <CheckInSuccessModal
-          visible={showSuccessModal}
-          onClose={() => setShowSuccessModal(false)}
-          breweryName={successData.breweryName}
-          pointsEarned={successData.pointsEarned}
-          totalPoints={successData.totalPoints}
-          level={successData.level}
-          newAchievements={successData.newAchievements}
-        />
-      )}
     </View>
   );
 }

@@ -1,13 +1,33 @@
 import React from 'react';
 import { Platform } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import HomeScreen from '../screens/HomeScreen';
 import EventsScreen from '../screens/EventsScreen';
 import CheckInScreen from '../screens/CheckInScreen';
+import CheckInResultScreen from '../screens/CheckInResultScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 
 const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
+
+function CheckInStack() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="CheckInMain"
+        component={CheckInScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="CheckInResult"
+        component={CheckInResultScreen}
+        options={{ headerShown: false }}
+      />
+    </Stack.Navigator>
+  );
+}
 
 export default function AppNavigator() {
   return (
@@ -51,7 +71,7 @@ export default function AppNavigator() {
       />
       <Tab.Screen
         name="Check In"
-        component={CheckInScreen}
+        component={CheckInStack}
         options={{
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="qrcode-scan" size={size} color={color} />
