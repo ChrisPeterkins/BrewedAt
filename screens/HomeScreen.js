@@ -1,9 +1,33 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import { signOut } from 'firebase/auth';
-import { auth } from '../firebase.config';
+import { doc, getDoc } from 'firebase/firestore';
+import { auth, db } from '../firebase.config';
 
 export default function HomeScreen() {
+  const navigation = useNavigation();
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadUserData();
+  }, []);
+
+  const loadUserData = async () => {
+    try {
+      const userDoc = await getDoc(doc(db, 'users', auth.currentUser.uid));
+      if (userDoc.exists()) {
+        setUserData(userDoc.data());
+      }
+    } catch (error) {
+      console.error('Error loading user data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSignOut = async () => {
     try {
       await signOut(auth);
@@ -12,45 +36,234 @@ export default function HomeScreen() {
     }
   };
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Welcome to BrewedAt!</Text>
-      <Text style={styles.email}>{auth.currentUser?.email}</Text>
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
 
-      <TouchableOpacity style={styles.button} onPress={handleSignOut}>
-        <Text style={styles.buttonText}>Sign Out</Text>
-      </TouchableOpacity>
-    </View>
+  return (
+    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <View style={styles.header}>
+        <Image
+          source={require('../assets/brewedat-logo.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+        <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
+          <Text style={styles.signOutText}>Sign Out</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.welcomeSection}>
+        <Text style={styles.greeting}>Hey, {userData?.name}!</Text>
+        <Text style={styles.subtitle}>Ready to discover some great beer?</Text>
+      </View>
+
+      <View style={styles.statsContainer}>
+        <View style={styles.statCard}>
+          <Text style={styles.statNumber}>{userData?.totalPoints || 0}</Text>
+          <Text style={styles.statLabel}>Points</Text>
+        </View>
+        <View style={styles.statCard}>
+          <Text style={styles.statNumber}>Level {userData?.level || 1}</Text>
+          <Text style={styles.statLabel}>Current Level</Text>
+        </View>
+      </View>
+
+      <Text style={styles.sectionTitle}>Quick Actions</Text>
+      <View style={styles.actionsContainer}>
+        <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('Events')}>
+          <MaterialCommunityIcons name="map-marker" size={32} color="#D4922A" />
+          <Text style={styles.actionText}>Find Events</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('Check In')}>
+          <MaterialCommunityIcons name="check-circle" size={32} color="#D4922A" />
+          <Text style={styles.actionText}>Check In</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('Profile')}>
+          <MaterialCommunityIcons name="trophy" size={32} color="#D4922A" />
+          <Text style={styles.actionText}>Achievements</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('Profile')}>
+          <MaterialCommunityIcons name="chart-bar" size={32} color="#D4922A" />
+          <Text style={styles.actionText}>Leaderboard</Text>
+        </TouchableOpacity>
+      </View>
+
+      <Text style={styles.sectionTitle}>Your Beer Preferences</Text>
+      <View style={styles.preferencesContainer}>
+        {userData?.beerPreferences?.map((style) => (
+          <View key={style} style={styles.preferenceChip}>
+            <Text style={styles.preferenceText}>{style}</Text>
+          </View>
+        ))}
+      </View>
+
+      <View style={styles.ctaCard}>
+        <Text style={styles.ctaTitle}>No events yet</Text>
+        <Text style={styles.ctaSubtitle}>Check in at your first brewery to start earning points!</Text>
+        <TouchableOpacity style={styles.ctaButton} onPress={() => navigation.navigate('Events')}>
+          <Text style={styles.ctaButtonText}>Explore Events</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: '#FAFAF8',
+  },
+  content: {
     padding: 20,
-    backgroundColor: '#fff',
+    paddingTop: 60,
   },
-  title: {
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  logo: {
+    width: 150,
+    height: 60,
+  },
+  signOutButton: {
+    padding: 8,
+  },
+  signOutText: {
+    color: '#8B4513',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  welcomeSection: {
+    marginBottom: 32,
+  },
+  greeting: {
+    fontSize: 32,
+    fontWeight: '700',
+    color: '#654321',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#8B4513',
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    gap: 16,
+    marginBottom: 32,
+  },
+  statCard: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+    padding: 20,
+    borderRadius: 16,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  statNumber: {
     fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 20,
+    fontWeight: '700',
+    color: '#D4922A',
+    marginBottom: 4,
   },
-  email: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 40,
+  statLabel: {
+    fontSize: 14,
+    color: '#8B4513',
+    fontWeight: '500',
   },
-  button: {
-    backgroundColor: '#FF6B35',
-    padding: 15,
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#654321',
+    marginBottom: 16,
+  },
+  actionsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    marginBottom: 32,
+  },
+  actionButton: {
+    width: '48%',
+    backgroundColor: '#FFFFFF',
+    padding: 20,
+    borderRadius: 12,
+    alignItems: 'center',
+    gap: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  actionText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#654321',
+  },
+  preferencesContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 32,
+  },
+  preferenceChip: {
+    backgroundColor: '#D4922A',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  preferenceText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  ctaCard: {
+    backgroundColor: '#FFFFFF',
+    padding: 24,
+    borderRadius: 16,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+    marginBottom: 32,
+  },
+  ctaTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#654321',
+    marginBottom: 8,
+  },
+  ctaSubtitle: {
+    fontSize: 14,
+    color: '#8B4513',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  ctaButton: {
+    backgroundColor: '#D4922A',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
     borderRadius: 8,
-    paddingHorizontal: 40,
   },
-  buttonText: {
-    color: '#fff',
+  ctaButtonText: {
+    color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '600',
   },
 });

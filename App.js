@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
+import { NavigationContainer } from '@react-navigation/native';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from './firebase.config';
 import AuthScreen from './screens/AuthScreen';
 import ProfileSetupScreen from './screens/ProfileSetupScreen';
-import HomeScreen from './screens/HomeScreen';
+import AppNavigator from './navigation/AppNavigator';
 import ScreenTransition from './components/ScreenTransition';
 
 export default function App() {
@@ -70,9 +71,11 @@ export default function App() {
   return (
     <>
       <StatusBar style="auto" />
-      <ScreenTransition key={screenKey} isVisible={true}>
-        <HomeScreen />
-      </ScreenTransition>
+      <NavigationContainer>
+        <ScreenTransition key={screenKey} isVisible={true}>
+          <AppNavigator />
+        </ScreenTransition>
+      </NavigationContainer>
     </>
   );
 }
