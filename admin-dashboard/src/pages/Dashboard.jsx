@@ -1,8 +1,13 @@
+import { useState } from 'react';
 import { signOut } from 'firebase/auth';
 import { auth } from '../firebase.config';
 import BreweryTable from '../components/BreweryTable';
+import Raffles from './Raffles';
+import DataManagement from './DataManagement';
 
 export default function Dashboard() {
+  const [activeTab, setActiveTab] = useState('breweries');
+
   const handleSignOut = async () => {
     try {
       await signOut(auth);
@@ -20,8 +25,40 @@ export default function Dashboard() {
         </button>
       </header>
 
+      <nav style={styles.nav}>
+        <button
+          style={{
+            ...styles.navButton,
+            ...(activeTab === 'breweries' ? styles.navButtonActive : {})
+          }}
+          onClick={() => setActiveTab('breweries')}
+        >
+          Breweries & Events
+        </button>
+        <button
+          style={{
+            ...styles.navButton,
+            ...(activeTab === 'raffles' ? styles.navButtonActive : {})
+          }}
+          onClick={() => setActiveTab('raffles')}
+        >
+          Raffles
+        </button>
+        <button
+          style={{
+            ...styles.navButton,
+            ...(activeTab === 'data' ? styles.navButtonActive : {})
+          }}
+          onClick={() => setActiveTab('data')}
+        >
+          Data Management
+        </button>
+      </nav>
+
       <main style={styles.main}>
-        <BreweryTable />
+        {activeTab === 'breweries' && <BreweryTable />}
+        {activeTab === 'raffles' && <Raffles />}
+        {activeTab === 'data' && <DataManagement />}
       </main>
     </div>
   );
@@ -55,6 +92,28 @@ const styles = {
     border: 'none',
     borderRadius: '6px',
     cursor: 'pointer',
+  },
+  nav: {
+    backgroundColor: '#FFFFFF',
+    borderBottom: '1px solid #E0E0E0',
+    display: 'flex',
+    gap: '8px',
+    padding: '0 32px',
+  },
+  navButton: {
+    backgroundColor: 'transparent',
+    color: '#8B4513',
+    padding: '16px 24px',
+    fontSize: '14px',
+    fontWeight: '600',
+    border: 'none',
+    borderBottom: '3px solid transparent',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+  },
+  navButtonActive: {
+    color: '#D4922A',
+    borderBottomColor: '#D4922A',
   },
   main: {
     maxWidth: '1400px',

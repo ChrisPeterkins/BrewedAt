@@ -1,16 +1,14 @@
 import React, { useState } from 'react';
-import { TextInput, TouchableOpacity, Text, StyleSheet, KeyboardAvoidingView, Platform, Image, View, ScrollView } from 'react-native';
+import { TextInput, TouchableOpacity, Text, StyleSheet, KeyboardAvoidingView, Platform, Image, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase.config';
-import ScreenTransition from '../components/ScreenTransition';
 
 export default function AuthScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLogin, setIsLogin] = useState(true);
   const [error, setError] = useState('');
-  const [showTestAnimation, setShowTestAnimation] = useState(false);
   const [bgColor, setBgColor] = useState('#FAFAF8');
 
   const bgOptions = [
@@ -116,19 +114,6 @@ export default function AuthScreen() {
           {isLogin ? "Don't have an account? Sign Up" : 'Already have an account? Sign In'}
         </Text>
       </TouchableOpacity>
-
-      <TouchableOpacity style={styles.testButton} onPress={() => {
-        setShowTestAnimation(true);
-        setTimeout(() => setShowTestAnimation(false), 1800);
-      }}>
-        <Text style={styles.testButtonText}>Test Animation</Text>
-      </TouchableOpacity>
-
-      {showTestAnimation && (
-        <ScreenTransition key={Date.now()} isVisible={true}>
-          <View style={{ flex: 1 }} />
-        </ScreenTransition>
-      )}
     </KeyboardAvoidingView>
   );
 }
@@ -207,19 +192,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 12,
     fontSize: 14,
-  },
-  testButton: {
-    marginTop: 20,
-    padding: 12,
-    backgroundColor: 'rgba(212, 146, 42, 0.2)',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#D4922A',
-  },
-  testButtonText: {
-    color: '#D4922A',
-    textAlign: 'center',
-    fontSize: 14,
-    fontWeight: '600',
   },
 });

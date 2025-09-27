@@ -7,6 +7,8 @@ import HomeScreen from '../screens/HomeScreen';
 import EventsScreen from '../screens/EventsScreen';
 import CheckInScreen from '../screens/CheckInScreen';
 import CheckInResultScreen from '../screens/CheckInResultScreen';
+import RaffleScreen from '../screens/RaffleScreen';
+import LeaderboardScreen from '../screens/LeaderboardScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 
 const Tab = createBottomTabNavigator();
@@ -75,6 +77,24 @@ export default function AppNavigator() {
         options={{
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="qrcode-scan" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Raffles"
+        component={RaffleScreen}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="gift" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Leaderboard"
+        component={LeaderboardScreen}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="trophy" size={size} color={color} />
           ),
         }}
       />

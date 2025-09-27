@@ -42,6 +42,8 @@ yarn-error.*
 firebase-debug.log
 firestore-debug.log
 ui-debug.log
+serviceAccountKey.json
+brewedat-firebase-adminsdk-*.json
 
 # generated native folders
 /ios

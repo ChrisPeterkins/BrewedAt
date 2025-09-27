@@ -58,5 +58,30 @@ service cloud.firestore {
       // Only admins can delete check-ins
       allow delete: if isAdmin();
     }
+
+    // Raffles collection
+    match /raffles/{raffleId} {
+      // Anyone signed in can read raffles
+      allow read: if isSignedIn();
+
+      // Only admins can create, update, or delete raffles
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Raffle entries collection
+    match /raffleEntries/{entryId} {
+      // Users can read their own entries, admins can read all
+      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+
+      // Users can create entries for themselves only
+      allow create: if isSignedIn()
+                    && request.resource.data.userId == request.auth.uid;
+
+      // No one can update entries (immutable)
+      allow update: if false;
+
+      // Only admins can delete entries
+      allow delete: if isAdmin();
+    }
   }
 }
