@@ -200,7 +200,7 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FAFAF8',
+    backgroundColor: '#FFF8E7',
   },
   content: {
     padding: 20,
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FAFAF8',
+    backgroundColor: '#FFF8E7',
   },
   header: {
     alignItems: 'center',

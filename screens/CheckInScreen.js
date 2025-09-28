@@ -429,13 +429,13 @@ export default function CheckInScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FAFAF8',
+    backgroundColor: '#FFF8E7',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FAFAF8',
+    backgroundColor: '#FFF8E7',
   },
   loadingText: {
     fontSize: 16,
@@ -446,7 +446,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FAFAF8',
+    backgroundColor: '#FFF8E7',
     padding: 40,
   },
   emptyTitle: {

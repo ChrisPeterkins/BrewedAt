@@ -5,6 +5,7 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { signOut } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase.config';
+import { ACTIVE_THEME } from '../config/themes';
 
 export default function HomeScreen() {
   const navigation = useNavigation();
@@ -120,7 +121,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FAFAF8',
+    backgroundColor: ACTIVE_THEME.backgroundColor,
   },
   content: {
     padding: 20,

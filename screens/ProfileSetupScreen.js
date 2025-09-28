@@ -166,7 +166,7 @@ export default function ProfileSetupScreen({ onComplete }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FAFAF8',
+    backgroundColor: '#FFF8E7',
   },
   content: {
     padding: 24,

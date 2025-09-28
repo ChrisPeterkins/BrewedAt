@@ -151,13 +151,13 @@ export default function EventsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FAFAF8',
+    backgroundColor: '#FFF8E7',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FAFAF8',
+    backgroundColor: '#FFF8E7',
   },
   loadingText: {
     fontSize: 16,
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   eventCard: {
-    backgroundColor: '#FAFAF8',
+    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     padding: 16,
     marginRight: 12,

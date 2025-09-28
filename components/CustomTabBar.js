@@ -1,27 +1,51 @@
-import React, { useEffect } from 'react';
-import { View, TouchableOpacity, Text, StyleSheet, Platform } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, TouchableOpacity, Text, StyleSheet, Platform, Animated } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function CustomTabBar({ state, descriptors, navigation, setHideTabBar }) {
   const [isTransitioning, setIsTransitioning] = React.useState(false);
   const prevIndexRef = React.useRef(state.index);
+  const fadeAnim = useRef(new Animated.Value(1)).current;
+  const slideAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (prevIndexRef.current !== state.index) {
       setIsTransitioning(true);
       setHideTabBar(true);
 
+      fadeAnim.setValue(1);
+      slideAnim.setValue(0);
+
       setTimeout(() => {
         setIsTransitioning(false);
         setHideTabBar(false);
+
+        fadeAnim.setValue(0);
+        slideAnim.setValue(20);
+
+        Animated.parallel([
+          Animated.timing(fadeAnim, {
+            toValue: 1,
+            duration: 400,
+            useNativeDriver: true,
+          }),
+          Animated.timing(slideAnim, {
+            toValue: 0,
+            duration: 400,
+            useNativeDriver: true,
+          }),
+        ]).start();
       }, 1600);
 
       prevIndexRef.current = state.index;
     }
-  }, [state.index, setHideTabBar]);
+  }, [state.index, setHideTabBar, fadeAnim, slideAnim]);
 
   return (
-    <View style={styles.tabBar}>
+    <Animated.View style={[styles.tabBar, {
+      opacity: fadeAnim,
+      transform: [{ translateY: slideAnim }]
+    }]}>
       {state.routes.map((route, index) => {
         const { options } = descriptors[route.key];
         const label = options.tabBarLabel || route.name;
@@ -71,7 +95,7 @@ export default function CustomTabBar({ state, descriptors, navigation, setHideTa
           </TouchableOpacity>
         );
       })}
-    </View>
+    </Animated.View>
   );
 }
 

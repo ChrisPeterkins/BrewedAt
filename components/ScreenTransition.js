@@ -5,6 +5,7 @@ import LottieView from 'lottie-react-native';
 
 export default function ScreenTransition({ children, isVisible }) {
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(20)).current;
   const lottieOpacity = useRef(new Animated.Value(1)).current;
   const lottieRef = useRef(null);
   const [showLottie, setShowLottie] = useState(true);
@@ -14,6 +15,7 @@ export default function ScreenTransition({ children, isVisible }) {
     if (isVisible) {
       setShowContent(false);
       fadeAnim.setValue(0);
+      slideAnim.setValue(20);
       lottieOpacity.setValue(1);
       setShowLottie(true);
 
@@ -27,7 +29,12 @@ export default function ScreenTransition({ children, isVisible }) {
         Animated.parallel([
           Animated.timing(fadeAnim, {
             toValue: 1,
-            duration: 400,
+            duration: 600,
+            useNativeDriver: true,
+          }),
+          Animated.timing(slideAnim, {
+            toValue: 0,
+            duration: 600,
             useNativeDriver: true,
           }),
           Animated.timing(lottieOpacity, {
@@ -48,7 +55,10 @@ export default function ScreenTransition({ children, isVisible }) {
 
   return (
     <>
-      <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
+      <Animated.View style={[styles.container, {
+        opacity: fadeAnim,
+        transform: [{ translateY: slideAnim }]
+      }]}>
         {showContent && children}
       </Animated.View>
       {showLottie && (
