@@ -4,6 +4,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { collection, query, where, getDocs, doc, getDoc, updateDoc, increment, addDoc, Timestamp, orderBy } from 'firebase/firestore';
 import { db, auth } from '../firebase.config';
 import { useFocusEffect } from '@react-navigation/native';
+import RaffleDetailModal from '../components/RaffleDetailModal';
 
 export default function RaffleScreen() {
   const [raffles, setRaffles] = useState([]);
@@ -11,6 +12,8 @@ export default function RaffleScreen() {
   const [userEntries, setUserEntries] = useState({});
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [selectedRaffle, setSelectedRaffle] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -165,13 +168,29 @@ export default function RaffleScreen() {
     return 'Ending soon';
   };
 
+  const handleOpenModal = (raffle) => {
+    setSelectedRaffle(raffle);
+    setModalVisible(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalVisible(false);
+    setTimeout(() => {
+      setSelectedRaffle(null);
+    }, 250);
+  };
+
   const renderRaffleCard = ({ item }) => {
     const userEntriesCount = userEntries[item.id] || 0;
     const totalEntries = item.totalEntries || 0;
     const canEnter = userEntriesCount < item.maxEntriesPerUser && userPoints >= item.costPerEntry;
 
     return (
-      <View style={styles.raffleCard}>
+      <TouchableOpacity
+        style={styles.raffleCard}
+        onPress={() => handleOpenModal(item)}
+        activeOpacity={0.7}
+      >
         <View style={styles.raffleHeader}>
           <View style={styles.prizeSection}>
             <MaterialCommunityIcons name="gift" size={40} color="#D4922A" />
@@ -210,25 +229,11 @@ export default function RaffleScreen() {
           </View>
         )}
 
-        <TouchableOpacity
-          style={[styles.enterButton, !canEnter && styles.enterButtonDisabled]}
-          onPress={() => handleEnterRaffle(item)}
-          disabled={!canEnter}
-        >
-          <MaterialCommunityIcons
-            name="ticket-confirmation"
-            size={20}
-            color="#FFFFFF"
-          />
-          <Text style={styles.enterButtonText}>
-            {userEntriesCount >= item.maxEntriesPerUser
-              ? 'Max Entries Reached'
-              : userPoints < item.costPerEntry
-              ? 'Not Enough Points'
-              : `Enter Raffle (${item.costPerEntry} pts)`}
-          </Text>
-        </TouchableOpacity>
-      </View>
+        <View style={styles.viewDetailsButton}>
+          <Text style={styles.viewDetailsText}>Tap to view details</Text>
+          <MaterialCommunityIcons name="chevron-right" size={20} color="#D4922A" />
+        </View>
+      </TouchableOpacity>
     );
   };
 
@@ -277,6 +282,18 @@ export default function RaffleScreen() {
             <Text style={styles.emptySubtitle}>Check back soon for new prizes!</Text>
           </View>
         }
+      />
+
+      <RaffleDetailModal
+        visible={modalVisible}
+        raffle={selectedRaffle}
+        onClose={handleCloseModal}
+        onEnter={() => {
+          handleCloseModal();
+          handleEnterRaffle(selectedRaffle);
+        }}
+        userEntries={selectedRaffle ? userEntries[selectedRaffle.id] || 0 : 0}
+        userPoints={userPoints}
       />
     </View>
   );
@@ -437,5 +454,20 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#8B4513',
     textAlign: 'center',
+  },
+  viewDetailsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#E0E0E0',
+    marginTop: 12,
+    gap: 8,
+  },
+  viewDetailsText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#D4922A',
   },
 });

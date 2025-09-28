@@ -3,7 +3,6 @@ import { View, TouchableOpacity, Text, StyleSheet, Platform, Animated } from 're
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function CustomTabBar({ state, descriptors, navigation, setHideTabBar }) {
-  const [isTransitioning, setIsTransitioning] = React.useState(false);
   const [isMounted, setIsMounted] = React.useState(false);
   const prevIndexRef = React.useRef(state.index);
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -12,64 +11,48 @@ export default function CustomTabBar({ state, descriptors, navigation, setHideTa
   useEffect(() => {
     if (!isMounted) {
       setIsMounted(true);
-      Animated.parallel([
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-        Animated.timing(slideAnim, {
-          toValue: 0,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-      ]).start();
+      setTimeout(() => {
+        Animated.parallel([
+          Animated.timing(fadeAnim, {
+            toValue: 1,
+            duration: 600,
+            useNativeDriver: true,
+          }),
+          Animated.timing(slideAnim, {
+            toValue: 0,
+            duration: 600,
+            useNativeDriver: true,
+          }),
+        ]).start();
+      }, 1200);
     }
   }, [isMounted, fadeAnim, slideAnim]);
 
   useEffect(() => {
     if (isMounted && prevIndexRef.current !== state.index) {
-      setIsTransitioning(true);
+      // Reset animations immediately
+      fadeAnim.setValue(0);
+      slideAnim.setValue(20);
 
-      Animated.parallel([
-        Animated.timing(fadeAnim, {
-          toValue: 0,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-        Animated.timing(slideAnim, {
-          toValue: 20,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-      ]).start(() => {
-        setHideTabBar(true);
-      });
-
+      // Wait for beer transition, then fade in WITH content
       setTimeout(() => {
-        setIsTransitioning(false);
-        setHideTabBar(false);
-
-        fadeAnim.setValue(0);
-        slideAnim.setValue(20);
-
         Animated.parallel([
           Animated.timing(fadeAnim, {
             toValue: 1,
-            duration: 200,
+            duration: 600,
             useNativeDriver: true,
           }),
           Animated.timing(slideAnim, {
             toValue: 0,
-            duration: 200,
+            duration: 600,
             useNativeDriver: true,
           }),
         ]).start();
-      }, 1600);
+      }, 1200);
 
       prevIndexRef.current = state.index;
     }
-  }, [state.index, setHideTabBar, fadeAnim, slideAnim, isMounted]);
+  }, [state.index, fadeAnim, slideAnim, isMounted]);
 
   return (
     <Animated.View style={[{

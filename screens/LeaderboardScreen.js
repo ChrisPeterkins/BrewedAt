@@ -4,12 +4,15 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 import { db, auth } from '../firebase.config';
 import { useFocusEffect } from '@react-navigation/native';
+import UserProfileModal from '../components/UserProfileModal';
 
 export default function LeaderboardScreen() {
   const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [timeFilter, setTimeFilter] = useState('all');
+  const [selectedUserId, setSelectedUserId] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -60,11 +63,27 @@ export default function LeaderboardScreen() {
     return 'account-circle';
   };
 
+  const handleOpenProfile = (userId) => {
+    setSelectedUserId(userId);
+    setModalVisible(true);
+  };
+
+  const handleCloseProfile = () => {
+    setModalVisible(false);
+    setTimeout(() => {
+      setSelectedUserId(null);
+    }, 250);
+  };
+
   const renderLeaderboardItem = ({ item }) => {
     const isCurrentUser = item.id === auth.currentUser?.uid;
 
     return (
-      <View style={[styles.userCard, isCurrentUser && styles.currentUserCard]}>
+      <TouchableOpacity
+        style={[styles.userCard, isCurrentUser && styles.currentUserCard]}
+        onPress={() => handleOpenProfile(item.id)}
+        activeOpacity={0.7}
+      >
         <View style={styles.rankContainer}>
           <MaterialCommunityIcons
             name={getRankIcon(item.rank)}
@@ -102,7 +121,9 @@ export default function LeaderboardScreen() {
             <Text style={styles.badgeText}>TOP {item.rank}</Text>
           </View>
         )}
-      </View>
+
+        <MaterialCommunityIcons name="chevron-right" size={24} color="#CCCCCC" />
+      </TouchableOpacity>
     );
   };
 
@@ -159,6 +180,12 @@ export default function LeaderboardScreen() {
             <Text style={styles.emptyText}>No users yet</Text>
           </View>
         }
+      />
+
+      <UserProfileModal
+        visible={modalVisible}
+        userId={selectedUserId}
+        onClose={handleCloseProfile}
       />
     </View>
   );

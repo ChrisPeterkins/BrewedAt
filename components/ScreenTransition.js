@@ -49,7 +49,7 @@ export default function ScreenTransition({ children, isVisible }) {
 
       setTimeout(() => {
         setShowContent(true);
-      }, 1000);
+      }, 1200);
     }
   }, [isVisible]);
 
