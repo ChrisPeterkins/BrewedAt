@@ -21,13 +21,14 @@ service cloud.firestore {
       // Anyone can read user profiles (for leaderboards, etc.)
       allow read: if isSignedIn();
 
-      // Users can only create their own profile during signup
-      allow create: if isOwner(userId);
+      // Users can create their own profile during signup, admins can create any user
+      allow create: if isOwner(userId) || isAdmin();
 
-      // Users can only update their own profile
-      // Prevent users from setting isAdmin to true
-      allow update: if isOwner(userId)
-                    && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAdmin']));
+      // Users can only update their own profile (except isAdmin field)
+      // Admins can update any user
+      allow update: if (isOwner(userId)
+                    && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAdmin'])))
+                    || isAdmin();
 
       // Only admins can delete users
       allow delete: if isAdmin();
@@ -44,13 +45,14 @@ service cloud.firestore {
 
     // Check-ins collection
     match /checkins/{checkinId} {
-      // Users can read their own check-ins
-      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      // Users can read their own check-ins, admins can read all
+      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
 
-      // Users can create check-ins for themselves only
-      allow create: if isSignedIn()
-                    && request.resource.data.userId == request.auth.uid
-                    && request.resource.data.timestamp is timestamp;
+      // Users can create check-ins for themselves, admins can create any check-in
+      allow create: if isAdmin()
+                    || (isSignedIn()
+                        && request.resource.data.userId == request.auth.uid
+                        && request.resource.data.timestamp is timestamp);
 
       // No one can update check-ins (immutable)
       allow update: if false;
@@ -73,9 +75,9 @@ service cloud.firestore {
       // Users can read their own entries, admins can read all
       allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
 
-      // Users can create entries for themselves only
-      allow create: if isSignedIn()
-                    && request.resource.data.userId == request.auth.uid;
+      // Users can create entries for themselves, admins can create any entry
+      allow create: if isAdmin()
+                    || (isSignedIn() && request.resource.data.userId == request.auth.uid);
 
       // No one can update entries (immutable)
       allow update: if false;

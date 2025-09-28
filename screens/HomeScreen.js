@@ -54,25 +54,24 @@ export default function HomeScreen() {
           style={styles.logo}
           resizeMode="contain"
         />
-        <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
-          <Text style={styles.signOutText}>Sign Out</Text>
-        </TouchableOpacity>
+        <View style={styles.headerRight}>
+          <View style={styles.statBadge}>
+            <MaterialCommunityIcons name="star" size={18} color="#D4922A" />
+            <Text style={styles.statBadgeText}>{userData?.totalPoints || 0}</Text>
+          </View>
+          <View style={styles.statBadge}>
+            <MaterialCommunityIcons name="chevron-triple-up" size={18} color="#D4922A" />
+            <Text style={styles.statBadgeText}>{userData?.level || 1}</Text>
+          </View>
+          <TouchableOpacity style={styles.profileButton} onPress={() => navigation.navigate('Profile')}>
+            <MaterialCommunityIcons name="account-circle" size={32} color="#D4922A" />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <View style={styles.welcomeSection}>
         <Text style={styles.greeting}>Hey, {userData?.name}!</Text>
         <Text style={styles.subtitle}>Ready to discover some great beer?</Text>
-      </View>
-
-      <View style={styles.statsContainer}>
-        <View style={styles.statCard}>
-          <Text style={styles.statNumber}>{userData?.totalPoints || 0}</Text>
-          <Text style={styles.statLabel}>Points</Text>
-        </View>
-        <View style={styles.statCard}>
-          <Text style={styles.statNumber}>Level {userData?.level || 1}</Text>
-          <Text style={styles.statLabel}>Current Level</Text>
-        </View>
       </View>
 
       <Text style={styles.sectionTitle}>Quick Actions</Text>
@@ -137,13 +136,32 @@ const styles = StyleSheet.create({
     width: 150,
     height: 60,
   },
-  signOutButton: {
-    padding: 8,
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
   },
-  signOutText: {
-    color: '#8B4513',
+  statBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 16,
+    gap: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  statBadgeText: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '700',
+    color: '#654321',
+  },
+  profileButton: {
+    padding: 4,
   },
   welcomeSection: {
     marginBottom: 32,
@@ -157,34 +175,6 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     color: '#8B4513',
-  },
-  statsContainer: {
-    flexDirection: 'row',
-    gap: 16,
-    marginBottom: 32,
-  },
-  statCard: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-    padding: 20,
-    borderRadius: 16,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  statNumber: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#D4922A',
-    marginBottom: 4,
-  },
-  statLabel: {
-    fontSize: 14,
-    color: '#8B4513',
-    fontWeight: '500',
   },
   sectionTitle: {
     fontSize: 20,

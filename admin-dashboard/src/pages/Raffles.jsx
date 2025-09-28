@@ -454,16 +454,16 @@ export default function Raffles() {
         {filteredRaffles.map(raffle => {
           const isExpired = isRaffleExpired(raffle);
           return (
-          <div
-            key={raffle.id}
-            style={{
-              backgroundColor: isExpired ? '#FFEBEE' : 'white',
-              padding: '24px',
-              borderRadius: '12px',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-              opacity: isExpired ? 0.8 : 1
-            }}
-          >
+            <div
+              key={raffle.id}
+              style={{
+                backgroundColor: isExpired ? '#FFEBEE' : 'white',
+                padding: '24px',
+                borderRadius: '12px',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                opacity: isExpired ? 0.8 : 1
+              }}
+            >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
@@ -741,8 +741,8 @@ export default function Raffles() {
                 )}
               </div>
             )}
-          </div>
-        );
+            </div>
+          );
         })}
 
         {filteredRaffles.length === 0 && (
