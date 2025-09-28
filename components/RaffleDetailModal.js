@@ -4,23 +4,30 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function RaffleDetailModal({ visible, raffle, onClose, onEnter, userEntries, userPoints }) {
   const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(300)).current;
+  const slideAnim = useRef(new Animated.Value(800)).current;
 
   useEffect(() => {
     if (visible) {
-      Animated.parallel([
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-        Animated.spring(slideAnim, {
-          toValue: 0,
-          tension: 65,
-          friction: 11,
-          useNativeDriver: true,
-        }),
-      ]).start();
+      // Reset animation values immediately EVERY time modal opens
+      fadeAnim.setValue(0);
+      slideAnim.setValue(800);
+
+      // Small delay to let Modal render
+      setTimeout(() => {
+        Animated.parallel([
+          Animated.timing(fadeAnim, {
+            toValue: 1,
+            duration: 300,
+            useNativeDriver: true,
+          }),
+          Animated.spring(slideAnim, {
+            toValue: 0,
+            tension: 65,
+            friction: 11,
+            useNativeDriver: true,
+          }),
+        ]).start();
+      }, 50);
     } else {
       Animated.parallel([
         Animated.timing(fadeAnim, {
@@ -29,11 +36,15 @@ export default function RaffleDetailModal({ visible, raffle, onClose, onEnter, u
           useNativeDriver: true,
         }),
         Animated.timing(slideAnim, {
-          toValue: 300,
+          toValue: 800,
           duration: 200,
           useNativeDriver: true,
         }),
-      ]).start();
+      ]).start(() => {
+        // Reset after close animation completes
+        fadeAnim.setValue(0);
+        slideAnim.setValue(800);
+      });
     }
   }, [visible]);
 
@@ -190,7 +201,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    maxHeight: '90%',
+    height: '90%',
   },
   modalHeader: {
     flexDirection: 'row',

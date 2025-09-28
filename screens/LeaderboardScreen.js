@@ -116,13 +116,7 @@ export default function LeaderboardScreen() {
           </View>
         </View>
 
-        {item.rank <= 3 && (
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>TOP {item.rank}</Text>
-          </View>
-        )}
-
-        <MaterialCommunityIcons name="chevron-right" size={24} color="#CCCCCC" />
+        <MaterialCommunityIcons name="chevron-right" size={24} color="#CCCCCC" style={styles.chevron} />
       </TouchableOpacity>
     );
   };
@@ -142,25 +136,19 @@ export default function LeaderboardScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Leaderboard</Text>
-        <Text style={styles.subtitle}>Top brewmasters in BrewedAt</Text>
-      </View>
-
-      {currentUser && currentUserRank > 0 && (
-        <View style={styles.currentUserBanner}>
-          <View style={styles.bannerContent}>
-            <MaterialCommunityIcons name="account" size={40} color="#D4922A" />
-            <View style={styles.bannerInfo}>
-              <Text style={styles.bannerTitle}>Your Rank</Text>
-              <Text style={styles.bannerRank}>#{currentUserRank}</Text>
-            </View>
-            <View style={styles.bannerStats}>
-              <Text style={styles.bannerPoints}>{currentUser.totalPoints || 0}</Text>
-              <Text style={styles.bannerLabel}>points</Text>
-            </View>
+        <View style={styles.headerTop}>
+          <View>
+            <Text style={styles.title}>Leaderboard</Text>
+            <Text style={styles.subtitle}>Top brewmasters in BrewedAt</Text>
           </View>
+          {currentUser && currentUserRank > 0 && (
+            <View style={styles.rankPill}>
+              <MaterialCommunityIcons name="trophy" size={20} color="#D4922A" />
+              <Text style={styles.rankPillText}>#{currentUserRank}</Text>
+            </View>
+          )}
         </View>
-      )}
+      </View>
 
       <FlatList
         data={leaderboard}
@@ -214,6 +202,11 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#E0E0E0',
   },
+  headerTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   title: {
     fontSize: 28,
     fontWeight: '700',
@@ -224,41 +217,21 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#8B4513',
   },
-  currentUserBanner: {
-    backgroundColor: '#FFF9E6',
-    borderBottomWidth: 2,
-    borderBottomColor: '#D4922A',
-    padding: 16,
-  },
-  bannerContent: {
+  rankPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
+    backgroundColor: '#FFF9E6',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: '#D4922A',
+    gap: 6,
   },
-  bannerInfo: {
-    flex: 1,
-  },
-  bannerTitle: {
-    fontSize: 14,
-    color: '#8B4513',
-    marginBottom: 4,
-  },
-  bannerRank: {
-    fontSize: 24,
+  rankPillText: {
+    fontSize: 18,
     fontWeight: '700',
     color: '#654321',
-  },
-  bannerStats: {
-    alignItems: 'flex-end',
-  },
-  bannerPoints: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#D4922A',
-  },
-  bannerLabel: {
-    fontSize: 12,
-    color: '#8B4513',
   },
   listContent: {
     padding: 20,
@@ -317,16 +290,8 @@ const styles = StyleSheet.create({
     color: '#8B4513',
     fontWeight: '600',
   },
-  badge: {
-    backgroundColor: '#D4922A',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 12,
-  },
-  badgeText: {
-    color: '#FFFFFF',
-    fontSize: 10,
-    fontWeight: '700',
+  chevron: {
+    marginLeft: 8,
   },
   emptyContainer: {
     alignItems: 'center',

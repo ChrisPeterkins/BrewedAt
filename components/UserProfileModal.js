@@ -10,25 +10,34 @@ export default function UserProfileModal({ visible, userId, onClose }) {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ checkins: 0, uniqueBreweries: 0 });
   const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(300)).current;
+  const slideAnim = useRef(new Animated.Value(800)).current;
 
   useEffect(() => {
     if (visible && userId) {
+      // Reset animation values immediately EVERY time modal opens
+      fadeAnim.setValue(0);
+      slideAnim.setValue(800);
+
+      // Start loading and animations together
       loadUserProfile();
-      Animated.parallel([
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-        Animated.spring(slideAnim, {
-          toValue: 0,
-          tension: 65,
-          friction: 11,
-          useNativeDriver: true,
-        }),
-      ]).start();
-    } else {
+
+      // Small delay to let Modal render
+      setTimeout(() => {
+        Animated.parallel([
+          Animated.timing(fadeAnim, {
+            toValue: 1,
+            duration: 300,
+            useNativeDriver: true,
+          }),
+          Animated.spring(slideAnim, {
+            toValue: 0,
+            tension: 65,
+            friction: 11,
+            useNativeDriver: true,
+          }),
+        ]).start();
+      }, 50);
+    } else if (!visible) {
       Animated.parallel([
         Animated.timing(fadeAnim, {
           toValue: 0,
@@ -36,11 +45,15 @@ export default function UserProfileModal({ visible, userId, onClose }) {
           useNativeDriver: true,
         }),
         Animated.timing(slideAnim, {
-          toValue: 300,
+          toValue: 800,
           duration: 200,
           useNativeDriver: true,
         }),
-      ]).start();
+      ]).start(() => {
+        // Reset after close animation completes
+        fadeAnim.setValue(0);
+        slideAnim.setValue(800);
+      });
     }
   }, [visible, userId]);
 
@@ -206,7 +219,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF8E7',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    maxHeight: '90%',
+    height: '90%',
   },
   modalHeader: {
     flexDirection: 'row',

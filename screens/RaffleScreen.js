@@ -249,16 +249,14 @@ export default function RaffleScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Raffles</Text>
-        <Text style={styles.subtitle}>Enter to win exclusive prizes</Text>
-      </View>
-
-      <View style={styles.pointsBanner}>
-        <View style={styles.pointsContent}>
-          <MaterialCommunityIcons name="star" size={32} color="#D4922A" />
-          <View style={styles.pointsInfo}>
-            <Text style={styles.pointsLabel}>Your Points</Text>
-            <Text style={styles.pointsValue}>{userPoints}</Text>
+        <View style={styles.headerTop}>
+          <View>
+            <Text style={styles.title}>Raffles</Text>
+            <Text style={styles.subtitle}>Enter to win exclusive prizes</Text>
+          </View>
+          <View style={styles.pointsPill}>
+            <MaterialCommunityIcons name="star" size={20} color="#D4922A" />
+            <Text style={styles.pointsPillText}>{userPoints}</Text>
           </View>
         </View>
       </View>
@@ -322,6 +320,11 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#E0E0E0',
   },
+  headerTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   title: {
     fontSize: 28,
     fontWeight: '700',
@@ -332,27 +335,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#8B4513',
   },
-  pointsBanner: {
-    backgroundColor: '#FFF9E6',
-    borderBottomWidth: 2,
-    borderBottomColor: '#D4922A',
-    padding: 16,
-  },
-  pointsContent: {
+  pointsPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
+    backgroundColor: '#FFF9E6',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: '#D4922A',
+    gap: 6,
   },
-  pointsInfo: {
-    flex: 1,
-  },
-  pointsLabel: {
-    fontSize: 14,
-    color: '#8B4513',
-    marginBottom: 4,
-  },
-  pointsValue: {
-    fontSize: 28,
+  pointsPillText: {
+    fontSize: 18,
     fontWeight: '700',
     color: '#654321',
   },
