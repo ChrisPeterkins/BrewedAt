@@ -72,9 +72,7 @@ export default function App() {
     <>
       <StatusBar style="auto" />
       <NavigationContainer>
-        <ScreenTransition key={screenKey} isVisible={true}>
-          <AppNavigator />
-        </ScreenTransition>
+        <AppNavigator />
       </NavigationContainer>
     </>
   );

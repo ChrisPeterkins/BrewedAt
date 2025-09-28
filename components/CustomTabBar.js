@@ -4,17 +4,47 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function CustomTabBar({ state, descriptors, navigation, setHideTabBar }) {
   const [isTransitioning, setIsTransitioning] = React.useState(false);
+  const [isMounted, setIsMounted] = React.useState(false);
   const prevIndexRef = React.useRef(state.index);
-  const fadeAnim = useRef(new Animated.Value(1)).current;
-  const slideAnim = useRef(new Animated.Value(0)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(20)).current;
 
   useEffect(() => {
-    if (prevIndexRef.current !== state.index) {
-      setIsTransitioning(true);
-      setHideTabBar(true);
+    if (!isMounted) {
+      setIsMounted(true);
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }
+  }, [isMounted, fadeAnim, slideAnim]);
 
-      fadeAnim.setValue(1);
-      slideAnim.setValue(0);
+  useEffect(() => {
+    if (isMounted && prevIndexRef.current !== state.index) {
+      setIsTransitioning(true);
+
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 20,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]).start(() => {
+        setHideTabBar(true);
+      });
 
       setTimeout(() => {
         setIsTransitioning(false);
@@ -26,12 +56,12 @@ export default function CustomTabBar({ state, descriptors, navigation, setHideTa
         Animated.parallel([
           Animated.timing(fadeAnim, {
             toValue: 1,
-            duration: 400,
+            duration: 200,
             useNativeDriver: true,
           }),
           Animated.timing(slideAnim, {
             toValue: 0,
-            duration: 400,
+            duration: 200,
             useNativeDriver: true,
           }),
         ]).start();
@@ -39,14 +69,19 @@ export default function CustomTabBar({ state, descriptors, navigation, setHideTa
 
       prevIndexRef.current = state.index;
     }
-  }, [state.index, setHideTabBar, fadeAnim, slideAnim]);
+  }, [state.index, setHideTabBar, fadeAnim, slideAnim, isMounted]);
 
   return (
-    <Animated.View style={[styles.tabBar, {
+    <Animated.View style={[{
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      right: 0,
       opacity: fadeAnim,
       transform: [{ translateY: slideAnim }]
     }]}>
-      {state.routes.map((route, index) => {
+      <View style={styles.tabBar}>
+        {state.routes.map((route, index) => {
         const { options } = descriptors[route.key];
         const label = options.tabBarLabel || route.name;
         const isFocused = state.index === index;
@@ -95,6 +130,7 @@ export default function CustomTabBar({ state, descriptors, navigation, setHideTa
           </TouchableOpacity>
         );
       })}
+      </View>
     </Animated.View>
   );
 }
