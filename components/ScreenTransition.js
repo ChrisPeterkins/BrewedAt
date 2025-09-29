@@ -9,11 +9,10 @@ export default function ScreenTransition({ children, isVisible }) {
   const lottieOpacity = useRef(new Animated.Value(1)).current;
   const lottieRef = useRef(null);
   const [showLottie, setShowLottie] = useState(true);
-  const [showContent, setShowContent] = useState(false);
 
   useEffect(() => {
     if (isVisible) {
-      setShowContent(false);
+      // Reset animations
       fadeAnim.setValue(0);
       slideAnim.setValue(20);
       lottieOpacity.setValue(1);
@@ -46,10 +45,6 @@ export default function ScreenTransition({ children, isVisible }) {
       ]).start(() => {
         setShowLottie(false);
       });
-
-      setTimeout(() => {
-        setShowContent(true);
-      }, 1200);
     }
   }, [isVisible]);
 
@@ -59,7 +54,7 @@ export default function ScreenTransition({ children, isVisible }) {
         opacity: fadeAnim,
         transform: [{ translateY: slideAnim }]
       }]}>
-        {showContent && children}
+        {children}
       </Animated.View>
       {showLottie && (
         <Animated.View

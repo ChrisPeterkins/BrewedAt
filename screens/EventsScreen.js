@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, Platform } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase.config';
+import BreweryDetailModal from '../components/BreweryDetailModal';
 
 export default function EventsScreen() {
   const [location, setLocation] = useState(null);
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     requestLocationPermission();
@@ -77,25 +79,41 @@ export default function EventsScreen() {
     return (
       <TouchableOpacity
         style={styles.eventCard}
-        onPress={() => setSelectedEvent(item)}
+        onPress={() => handleBreweryPress(item)}
+        activeOpacity={0.7}
       >
         <View style={styles.eventHeader}>
           <MaterialCommunityIcons name="beer" size={24} color="#D4922A" />
-          <Text style={styles.eventName}>{item.name}</Text>
+          <Text style={styles.eventName} numberOfLines={1} ellipsizeMode="tail">
+            {item.name}
+          </Text>
         </View>
-        <Text style={styles.eventDescription}>{item.description}</Text>
-        <Text style={styles.eventAddress}>{item.address}</Text>
+        <Text style={styles.eventAddress} numberOfLines={2} ellipsizeMode="tail">
+          {item.address}
+        </Text>
         {distance && (
           <View style={styles.eventFooter}>
-            <Text style={styles.distance}>
+            <View style={styles.distanceContainer}>
               <MaterialCommunityIcons name="map-marker" size={14} color="#8B4513" />
-              {' '}{distance} mi away
-            </Text>
-            <Text style={styles.points}>+{item.pointsReward} points</Text>
+              <Text style={styles.distance}>{distance} mi</Text>
+            </View>
+            <Text style={styles.points}>+{item.pointsReward} pts</Text>
           </View>
         )}
       </TouchableOpacity>
     );
+  };
+
+  const handleBreweryPress = (brewery) => {
+    setSelectedEvent(brewery);
+    setModalVisible(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalVisible(false);
+    setTimeout(() => {
+      setSelectedEvent(null);
+    }, 250);
   };
 
   if (loading || !location) {
@@ -144,6 +162,13 @@ export default function EventsScreen() {
           contentContainerStyle={styles.listContent}
         />
       </View>
+
+      <BreweryDetailModal
+        visible={modalVisible}
+        brewery={selectedEvent}
+        onClose={handleCloseModal}
+        userLocation={location}
+      />
     </View>
   );
 }
@@ -175,10 +200,10 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     position: 'absolute',
-    bottom: 0,
+    bottom: Platform.OS === 'ios' ? 100 : 70, // Account for tab bar height
     left: 0,
     right: 0,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FFF8E7',
     paddingTop: 16,
     paddingBottom: 16,
     borderTopLeftRadius: 20,
@@ -188,6 +213,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 5,
+    height: 180, // Fixed height to prevent text cutoff
   },
   listTitle: {
     fontSize: 18,
@@ -198,15 +224,18 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingHorizontal: 20,
+    paddingRight: 40, // Extra padding at the end for last card
   },
   eventCard: {
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
-    padding: 16,
+    padding: 14,
     marginRight: 12,
-    width: 280,
+    width: 240,
     borderWidth: 1,
     borderColor: '#E0E0E0',
+    height: 120, // Fixed height to prevent content overflow
+    justifyContent: 'space-between',
   },
   eventHeader: {
     flexDirection: 'row',
@@ -220,20 +249,21 @@ const styles = StyleSheet.create({
     color: '#654321',
     flex: 1,
   },
-  eventDescription: {
-    fontSize: 14,
-    color: '#8B4513',
-    marginBottom: 8,
-  },
   eventAddress: {
     fontSize: 12,
     color: '#999',
-    marginBottom: 12,
+    marginBottom: 8,
+    lineHeight: 16,
   },
   eventFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  distanceContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   distance: {
     fontSize: 12,
