@@ -36,11 +36,13 @@ service cloud.firestore {
 
     // Events (breweries) collection
     match /events/{eventId} {
-      // Anyone signed in can read events
-      allow read: if isSignedIn();
+      // Anyone can read approved events, signed-in users can read all
+      allow read: if true;
 
-      // Only admins can create, update, or delete events
-      allow create, update, delete: if isAdmin();
+      // Anyone can create events (submissions), but they'll be marked pending
+      // Only admins can update or delete events
+      allow create: if true;
+      allow update, delete: if isAdmin();
     }
 
     // Check-ins collection
