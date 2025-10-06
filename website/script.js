@@ -232,3 +232,128 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+// Photo Carousel
+document.addEventListener('DOMContentLoaded', () => {
+    const track = document.getElementById('carouselTrack');
+    const prevButton = document.getElementById('carouselPrev');
+    const nextButton = document.getElementById('carouselNext');
+    const dotsContainer = document.getElementById('carouselDots');
+
+    if (!track || !prevButton || !nextButton || !dotsContainer) return;
+
+    const slides = Array.from(track.children);
+    const slideCount = slides.length;
+    let currentIndex = 0;
+    let autoplayInterval;
+
+    // Calculate visible slides based on screen width
+    const getVisibleSlides = () => {
+        if (window.innerWidth <= 640) return 1;
+        if (window.innerWidth <= 968) return 2;
+        return 3;
+    };
+
+    // Create dots
+    const createDots = () => {
+        dotsContainer.innerHTML = '';
+        const visibleSlides = getVisibleSlides();
+        const dotCount = Math.max(1, slideCount - visibleSlides + 1);
+
+        for (let i = 0; i < dotCount; i++) {
+            const dot = document.createElement('div');
+            dot.classList.add('carousel-dot');
+            if (i === 0) dot.classList.add('active');
+            dot.addEventListener('click', () => goToSlide(i));
+            dotsContainer.appendChild(dot);
+        }
+    };
+
+    // Update dots
+    const updateDots = () => {
+        const dots = dotsContainer.querySelectorAll('.carousel-dot');
+        dots.forEach((dot, index) => {
+            dot.classList.toggle('active', index === currentIndex);
+        });
+    };
+
+    // Move to slide
+    const goToSlide = (index) => {
+        const visibleSlides = getVisibleSlides();
+        const maxIndex = Math.max(0, slideCount - visibleSlides);
+        currentIndex = Math.max(0, Math.min(index, maxIndex));
+
+        const slideWidth = slides[0].getBoundingClientRect().width;
+        const gap = 20;
+        const offset = -(currentIndex * (slideWidth + gap));
+
+        track.style.transform = `translateX(${offset}px)`;
+        updateDots();
+    };
+
+    // Next slide
+    const nextSlide = () => {
+        const visibleSlides = getVisibleSlides();
+        const maxIndex = Math.max(0, slideCount - visibleSlides);
+        if (currentIndex < maxIndex) {
+            goToSlide(currentIndex + 1);
+        } else {
+            goToSlide(0); // Loop back to start
+        }
+    };
+
+    // Previous slide
+    const prevSlide = () => {
+        if (currentIndex > 0) {
+            goToSlide(currentIndex - 1);
+        } else {
+            const visibleSlides = getVisibleSlides();
+            const maxIndex = Math.max(0, slideCount - visibleSlides);
+            goToSlide(maxIndex); // Loop to end
+        }
+    };
+
+    // Autoplay
+    const startAutoplay = () => {
+        stopAutoplay();
+        autoplayInterval = setInterval(nextSlide, 5000); // Change slide every 5 seconds
+    };
+
+    const stopAutoplay = () => {
+        if (autoplayInterval) {
+            clearInterval(autoplayInterval);
+        }
+    };
+
+    // Event listeners
+    nextButton.addEventListener('click', () => {
+        nextSlide();
+        stopAutoplay();
+        startAutoplay();
+    });
+
+    prevButton.addEventListener('click', () => {
+        prevSlide();
+        stopAutoplay();
+        startAutoplay();
+    });
+
+    // Pause autoplay on hover
+    track.addEventListener('mouseenter', stopAutoplay);
+    track.addEventListener('mouseleave', startAutoplay);
+
+    // Handle window resize
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            createDots();
+            goToSlide(0); // Reset to first slide on resize
+        }, 250);
+    });
+
+    // Initialize
+    createDots();
+    goToSlide(0);
+    startAutoplay();
+});

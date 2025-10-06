@@ -126,42 +126,59 @@ export default function EventsScreen() {
 
   return (
     <View style={styles.container}>
-      <MapView
-        style={styles.map}
-        provider={PROVIDER_GOOGLE}
-        initialRegion={location}
-        showsUserLocation
-        showsMyLocationButton
-      >
-        {events.map((event) => (
-          <Marker
-            key={event.id}
-            coordinate={{
-              latitude: event.coordinates.latitude,
-              longitude: event.coordinates.longitude,
-            }}
-            title={event.name}
-            description={event.description}
-            onPress={() => setSelectedEvent(event)}
+      {Platform.OS === 'web' ? (
+        // Web fallback - show list view only
+        <View style={styles.webContainer}>
+          <Text style={styles.webTitle}>Nearby Breweries ({events.length})</Text>
+          <FlatList
+            data={events}
+            renderItem={renderEventCard}
+            keyExtractor={(item) => item.id}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.webListContent}
+          />
+        </View>
+      ) : (
+        // Native - show map with overlay list
+        <>
+          <MapView
+            style={styles.map}
+            provider={PROVIDER_GOOGLE}
+            initialRegion={location}
+            showsUserLocation
+            showsMyLocationButton
           >
-            <View style={styles.markerContainer}>
-              <MaterialCommunityIcons name="beer" size={30} color="#D4922A" />
-            </View>
-          </Marker>
-        ))}
-      </MapView>
+            {events.map((event) => (
+              <Marker
+                key={event.id}
+                coordinate={{
+                  latitude: event.coordinates.latitude,
+                  longitude: event.coordinates.longitude,
+                }}
+                title={event.name}
+                description={event.description}
+                onPress={() => setSelectedEvent(event)}
+              >
+                <View style={styles.markerContainer}>
+                  <MaterialCommunityIcons name="beer" size={30} color="#D4922A" />
+                </View>
+              </Marker>
+            ))}
+          </MapView>
 
-      <View style={styles.listContainer}>
-        <Text style={styles.listTitle}>Nearby Breweries ({events.length})</Text>
-        <FlatList
-          data={events}
-          renderItem={renderEventCard}
-          keyExtractor={(item) => item.id}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.listContent}
-        />
-      </View>
+          <View style={styles.listContainer}>
+            <Text style={styles.listTitle}>Nearby Breweries ({events.length})</Text>
+            <FlatList
+              data={events}
+              renderItem={renderEventCard}
+              keyExtractor={(item) => item.id}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.listContent}
+            />
+          </View>
+        </>
+      )}
 
       <BreweryDetailModal
         visible={modalVisible}
@@ -274,5 +291,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     color: '#D4922A',
+  },
+  webContainer: {
+    flex: 1,
+    padding: 20,
+  },
+  webTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#654321',
+    marginBottom: 20,
+  },
+  webListContent: {
+    gap: 12,
   },
 });
