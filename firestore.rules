@@ -87,5 +87,14 @@ service cloud.firestore {
       // Only admins can delete entries
       allow delete: if isAdmin();
     }
+
+    // Site configuration collection
+    match /siteConfig/{docId} {
+      // Anyone can read site config (for public website)
+      allow read: if true;
+
+      // Only admins can create, update, or delete site config
+      allow create, update, delete: if isAdmin();
+    }
   }
 }

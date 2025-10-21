@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upcoming Events | BrewedAt</title>
+    <meta name="description" content="Find the best craft beer events, festivals, and taproom happenings in the Greater Philadelphia and New Jersey area.">
+
+    <!-- SEO Meta Tags -->
+    <meta name="keywords" content="craft beer events, brewery events, Philadelphia beer, New Jersey beer, beer festivals">
+    <meta name="author" content="BrewedAt">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://brewedat.com/events.html">
+    <meta property="og:title" content="Upcoming Events | BrewedAt">
+    <meta property="og:description" content="Find the best craft beer events, festivals, and taproom happenings in the Greater Philadelphia and New Jersey area.">
+    <meta property="og:image" content="https://brewedat.com/brewedat-logo.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://brewedat.com/events.html">
+    <meta property="twitter:title" content="Upcoming Events | BrewedAt">
+    <meta property="twitter:description" content="Find the best craft beer events, festivals, and taproom happenings in the Greater Philadelphia and New Jersey area.">
+    <meta property="twitter:image" content="https://brewedat.com/brewedat-logo.png">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/brewedat-logo.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav-container">
+        <div class="nav-content">
+            <div class="logo">
+                <a href="/"><img src="/brewedat-logo.png" alt="BrewedAt Logo" class="logo-img"></a>
+            </div>
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/events.html">Events</a>
+                <a href="/podcast.html">Podcast</a>
+                <a href="/press.html">Press</a>
+                <a href="/for-business.html">Partner With Us</a>
+                <a href="/submit-event.html" class="btn-primary">Submit Event</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <h1>Upcoming Events</h1>
+            <p>Discover the best craft beer events, festivals, and taproom happenings in PA & NJ</p>
+        </div>
+    </section>
+
+    <!-- Event Sections -->
+    <section class="events-section">
+        <div class="container">
+            <!-- BrewedAt Events -->
+            <div class="event-category">
+                <h2>BrewedAt Events</h2>
+                <div class="events-grid" id="brewedat-events">
+                    <!-- Events will be loaded dynamically from Firebase -->
+                    <p style="text-align: center; color: #8B4513;">Loading events...</p>
+                </div>
+            </div>
+
+            <!-- Local Craft & Bar Events -->
+            <div class="event-category">
+                <h2>Local Craft & Bar Events</h2>
+                <div class="events-grid" id="local-events">
+                    <!-- Events will be loaded dynamically from Firebase -->
+                    <p style="text-align: center; color: #8B4513;">Loading events...</p>
+                </div>
+            </div>
+
+            <!-- Hall of Champions -->
+            <div class="event-category">
+                <h2>Hall of Champions</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 2rem;">Celebrating the legends of our gaming tournaments</p>
+
+                <div class="champions-compact">
+                    <div class="champion-card-compact">
+                        <div class="champion-header-compact">
+                            <div class="category-icon-text">Racing</div>
+                            <div>
+                                <h3>Mario Kart</h3>
+                                <p class="platform">Nintendo Switch</p>
+                            </div>
+                        </div>
+                        <p>64-player tournaments in 150cc. Speed, strategy, and a little bit of chaos.</p>
+                        <div class="champion-placeholder-small">
+                            <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="30" cy="30" r="28" stroke="#D4922A" stroke-width="3"/>
+                                <path d="M30 15L33.75 26.25L45 26.25L36 33.75L39.75 45L30 37.5L20.25 45L24 33.75L15 26.25L26.25 26.25L30 15Z" fill="#D4922A"/>
+                            </svg>
+                            <p>Champions TBA</p>
+                        </div>
+                    </div>
+
+                    <div class="champion-card-compact">
+                        <div class="champion-header-compact">
+                            <div class="category-icon-text">Fighting</div>
+                            <div>
+                                <h3>Super Smash Bros. Ultimate</h3>
+                                <p class="platform">Nintendo Switch</p>
+                            </div>
+                        </div>
+                        <p>Intense 64-player brackets. 3-stock, no items, pure skill.</p>
+                        <div class="champion-placeholder-small">
+                            <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="30" cy="30" r="28" stroke="#D4922A" stroke-width="3"/>
+                                <path d="M30 15L33.75 26.25L45 26.25L36 33.75L39.75 45L30 37.5L20.25 45L24 33.75L15 26.25L26.25 26.25L30 15Z" fill="#D4922A"/>
+                            </svg>
+                            <p>Champions TBA</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Event CTA -->
+            <div class="submit-event-cta">
+                <h2>Have an Event?</h2>
+                <p>Hosting an event at a craft beverage location or local bar in Greater Philadelphia, New Jersey or Surrounding Areas? Have it featured on BrewedAt!</p>
+                <a href="/submit-event.html" class="btn-large btn-primary">Submit Your Event</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="/brewedat-logo.png" alt="BrewedAt Logo" class="footer-logo-img">
+                </div>
+                <div class="footer-links">
+                    <a href="/events.html">Events</a>
+                    <a href="/podcast.html">Podcast</a>
+                    <a href="/press.html">Press</a>
+                    <a href="/for-business.html">Partner With Us</a>
+                    <a href="/submit-event.html">Submit Event</a>
+                </div>
+                <div class="footer-social">
+                    <a href="#" aria-label="Twitter">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M23 3C22 3.5 21 4 20 4C19 3 18 2 16.5 2C13.5 2 11 4.5 11 7.5C11 8 11 8.5 11 9C7.5 9 4.5 7 2 4C1.5 5 1 6 1 7.5C1 9.5 2 11 3.5 12C2.5 12 2 11.5 1 11C1 14 3 16 5.5 16.5C5 16.5 4.5 17 4 17C3.5 17 3 17 2.5 16.5C3 18.5 5 20 7.5 20C5.5 21.5 3 22 1 22C3 23.5 5.5 24 8 24C16.5 24 21 17 21 8.5C21 8 21 8 21 7.5C22 7 22.5 6 23 5C22 5.5 21 6 20 6C21 5 22 4 23 3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </a>
+                    <a href="#" aria-label="Instagram">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="2"/>
+                            <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2"/>
+                            <circle cx="17.5" cy="6.5" r="1.5" fill="currentColor"/>
+                        </svg>
+                    </a>
+                    <a href="#" aria-label="Facebook">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M24 12C24 5.37258 18.6274 0 12 0C5.37258 0 0 5.37258 0 12C0 17.9895 4.38823 22.954 10.125 23.8542V15.4688H7.07812V12H10.125V9.35625C10.125 6.34875 11.9165 4.6875 14.6576 4.6875C15.9705 4.6875 17.3438 4.92188 17.3438 4.92188V7.875H15.8306C14.3399 7.875 13.875 8.80001 13.875 9.74899V12H17.2031L16.6711 15.4688H13.875V23.8542C19.6118 22.954 24 17.9895 24 12Z" fill="currentColor"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 BrewedAt. All rights reserved. Drink responsibly.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script type="module" src="events.js"></script>
+</body>
+</html>

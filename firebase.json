@@ -2,5 +2,40 @@
   "firestore": {
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
-  }
+  },
+  "hosting": [
+    {
+      "target": "public",
+      "public": "web/dist/public",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ],
+      "headers": [
+        {
+          "source": "**/*.@(js|css)",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "max-age=31536000"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "target": "admin",
+      "public": "web/dist/admin",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ]
+    }
+  ]
 }

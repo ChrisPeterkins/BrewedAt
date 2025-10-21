@@ -1,7 +1,19 @@
 {
   "projects": {
+    "default": "brewedat",
     "dev": "brewedat"
   },
-  "targets": {},
+  "targets": {
+    "brewedat": {
+      "hosting": {
+        "public": [
+          "brewedat"
+        ],
+        "admin": [
+          "brewedat-admin"
+        ]
+      }
+    }
+  },
   "etags": {}
 }
