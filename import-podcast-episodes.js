@@ -19,7 +19,7 @@ async function fetchYouTubeVideos() {
   let pageToken = '';
 
   do {
-    const url = `https://www.googleapis.com/youtube/v3/search?key=${YOUTUBE_API_KEY}&channelId=${CHANNEL_ID}&part=snippet,id&order=date&maxResults=50&type=video${pageToken ? `&pageToken=${pageToken}` : ''}`;
+    const url = `https://www.googleapis.com/youtube/v3/search?key=${YOUTUBE_API_KEY}&channelId=${CHANNEL_ID}&part=snippet,id&order=date&maxResults=50&type=video&videoDuration=long${pageToken ? `&pageToken=${pageToken}` : ''}`;
 
     const response = await fetch(url);
     const data = await response.json();
@@ -48,20 +48,18 @@ async function importEpisodesToFirestore(videos) {
   console.log(`\nImporting ${videos.length} episodes to Firestore...`);
 
   let imported = 0;
-  let skipped = 0;
+  let withoutNumber = 0;
 
   for (const video of videos) {
     const { snippet, id } = video;
     const episodeNumber = await extractEpisodeNumber(snippet.title);
 
     if (!episodeNumber) {
-      console.log(`⚠️  Skipping: "${snippet.title}" (no episode number found)`);
-      skipped++;
-      continue;
+      withoutNumber++;
     }
 
     const episodeData = {
-      episodeNumber,
+      episodeNumber: episodeNumber || 0, // Set to 0 if no number found - can be edited manually later
       title: snippet.title,
       description: snippet.description,
       publishDate: admin.firestore.Timestamp.fromDate(new Date(snippet.publishedAt)),
@@ -80,16 +78,20 @@ async function importEpisodesToFirestore(videos) {
 
     try {
       await db.collection('podcastEpisodes').add(episodeData);
-      console.log(`✅ Imported Episode ${episodeNumber}: ${snippet.title}`);
+      if (episodeNumber) {
+        console.log(`✅ Imported Episode ${episodeNumber}: ${snippet.title}`);
+      } else {
+        console.log(`✅ Imported (no #): ${snippet.title}`);
+      }
       imported++;
     } catch (error) {
-      console.error(`❌ Error importing episode ${episodeNumber}:`, error.message);
+      console.error(`❌ Error importing "${snippet.title}":`, error.message);
     }
   }
 
   console.log(`\n✨ Import complete!`);
   console.log(`   Imported: ${imported}`);
-  console.log(`   Skipped: ${skipped}`);
+  console.log(`   Without episode #: ${withoutNumber}`);
   console.log(`   Total: ${videos.length}`);
 }
 
@@ -126,11 +128,11 @@ async function main() {
 
     console.log(`\n✅ Found ${videos.length} videos\n`);
 
-    // Sort by episode number (newest first)
+    // Sort by publish date (newest first)
     videos.sort((a, b) => {
-      const numA = extractEpisodeNumber(a.snippet.title);
-      const numB = extractEpisodeNumber(b.snippet.title);
-      return (numB || 0) - (numA || 0);
+      const dateA = new Date(a.snippet.publishedAt);
+      const dateB = new Date(b.snippet.publishedAt);
+      return dateB - dateA;
     });
 
     await importEpisodesToFirestore(videos);
