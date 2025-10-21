@@ -132,6 +132,8 @@ export interface PodcastEpisode {
   guestName?: string;
   thumbnailUrl?: string;
   featured: boolean;
+  videoType?: 'episode' | 'short'; // Type of content
+  durationSeconds?: number; // Duration in seconds
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
@@ -150,6 +152,8 @@ export interface PodcastFormData {
   guestName: string;
   thumbnailUrl: string;
   featured: boolean;
+  videoType: 'episode' | 'short';
+  durationSeconds: number;
 }
 
 // Homepage Content Types

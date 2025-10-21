@@ -18,8 +18,9 @@ async function fetchYouTubeVideos() {
   const videos = [];
   let pageToken = '';
 
+  // First, fetch all video IDs
   do {
-    const url = `https://www.googleapis.com/youtube/v3/search?key=${YOUTUBE_API_KEY}&channelId=${CHANNEL_ID}&part=snippet,id&order=date&maxResults=50&type=video&videoDuration=long${pageToken ? `&pageToken=${pageToken}` : ''}`;
+    const url = `https://www.googleapis.com/youtube/v3/search?key=${YOUTUBE_API_KEY}&channelId=${CHANNEL_ID}&part=snippet,id&order=date&maxResults=50&type=video${pageToken ? `&pageToken=${pageToken}` : ''}`;
 
     const response = await fetch(url);
     const data = await response.json();
@@ -38,6 +39,39 @@ async function fetchYouTubeVideos() {
   return videos;
 }
 
+async function getVideoDurations(videoIds) {
+  const durations = {};
+
+  // Process in batches of 50 (YouTube API limit)
+  for (let i = 0; i < videoIds.length; i += 50) {
+    const batch = videoIds.slice(i, i + 50);
+    const url = `https://www.googleapis.com/youtube/v3/videos?key=${YOUTUBE_API_KEY}&id=${batch.join(',')}&part=contentDetails`;
+
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (data.error) {
+      console.error('YouTube API Error:', data.error.message);
+      throw new Error(data.error.message);
+    }
+
+    data.items.forEach(item => {
+      durations[item.id] = parseDuration(item.contentDetails.duration);
+    });
+  }
+
+  return durations;
+}
+
+function parseDuration(isoDuration) {
+  // Parse ISO 8601 duration format (e.g., PT1H23M45S)
+  const match = isoDuration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+  const hours = parseInt(match[1] || 0);
+  const minutes = parseInt(match[2] || 0);
+  const seconds = parseInt(match[3] || 0);
+  return hours * 3600 + minutes * 60 + seconds;
+}
+
 async function extractEpisodeNumber(title) {
   // Try to extract episode number from title (e.g., "#60", "Episode 60", "Ep 60")
   const match = title.match(/#?(\d+)/);
@@ -45,43 +79,59 @@ async function extractEpisodeNumber(title) {
 }
 
 async function importEpisodesToFirestore(videos) {
-  console.log(`\nImporting ${videos.length} episodes to Firestore...`);
+  console.log(`\nFetching video durations...`);
+
+  const videoIds = videos.map(v => v.id.videoId);
+  const durations = await getVideoDurations(videoIds);
+
+  console.log(`\nImporting ${videos.length} videos to Firestore...\n`);
 
   let imported = 0;
   let withoutNumber = 0;
+  let episodeCount = 0;
+  let shortCount = 0;
 
   for (const video of videos) {
     const { snippet, id } = video;
     const episodeNumber = await extractEpisodeNumber(snippet.title);
+    const durationSeconds = durations[id.videoId] || 0;
+    const videoType = durationSeconds > 600 ? 'episode' : 'short'; // 600 seconds = 10 minutes
 
     if (!episodeNumber) {
       withoutNumber++;
     }
 
+    if (videoType === 'episode') {
+      episodeCount++;
+    } else {
+      shortCount++;
+    }
+
     const episodeData = {
-      episodeNumber: episodeNumber || 0, // Set to 0 if no number found - can be edited manually later
-      title: snippet.title,
+      episodeNumber: 0, // Set manually in admin panel
+      title: snippet.title, // Use title as-is from YouTube
       description: snippet.description,
       publishDate: admin.firestore.Timestamp.fromDate(new Date(snippet.publishedAt)),
       youtubeUrl: `https://www.youtube.com/watch?v=${id.videoId}`,
       thumbnailUrl: snippet.thumbnails.high?.url || snippet.thumbnails.default.url,
       featured: false,
-      // Extract guest name from title if format is consistent
-      guestName: extractGuestName(snippet.title),
-      // You can manually add these later in admin panel
+      videoType: videoType, // 'episode' or 'short'
+      durationSeconds: durationSeconds,
+      duration: formatDuration(durationSeconds),
+      guestName: '', // Add manually in admin panel
       spotifyUrl: '',
       appleUrl: '',
-      duration: '',
       createdAt: admin.firestore.Timestamp.now(),
       updatedAt: admin.firestore.Timestamp.now(),
     };
 
     try {
       await db.collection('podcastEpisodes').add(episodeData);
+      const typeLabel = videoType === 'episode' ? '🎙️' : '📹';
       if (episodeNumber) {
-        console.log(`✅ Imported Episode ${episodeNumber}: ${snippet.title}`);
+        console.log(`✅ ${typeLabel} Episode ${episodeNumber}: ${snippet.title}`);
       } else {
-        console.log(`✅ Imported (no #): ${snippet.title}`);
+        console.log(`✅ ${typeLabel} (no #): ${snippet.title.substring(0, 60)}...`);
       }
       imported++;
     } catch (error) {
@@ -90,9 +140,22 @@ async function importEpisodesToFirestore(videos) {
   }
 
   console.log(`\n✨ Import complete!`);
-  console.log(`   Imported: ${imported}`);
+  console.log(`   Total imported: ${imported}`);
+  console.log(`   Full episodes (>10 min): ${episodeCount}`);
+  console.log(`   Shorts (≤10 min): ${shortCount}`);
   console.log(`   Without episode #: ${withoutNumber}`);
-  console.log(`   Total: ${videos.length}`);
+}
+
+function formatDuration(seconds) {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = seconds % 60;
+
+  if (hours > 0) {
+    return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  } else {
+    return `${minutes}:${secs.toString().padStart(2, '0')}`;
+  }
 }
 
 function extractGuestName(title) {
