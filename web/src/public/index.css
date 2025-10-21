@@ -161,6 +161,13 @@ p {
     font-size: 1.125rem;
 }
 
+.button-group {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 24px;
+}
+
 /* Hero Section */
 .hero {
     padding: 120px 20px 80px;

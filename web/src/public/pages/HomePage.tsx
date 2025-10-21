@@ -222,7 +222,10 @@ export default function HomePage() {
                 <li>Beer festivals and tastings</li>
                 <li>Community meetups</li>
               </ul>
-              <a href="/events" className="btn-large btn-primary">View All Events</a>
+              <div className="button-group">
+                <a href="/events" className="btn-large btn-primary">View All Events</a>
+                <a href="/get-involved" className="btn-large btn-secondary">Submit an Event</a>
+              </div>
             </div>
             <div className="content-visual">
               {featuredEvents.length > 0 ? (

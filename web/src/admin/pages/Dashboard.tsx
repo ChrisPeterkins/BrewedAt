@@ -8,8 +8,9 @@ import Content from './Content';
 import Analytics from './Analytics';
 import Raffles from './Raffles';
 import DataManagement from './DataManagement';
+import ContactSubmissions from './ContactSubmissions';
 
-type TabType = 'events' | 'podcast' | 'content' | 'analytics' | 'breweries' | 'raffles' | 'data';
+type TabType = 'events' | 'podcast' | 'content' | 'analytics' | 'breweries' | 'raffles' | 'data' | 'contact';
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<TabType>('events');
@@ -101,6 +102,19 @@ export default function Dashboard() {
         <button
           style={{
             ...styles.navButton,
+            ...(activeTab === 'contact' ? styles.navButtonActive : {})
+          }}
+          onClick={() => setActiveTab('contact')}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <polyline points="22,6 12,13 2,6"/>
+          </svg>
+          Contact
+        </button>
+        <button
+          style={{
+            ...styles.navButton,
             ...(activeTab === 'raffles' ? styles.navButtonActive : {})
           }}
           onClick={() => setActiveTab('raffles')}
@@ -132,6 +146,7 @@ export default function Dashboard() {
         {activeTab === 'content' && <Content />}
         {activeTab === 'analytics' && <Analytics />}
         {activeTab === 'breweries' && <BreweryTable />}
+        {activeTab === 'contact' && <ContactSubmissions />}
         {activeTab === 'raffles' && <Raffles />}
         {activeTab === 'data' && <DataManagement />}
       </main>
