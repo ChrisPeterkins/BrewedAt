@@ -2221,7 +2221,7 @@ html {
 /* Large Content Sections (Events, Podcast, Social) */
 .events-highlight,
 .podcast-highlight,
-.social-highlight {
+.instagram-feed-section {
     padding: 100px 0;
 }
 
@@ -2233,7 +2233,7 @@ html {
     background: var(--secondary-bg);
 }
 
-.social-highlight {
+.instagram-feed-section {
     background: var(--primary-bg);
 }
 
@@ -2481,68 +2481,133 @@ html {
     margin-bottom: 0;
 }
 
-.social-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 2rem;
-    margin: 2rem 0;
-    padding: 2rem;
-    background: var(--secondary-bg);
-    border-radius: 16px;
-    border: 2px solid var(--border-color);
-}
-
-.social-stat {
+/* Instagram Feed Section */
+.section-header-center {
     text-align: center;
+    margin-bottom: 3rem;
 }
 
-.social-stat .stat-number {
-    display: block;
-    font-size: 2rem;
+.section-header-center h2 {
+    font-size: 2.5rem;
     font-weight: 800;
-    color: var(--accent-color);
-    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
 }
 
-.social-stat .stat-label {
-    display: block;
-    font-size: 0.875rem;
+.section-header-center p {
+    font-size: 1.125rem;
     color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    max-width: 600px;
+    margin: 0 auto 1.5rem;
 }
 
-.social-links-large {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
+.social-buttons-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    max-width: 800px;
+    margin: 2rem auto 0;
 }
 
-.social-button {
+.social-platform-button {
     display: flex;
+    flex-direction: column;
     align-items: center;
     gap: 0.75rem;
-    padding: 1rem 1.5rem;
-    background: var(--secondary-bg);
-    border: 2px solid var(--border-color);
-    border-radius: 12px;
-    color: var(--text-primary);
+    padding: 2rem 1.5rem;
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 16px;
     text-decoration: none;
-    font-weight: 600;
     transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
-.social-button:hover {
-    background: var(--accent-color);
-    border-color: var(--accent-color);
+.social-platform-button:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.social-platform-button svg {
+    width: 48px;
+    height: 48px;
+}
+
+.social-platform-button .platform-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.social-platform-button .platform-handle {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+/* Instagram branding */
+.social-platform-button.instagram svg {
+    stroke: #E4405F;
+}
+
+.social-platform-button.instagram:hover {
+    border-color: #E4405F;
+    background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+}
+
+.social-platform-button.instagram:hover .platform-name,
+.social-platform-button.instagram:hover .platform-handle {
     color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px var(--shadow-medium);
 }
 
-.social-button svg {
-    width: 24px;
-    height: 24px;
+.social-platform-button.instagram:hover svg {
+    stroke: white;
+}
+
+/* Facebook branding */
+.social-platform-button.facebook svg {
+    fill: #1877F2;
+}
+
+.social-platform-button.facebook:hover {
+    border-color: #1877F2;
+    background: #1877F2;
+}
+
+.social-platform-button.facebook:hover .platform-name,
+.social-platform-button.facebook:hover .platform-handle {
+    color: white;
+}
+
+.social-platform-button.facebook:hover svg {
+    fill: white;
+}
+
+/* TikTok branding */
+.social-platform-button.tiktok svg {
+    fill: #000000;
+}
+
+.social-platform-button.tiktok:hover {
+    border-color: #000000;
+    background: #000000;
+}
+
+.social-platform-button.tiktok:hover .platform-name,
+.social-platform-button.tiktok:hover .platform-handle {
+    color: white;
+}
+
+.social-platform-button.tiktok:hover svg {
+    fill: #00f2ea;
+}
+
+.instagram-embed-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
 }
 
 @media (max-width: 968px) {
@@ -2557,25 +2622,26 @@ html {
         height: 350px;
     }
 
-    .social-stats {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-    }
-
     .events-highlight,
     .podcast-highlight,
-    .social-highlight {
+    .instagram-feed-section {
         padding: 60px 0;
     }
-}
 
-@media (max-width: 640px) {
-    .social-links-large {
-        flex-direction: column;
+    .section-header-center h2 {
+        font-size: 2rem;
     }
 
-    .social-button {
-        width: 100%;
-        justify-content: center;
+    .section-header-center p {
+        font-size: 1rem;
+    }
+
+    .social-buttons-grid {
+        grid-template-columns: 1fr;
+        max-width: 400px;
+    }
+
+    .social-platform-button {
+        padding: 1.5rem 1rem;
     }
 }

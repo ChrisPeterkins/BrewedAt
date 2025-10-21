@@ -302,49 +302,59 @@ export default function HomePage() {
       </section>
 
       {/* Social Media Section */}
-      <section id="social" className="social-highlight">
+      <section id="social" className="instagram-feed-section">
         <div className="container">
-          <div className="content-split">
-            <div className="content-text">
-              <h2>Follow Our Journey</h2>
-              <p>Stay connected with the latest beer news, event updates, and behind-the-scenes content. We share everything from brewery spotlights to event highlights, keeping you in the loop on all things craft beer in PA & NJ.</p>
-              <div className="social-stats">
-                <div className="social-stat">
-                  <span className="stat-number">{totalFollowers}</span>
-                  <span className="stat-label">Total Followers</span>
-                </div>
-                <div className="social-stat">
-                  <span className="stat-number">4</span>
-                  <span className="stat-label">Platforms</span>
-                </div>
-                <div className="social-stat">
-                  <span className="stat-number">Daily</span>
-                  <span className="stat-label">Updates</span>
-                </div>
-              </div>
-              <div className="social-links-large">
-                <a href={socialStats?.instagram?.handle ? `https://instagram.com/${socialStats.instagram.handle}` : '#'} className="social-button">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" strokeWidth="2" fill="none"/><circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="2" fill="none"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor"/></svg>
-                  Instagram
-                </a>
-                <a href={socialStats?.facebook?.handle ? `https://facebook.com/${socialStats.facebook.handle}` : '#'} className="social-button">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12C24 5.37258 18.6274 0 12 0C5.37258 0 0 5.37258 0 12C0 17.9895 4.38823 22.954 10.125 23.8542V15.4688H7.07812V12H10.125V9.35625C10.125 6.34875 11.9165 4.6875 14.6576 4.6875C15.9705 4.6875 17.3438 4.92188 17.3438 4.92188V7.875H15.8306C14.3399 7.875 13.875 8.80001 13.875 9.74899V12H17.2031L16.6711 15.4688H13.875V23.8542C19.6118 22.954 24 17.9895 24 12Z"/></svg>
-                  Facebook
-                </a>
-                <a href={socialStats?.twitter?.handle ? `https://twitter.com/${socialStats.twitter.handle}` : '#'} className="social-button">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3C22 3.5 21 4 20 4C19 3 18 2 16.5 2C13.5 2 11 4.5 11 7.5C11 8 11 8.5 11 9C7.5 9 4.5 7 2 4C1.5 5 1 6 1 7.5C1 9.5 2 11 3.5 12C2.5 12 2 11.5 1 11C1 14 3 16 5.5 16.5C5 16.5 4.5 17 4 17C3.5 17 3 17 2.5 16.5C3 18.5 5 20 7.5 20C5.5 21.5 3 22 1 22C3 23.5 5.5 24 8 24C16.5 24 21 17 21 8.5C21 8 21 8 21 7.5C22 7 22.5 6 23 5C22 5.5 21 6 20 6C21 5 22 4 23 3Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                  Twitter
-                </a>
-              </div>
+          <div className="section-header-center">
+            <h2>Follow Our Journey</h2>
+            <p>Stay connected with the latest brewery visits, event highlights, and craft beer community moments</p>
+
+            <div className="social-buttons-grid">
+              <a
+                href="https://www.instagram.com/brewedat/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="social-platform-button instagram"
+              >
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                  <rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" strokeWidth="2" fill="none"/>
+                  <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="2" fill="none"/>
+                  <circle cx="17.5" cy="6.5" r="1.5" fill="currentColor"/>
+                </svg>
+                <span className="platform-name">Instagram</span>
+                <span className="platform-handle">@brewedat</span>
+              </a>
+
+              <a
+                href="https://www.facebook.com/brewedat"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="social-platform-button facebook"
+              >
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M24 12C24 5.37258 18.6274 0 12 0C5.37258 0 0 5.37258 0 12C0 17.9895 4.38823 22.954 10.125 23.8542V15.4688H7.07812V12H10.125V9.35625C10.125 6.34875 11.9165 4.6875 14.6576 4.6875C15.9705 4.6875 17.3438 4.92188 17.3438 4.92188V7.875H15.8306C14.3399 7.875 13.875 8.80001 13.875 9.74899V12H17.2031L16.6711 15.4688H13.875V23.8542C19.6118 22.954 24 17.9895 24 12Z"/>
+                </svg>
+                <span className="platform-name">Facebook</span>
+                <span className="platform-handle">BrewedAt</span>
+              </a>
+
+              <a
+                href="https://www.tiktok.com/@brewedat"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="social-platform-button tiktok"
+              >
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+                </svg>
+                <span className="platform-name">TikTok</span>
+                <span className="platform-handle">@brewedat</span>
+              </a>
             </div>
-            <div className="content-visual">
-              <div className="visual-placeholder" style={{ background: 'linear-gradient(135deg, #8B4513 0%, #654321 100%)' }}>
-                <div className="placeholder-text">
-                  <h3>Social Feed</h3>
-                  <p>Latest posts and updates</p>
-                </div>
-              </div>
-            </div>
+          </div>
+
+          <div className="instagram-embed-container">
+            <script src="https://static.elfsight.com/platform/platform.js" data-use-service-core defer></script>
+            <div className="elfsight-app-d8c826a7-8aa0-4d9b-9e2f-7a8e6c5d4b3a" data-elfsight-app-lazy></div>
           </div>
         </div>
       </section>
