@@ -2508,104 +2508,141 @@ html {
     margin: 0 auto 1.5rem;
 }
 
-.social-buttons-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-    max-width: 800px;
-    margin: 2rem auto 0;
+/* Compact Social Buttons */
+.social-buttons-compact {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 2rem auto;
 }
 
-.social-platform-button {
-    display: flex;
-    flex-direction: column;
+.social-button-compact {
+    display: inline-flex;
     align-items: center;
-    gap: 0.75rem;
-    padding: 2rem 1.5rem;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
     background: white;
     border: 2px solid #e0e0e0;
-    border-radius: 16px;
+    border-radius: 50px;
     text-decoration: none;
+    font-size: 0.9375rem;
+    font-weight: 600;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
-.social-platform-button:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+.social-button-compact:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
-.social-platform-button svg {
-    width: 48px;
-    height: 48px;
+.social-button-compact svg {
+    width: 20px;
+    height: 20px;
 }
 
-.social-platform-button .platform-name {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--text-primary);
+/* Instagram */
+.social-button-compact.instagram {
+    color: #E4405F;
 }
 
-.social-platform-button .platform-handle {
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-}
-
-/* Instagram branding */
-.social-platform-button.instagram svg {
+.social-button-compact.instagram svg {
     stroke: #E4405F;
 }
 
-.social-platform-button.instagram:hover {
-    border-color: #E4405F;
+.social-button-compact.instagram:hover {
     background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-}
-
-.social-platform-button.instagram:hover .platform-name,
-.social-platform-button.instagram:hover .platform-handle {
+    border-color: #E4405F;
     color: white;
 }
 
-.social-platform-button.instagram:hover svg {
+.social-button-compact.instagram:hover svg {
     stroke: white;
 }
 
-/* Facebook branding */
-.social-platform-button.facebook svg {
+/* Facebook */
+.social-button-compact.facebook {
+    color: #1877F2;
+}
+
+.social-button-compact.facebook svg {
     fill: #1877F2;
 }
 
-.social-platform-button.facebook:hover {
-    border-color: #1877F2;
+.social-button-compact.facebook:hover {
     background: #1877F2;
-}
-
-.social-platform-button.facebook:hover .platform-name,
-.social-platform-button.facebook:hover .platform-handle {
+    border-color: #1877F2;
     color: white;
 }
 
-.social-platform-button.facebook:hover svg {
+.social-button-compact.facebook:hover svg {
     fill: white;
 }
 
-/* TikTok branding */
-.social-platform-button.tiktok svg {
+/* TikTok */
+.social-button-compact.tiktok {
+    color: #000000;
+}
+
+.social-button-compact.tiktok svg {
     fill: #000000;
 }
 
-.social-platform-button.tiktok:hover {
-    border-color: #000000;
+.social-button-compact.tiktok:hover {
     background: #000000;
-}
-
-.social-platform-button.tiktok:hover .platform-name,
-.social-platform-button.tiktok:hover .platform-handle {
+    border-color: #000000;
     color: white;
 }
 
-.social-platform-button.tiktok:hover svg {
+.social-button-compact.tiktok:hover svg {
     fill: #00f2ea;
+}
+
+/* Social Content Grid */
+.social-content-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.social-feed-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.social-feed-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    font-weight: 700;
+    font-size: 1.125rem;
+    color: white;
+}
+
+.social-feed-header.instagram-theme {
+    background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+}
+
+.social-feed-header.facebook-theme {
+    background: #1877F2;
+}
+
+.social-feed-header.tiktok-theme {
+    background: #000000;
+}
+
+.social-feed-embed {
+    padding: 1.5rem;
+    min-height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #FAFAF8;
 }
 
 .instagram-embed-container {
@@ -2643,12 +2680,21 @@ html {
         font-size: 1rem;
     }
 
-    .social-buttons-grid {
-        grid-template-columns: 1fr;
-        max-width: 400px;
+    .social-buttons-compact {
+        flex-direction: column;
+        align-items: stretch;
+        max-width: 300px;
     }
 
-    .social-platform-button {
-        padding: 1.5rem 1rem;
+    .social-button-compact {
+        justify-content: center;
+    }
+
+    .social-content-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .social-feed-card {
+        max-width: 100%;
     }
 }
