@@ -40,8 +40,8 @@ export default function Navigation() {
               {link.label}
             </Link>
           ))}
-          <Link to="/submit-event" style={styles.ctaButton}>
-            Submit Event
+          <Link to="/get-involved" style={styles.ctaButton}>
+            Contact Us
           </Link>
         </div>
 
@@ -69,11 +69,11 @@ export default function Navigation() {
             </Link>
           ))}
           <Link
-            to="/submit-event"
+            to="/get-involved"
             style={styles.mobileCtaButton}
             onClick={() => setMobileMenuOpen(false)}
           >
-            Submit Event
+            Contact Us
           </Link>
         </div>
       )}
@@ -83,11 +83,14 @@ export default function Navigation() {
 
 const styles = {
   nav: {
-    backgroundColor: '#FFFFFF',
-    borderBottom: '1px solid #E0E0E0',
+    backgroundColor: 'rgba(255, 255, 255, 0.85)',
+    backdropFilter: 'blur(12px)',
+    WebkitBackdropFilter: 'blur(12px)',
+    borderBottom: '1px solid rgba(0, 0, 0, 0.1)',
     position: 'sticky' as const,
     top: 0,
     zIndex: 1000,
+    boxShadow: '0 2px 12px rgba(0, 0, 0, 0.08)',
   },
   container: {
     maxWidth: '1200px',
@@ -111,7 +114,7 @@ const styles = {
     gap: '32px',
   },
   navLink: {
-    color: '#654321',
+    color: '#1f3540',
     fontSize: '15px',
     fontWeight: '500' as const,
     textDecoration: 'none',
@@ -120,11 +123,11 @@ const styles = {
     borderBottom: '2px solid transparent',
   },
   navLinkActive: {
-    color: '#D4922A',
-    borderBottomColor: '#D4922A',
+    color: 'var(--color-secondary)',
+    borderBottomColor: 'var(--color-secondary)',
   },
   ctaButton: {
-    backgroundColor: '#D4922A',
+    backgroundColor: 'var(--color-secondary)',
     color: '#FFFFFF',
     padding: '10px 20px',
     borderRadius: '6px',
@@ -138,7 +141,7 @@ const styles = {
     backgroundColor: 'transparent',
     border: 'none',
     fontSize: '24px',
-    color: '#654321',
+    color: '#1f3540',
     padding: '8px',
   },
   mobileMenu: {
@@ -146,19 +149,21 @@ const styles = {
     flexDirection: 'column' as const,
     gap: '8px',
     padding: '16px 24px',
-    borderTop: '1px solid #E0E0E0',
-    backgroundColor: '#FFFFFF',
+    borderTop: '1px solid rgba(0, 0, 0, 0.1)',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    backdropFilter: 'blur(12px)',
+    WebkitBackdropFilter: 'blur(12px)',
   },
   mobileLink: {
-    color: '#654321',
+    color: '#1f3540',
     fontSize: '16px',
     fontWeight: '500' as const,
     padding: '12px 0',
     textDecoration: 'none',
-    borderBottom: '1px solid #F5F5F5',
+    borderBottom: '1px solid #E0E0E0',
   },
   mobileCtaButton: {
-    backgroundColor: '#D4922A',
+    backgroundColor: 'var(--color-secondary)',
     color: '#FFFFFF',
     padding: '12px 20px',
     borderRadius: '6px',

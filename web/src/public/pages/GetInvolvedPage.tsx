@@ -6,6 +6,7 @@ type Tab = 'event' | 'contact';
 
 export default function GetInvolvedPage() {
   const [activeTab, setActiveTab] = useState<Tab>('event');
+  const [formSelected, setFormSelected] = useState(false);
   const [eventFormData, setEventFormData] = useState({
     name: '',
     description: '',
@@ -86,41 +87,56 @@ export default function GetInvolvedPage() {
 
   return (
     <div>
-      <section style={styles.header}>
-        <div style={styles.container}>
-          <h1 style={styles.title}>Get Involved</h1>
-          <p style={styles.subtitle}>
-            Submit an event or get in touch with us
-          </p>
-        </div>
-      </section>
-
       <section style={styles.section}>
         <div style={styles.container}>
           <div style={styles.formContainer}>
-            {/* Tab Buttons */}
-            <div style={styles.tabContainer}>
-              <button
-                onClick={() => { setActiveTab('event'); setSubmitted(false); }}
-                style={{
-                  ...styles.tab,
-                  ...(activeTab === 'event' ? styles.activeTab : {}),
-                }}
-              >
-                Submit an Event
-              </button>
-              <button
-                onClick={() => { setActiveTab('contact'); setSubmitted(false); }}
-                style={{
-                  ...styles.tab,
-                  ...(activeTab === 'contact' ? styles.activeTab : {}),
-                }}
-              >
-                Contact Us
-              </button>
-            </div>
+            {!formSelected && !submitted ? (
+              <div style={styles.buttonSelectionContainer}>
+                <h2 style={styles.selectionTitle}>Get Involved</h2>
+                <p style={styles.selectionSubtitle}>
+                  Choose an option below to get started
+                </p>
+                <div style={styles.buttonGrid}>
+                  <button
+                    onClick={() => {
+                      setActiveTab('event');
+                      setFormSelected(true);
+                    }}
+                    style={styles.selectionButton}
+                  >
+                    <div style={styles.buttonIcon}>
+                      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2"/>
+                        <path d="M16 2v4M8 2v4M3 10h18"/>
+                      </svg>
+                    </div>
+                    <h3 style={styles.buttonTitle}>Submit an Event</h3>
+                    <p style={styles.buttonDescription}>
+                      Share your upcoming beer-related event with the BrewedAt community
+                    </p>
+                  </button>
 
-            {submitted ? (
+                  <button
+                    onClick={() => {
+                      setActiveTab('contact');
+                      setFormSelected(true);
+                    }}
+                    style={styles.selectionButton}
+                  >
+                    <div style={styles.buttonIcon}>
+                      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                        <polyline points="22,6 12,13 2,6"/>
+                      </svg>
+                    </div>
+                    <h3 style={styles.buttonTitle}>Contact Us</h3>
+                    <p style={styles.buttonDescription}>
+                      Get in touch for partnerships, press inquiries, or general questions
+                    </p>
+                  </button>
+                </div>
+              </div>
+            ) : submitted ? (
               <div style={styles.success}>
                 <h2>Thank You!</h2>
                 <p>
@@ -128,12 +144,29 @@ export default function GetInvolvedPage() {
                     ? 'Your event has been submitted and will be reviewed shortly.'
                     : 'Your message has been received. We\'ll get back to you soon!'}
                 </p>
-                <button onClick={() => setSubmitted(false)} style={styles.submitButton}>
-                  {submittedType === 'event' ? 'Submit Another Event' : 'Send Another Message'}
+                <button
+                  onClick={() => {
+                    setSubmitted(false);
+                    setFormSelected(false);
+                  }}
+                  style={styles.submitButton}
+                >
+                  Back to Options
                 </button>
               </div>
             ) : (
               <>
+                {/* Back Button */}
+                <button
+                  onClick={() => setFormSelected(false)}
+                  style={styles.backButton}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                  </svg>
+                  Back to Options
+                </button>
+
                 {/* Submit Event Form */}
                 {activeTab === 'event' && (
                   <form onSubmit={handleEventSubmit} style={styles.form}>
@@ -272,10 +305,7 @@ export default function GetInvolvedPage() {
 }
 
 const styles = {
-  header: { backgroundColor: '#FFF3E0', padding: '60px 0', textAlign: 'center' as const },
   container: { maxWidth: '1200px', margin: '0 auto', padding: '0 24px' },
-  title: { fontSize: '42px', fontWeight: '700' as const, color: '#654321', marginBottom: '16px' },
-  subtitle: { fontSize: '18px', color: '#8B4513' },
   section: { padding: '60px 0' },
   formContainer: {
     maxWidth: '700px',
@@ -285,28 +315,76 @@ const styles = {
     borderRadius: '12px',
     boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
   },
-  tabContainer: {
-    display: 'flex',
-    gap: '12px',
-    marginBottom: '32px',
-    borderBottom: '2px solid #E0E0E0',
-    paddingBottom: '0',
+  buttonSelectionContainer: {
+    textAlign: 'center' as const,
+    padding: '20px 0',
   },
-  tab: {
-    padding: '12px 24px',
-    backgroundColor: 'transparent',
-    border: 'none',
-    borderBottom: '3px solid transparent',
-    color: '#8B4513',
+  selectionTitle: {
+    fontSize: '28px',
+    fontWeight: '700' as const,
+    color: '#654321',
+    marginBottom: '12px',
+  },
+  selectionSubtitle: {
     fontSize: '16px',
-    fontWeight: '600' as const,
+    color: '#8B4513',
+    marginBottom: '40px',
+  },
+  buttonGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+    gap: '24px',
+    marginTop: '32px',
+  },
+  selectionButton: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    alignItems: 'center',
+    padding: '40px 32px',
+    backgroundColor: '#FFF9F0',
+    border: '2px solid #E0E0E0',
+    borderRadius: '12px',
     cursor: 'pointer',
     transition: 'all 0.3s ease',
-    marginBottom: '-2px',
+    textAlign: 'center' as const,
   },
-  activeTab: {
-    color: '#D4922A',
-    borderBottomColor: '#D4922A',
+  buttonIcon: {
+    width: '64px',
+    height: '64px',
+    backgroundColor: '#D4922A',
+    color: '#FFFFFF',
+    borderRadius: '50%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: '20px',
+  },
+  buttonTitle: {
+    fontSize: '20px',
+    fontWeight: '600' as const,
+    color: '#654321',
+    marginBottom: '12px',
+  },
+  buttonDescription: {
+    fontSize: '14px',
+    color: '#8B4513',
+    lineHeight: '1.6',
+    margin: 0,
+  },
+  backButton: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    padding: '10px 16px',
+    backgroundColor: 'transparent',
+    border: '1px solid #E0E0E0',
+    borderRadius: '6px',
+    color: '#8B4513',
+    fontSize: '14px',
+    fontWeight: '600' as const,
+    cursor: 'pointer',
+    marginBottom: '24px',
+    transition: 'all 0.2s ease',
   },
   form: { display: 'flex', flexDirection: 'column' as const, gap: '20px' },
   formSection: {

@@ -6,24 +6,35 @@
 }
 
 :root {
-    /* Wheat Theme Colors */
-    --primary-bg: #FFF8E7;
-    --secondary-bg: #FFFFFF;
-    --accent-color: #D4922A;
-    --text-primary: #654321;
-    --text-secondary: #8B4513;
-    --text-muted: #A0826D;
-    --border-color: #E8D4B0;
+    /* Theme colors - set by ThemeContext */
+    --color-primary: #1f3540;
+    --color-secondary: #fd5526;
+    --color-tertiary: #25303d;
+    --color-background: #f5f5f5;
+    --color-surface: #FFFFFF;
+    --color-text: #1f3540;
+    --color-text-secondary: #25303d;
+    --color-border: #E0E0E0;
+    --font-family: Rubik, sans-serif;
+
+    /* Legacy aliases for backwards compatibility */
+    --primary-bg: var(--color-background);
+    --secondary-bg: var(--color-surface);
+    --accent-color: var(--color-secondary);
+    --text-primary: var(--color-text);
+    --text-secondary: var(--color-text-secondary);
+    --text-muted: var(--color-text-secondary);
+    --border-color: var(--color-border);
     --shadow-light: rgba(101, 67, 33, 0.05);
     --shadow-medium: rgba(101, 67, 33, 0.1);
-    --gradient-start: #FFF8E7;
-    --gradient-end: #FAECD0;
+    --gradient-start: var(--color-background);
+    --gradient-end: var(--color-surface);
 }
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background-color: var(--primary-bg);
-    color: var(--text-primary);
+    font-family: var(--font-family);
+    background-color: var(--color-background);
+    color: var(--color-text);
     line-height: 1.6;
     overflow-x: hidden;
 }
@@ -171,10 +182,27 @@ p {
 /* Hero Section */
 .hero {
     padding: 120px 20px 80px;
-    min-height: 100vh;
+    min-height: 70vh;
     display: flex;
     align-items: center;
-    background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+    position: relative;
+    background-image: url('/beer background.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(8px) saturate(120%);
+    -webkit-backdrop-filter: blur(8px) saturate(120%);
+    z-index: 1;
 }
 
 .hero-content {
@@ -184,6 +212,8 @@ p {
     grid-template-columns: 1fr 1fr;
     gap: 60px;
     align-items: center;
+    position: relative;
+    z-index: 2;
 }
 
 .hero-text {
@@ -197,6 +227,7 @@ p {
 .hero-text h1 {
     font-size: clamp(2.5rem, 5vw, 3.5rem);
     margin-bottom: 1.5rem;
+    color: #1f3540;
 }
 
 .hero-text-centered {
@@ -209,6 +240,7 @@ p {
 .hero-text-centered h1 {
     font-size: clamp(2.5rem, 6vw, 4rem);
     margin-bottom: 1.5rem;
+    color: #1f3540;
 }
 
 .hero-carousel {
@@ -219,7 +251,7 @@ p {
 
 .hero-subtitle {
     font-size: 1.25rem;
-    color: var(--text-secondary);
+    color: #25303d;
     margin-bottom: 2rem;
     line-height: 1.8;
 }
@@ -238,7 +270,7 @@ p {
     gap: 2rem;
     margin-top: 3rem;
     padding-top: 3rem;
-    border-top: 1px solid var(--border-color);
+    border-top: 1px solid rgba(31, 53, 64, 0.2);
 }
 
 .stat {
@@ -249,13 +281,13 @@ p {
     display: block;
     font-size: 1.75rem;
     font-weight: 700;
-    color: var(--accent-color);
+    color: #fd5526;
 }
 
 .stat-label {
     display: block;
     font-size: 0.875rem;
-    color: var(--text-muted);
+    color: #25303d;
     margin-top: 0.25rem;
 }
 
@@ -790,7 +822,9 @@ html {
 /* Events Section */
 .events-section {
     padding: 60px 0;
-    background: white;
+    background: var(--color-background);
+    border-top: 1px solid var(--color-border);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .event-category {
@@ -2062,8 +2096,10 @@ html {
 /* Photo Carousel */
 .photo-carousel-section {
     padding: 60px 0;
-    background: var(--secondary-bg);
+    background: var(--color-surface);
     overflow: hidden;
+    border-top: 1px solid var(--color-border);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .hero-carousel .carousel-container {
@@ -2145,8 +2181,8 @@ html {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background: white;
-    border: 2px solid var(--border-color);
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid rgba(31, 53, 64, 0.2);
     border-radius: 50%;
     width: 48px;
     height: 48px;
@@ -2156,14 +2192,16 @@ html {
     cursor: pointer;
     transition: all 0.3s ease;
     z-index: 10;
-    color: var(--text-primary);
+    color: #1f3540;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .carousel-button:hover {
-    background: var(--accent-color);
-    border-color: var(--accent-color);
+    background: #fd5526;
+    border-color: #fd5526;
     color: white;
     transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 4px 12px rgba(253, 85, 38, 0.3);
 }
 
 .carousel-button-prev {
@@ -2230,18 +2268,21 @@ html {
 .podcast-highlight,
 .instagram-feed-section {
     padding: 100px 0;
+    background: var(--color-background);
+    border-top: 1px solid var(--color-border);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .events-highlight {
-    background: var(--primary-bg);
+    background: var(--color-background);
+    border-top: 1px solid var(--color-border);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .podcast-highlight {
-    background: var(--secondary-bg);
-}
-
-.instagram-feed-section {
-    background: var(--primary-bg);
+    background: var(--color-background);
+    border-top: 1px solid var(--color-border);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .content-split {
@@ -2602,7 +2643,7 @@ html {
 /* Social Content Grid */
 .social-content-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 2rem;
     margin-top: 3rem;
 }
@@ -2638,7 +2679,7 @@ html {
 
 .social-feed-embed {
     padding: 1.5rem;
-    min-height: 400px;
+    min-height: 600px;
     display: flex;
     align-items: center;
     justify-content: center;
