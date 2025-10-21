@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, orderBy, limit, getDocs } from 'firebase/firestore';
 import { db } from '@shared/firebase.config';
-import type { SocialMediaStats } from '@shared/types';
+import type { SocialMediaStats, Event } from '@shared/types';
 
 export default function HomePage() {
   const [socialStats, setSocialStats] = useState<SocialMediaStats | null>(null);
+  const [featuredEvents, setFeaturedEvents] = useState<Event[]>([]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [totalFollowers, setTotalFollowers] = useState('15,000+');
   const [email, setEmail] = useState('');
@@ -42,6 +43,7 @@ export default function HomePage() {
 
   useEffect(() => {
     loadSocialStats();
+    loadFeaturedEvents();
   }, []);
 
   useEffect(() => {
@@ -63,6 +65,27 @@ export default function HomePage() {
       }
     } catch (error) {
       console.error('Error loading social stats:', error);
+    }
+  };
+
+  const loadFeaturedEvents = async () => {
+    try {
+      const eventsRef = collection(db, 'events');
+      const q = query(
+        eventsRef,
+        where('approved', '==', true),
+        where('featured', '==', true),
+        orderBy('eventDate', 'asc'),
+        limit(3)
+      );
+      const snapshot = await getDocs(q);
+      const events = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as Event[];
+      setFeaturedEvents(events);
+    } catch (error) {
+      console.error('Error loading featured events:', error);
     }
   };
 
@@ -202,12 +225,35 @@ export default function HomePage() {
               <a href="/events" className="btn-large btn-primary">View All Events</a>
             </div>
             <div className="content-visual">
-              <div className="visual-placeholder" style={{ background: 'linear-gradient(135deg, #D4922A 0%, #8B4513 100%)' }}>
-                <div className="placeholder-text">
-                  <h3>Upcoming Events</h3>
-                  <p>Check out what's happening this month</p>
+              {featuredEvents.length > 0 ? (
+                <div className="featured-events-list">
+                  {featuredEvents.map((event) => (
+                    <a key={event.id} href="/events" className="featured-event-card">
+                      <div className="featured-event-date">
+                        <span className="month">{event.eventDate.toDate().toLocaleDateString('en-US', { month: 'short' })}</span>
+                        <span className="day">{event.eventDate.toDate().getDate()}</span>
+                      </div>
+                      <div className="featured-event-info">
+                        <h4>{event.name}</h4>
+                        <div className="event-meta">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                          </svg>
+                          <span>{event.location}</span>
+                        </div>
+                      </div>
+                    </a>
+                  ))}
                 </div>
-              </div>
+              ) : (
+                <div className="visual-placeholder" style={{ background: 'linear-gradient(135deg, #D4922A 0%, #8B4513 100%)' }}>
+                  <div className="placeholder-text">
+                    <h3>Upcoming Events</h3>
+                    <p>Check out what's happening this month</p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

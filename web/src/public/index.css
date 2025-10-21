@@ -2325,6 +2325,77 @@ html {
     color: white;
 }
 
+.featured-events-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+}
+
+.featured-event-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.featured-event-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+
+.featured-event-date {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: var(--primary-bg);
+    padding: 12px 16px;
+    border-radius: 8px;
+    min-width: 70px;
+}
+
+.featured-event-date .month {
+    font-size: 12px;
+    color: var(--accent-color);
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.featured-event-date .day {
+    font-size: 24px;
+    color: var(--primary-color);
+    font-weight: 700;
+    margin-top: 4px;
+}
+
+.featured-event-info {
+    flex: 1;
+}
+
+.featured-event-info h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 8px 0;
+}
+
+.featured-event-info .event-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    color: var(--accent-color);
+}
+
+.featured-event-info .event-meta svg {
+    flex-shrink: 0;
+}
+
 .podcast-platforms {
     margin: 2rem 0;
 }
