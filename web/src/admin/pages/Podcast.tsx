@@ -115,10 +115,10 @@ export default function Podcast() {
 
       if (editingEpisode) {
         await updateDoc(doc(db, 'podcastEpisodes', editingEpisode.id), episodeData);
-        alert('✅ Episode updated successfully!');
+        alert('Episode updated successfully!');
       } else {
         await addDoc(collection(db, 'podcastEpisodes'), episodeData);
-        alert('✅ Episode created successfully!');
+        alert('Episode created successfully!');
       }
 
       setFormData(INITIAL_FORM_DATA);
@@ -128,7 +128,7 @@ export default function Podcast() {
       loadEpisodes();
     } catch (error) {
       console.error('Error saving episode:', error);
-      alert('❌ Failed to save episode: ' + (error as Error).message);
+      alert('Failed to save episode: ' + (error as Error).message);
     } finally {
       setLoading(false);
     }
@@ -159,11 +159,11 @@ export default function Podcast() {
 
     try {
       await deleteDoc(doc(db, 'podcastEpisodes', episodeId));
-      alert('✅ Episode deleted successfully!');
+      alert('Episode deleted successfully!');
       loadEpisodes();
     } catch (error) {
       console.error('Error deleting episode:', error);
-      alert('❌ Failed to delete episode');
+      alert('Failed to delete episode');
     }
   };
 
@@ -591,7 +591,7 @@ export default function Podcast() {
                           backgroundColor: '#FFF3E0',
                           color: '#E65100',
                         }}>
-                          ⭐ Featured
+                          Featured
                         </span>
                       )}
                     </td>

@@ -62,7 +62,7 @@ export default function PodcastPage() {
                   <div style={styles.episodeContent}>
                     <div style={styles.episodeHeader}>
                       <span style={styles.episodeNumber}>Episode {episode.episodeNumber}</span>
-                      {episode.featured && <span style={styles.featured}>⭐ Featured</span>}
+                      {episode.featured && <span style={styles.featured}>Featured</span>}
                     </div>
                     <h3 style={styles.episodeTitle}>{episode.title}</h3>
                     {episode.guestName && (

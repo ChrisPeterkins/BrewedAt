@@ -39,7 +39,11 @@ export default function Dashboard() {
           }}
           onClick={() => setActiveTab('events')}
         >
-          📅 Events
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <rect x="3" y="4" width="18" height="18" rx="2"/>
+            <path d="M16 2v4M8 2v4M3 10h18"/>
+          </svg>
+          Events
         </button>
         <button
           style={{
@@ -48,7 +52,11 @@ export default function Dashboard() {
           }}
           onClick={() => setActiveTab('podcast')}
         >
-          🎙️ Podcast
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/>
+          </svg>
+          Podcast
         </button>
         <button
           style={{
@@ -57,7 +65,11 @@ export default function Dashboard() {
           }}
           onClick={() => setActiveTab('content')}
         >
-          ✏️ Content
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+          Content
         </button>
         <button
           style={{
@@ -66,7 +78,11 @@ export default function Dashboard() {
           }}
           onClick={() => setActiveTab('analytics')}
         >
-          📊 Analytics
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M3 3v18h18"/>
+            <path d="M18 17V9M13 17V5M8 17v-3"/>
+          </svg>
+          Analytics
         </button>
         <button
           style={{
@@ -75,7 +91,12 @@ export default function Dashboard() {
           }}
           onClick={() => setActiveTab('breweries')}
         >
-          🍺 Breweries
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M17 11h1a3 3 0 0 1 0 6h-1M17 7h1a3 3 0 0 1 0 6h-1"/>
+            <path d="M17 3v18M9 3v18"/>
+            <path d="M3 7a3 3 0 0 1 3-3h3v14H6a3 3 0 0 1-3-3V7z"/>
+          </svg>
+          Breweries
         </button>
         <button
           style={{
@@ -84,7 +105,11 @@ export default function Dashboard() {
           }}
           onClick={() => setActiveTab('raffles')}
         >
-          🎟️ Raffles
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7"/>
+            <path d="M3 7l9-4 9 4M9 11v.01M15 11v.01M9 15v.01M15 15v.01"/>
+          </svg>
+          Raffles
         </button>
         <button
           style={{
@@ -93,7 +118,11 @@ export default function Dashboard() {
           }}
           onClick={() => setActiveTab('data')}
         >
-          ⚙️ Settings
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24"/>
+          </svg>
+          Settings
         </button>
       </nav>
 
@@ -147,6 +176,9 @@ const styles = {
     padding: '0 32px',
   },
   navButton: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
     backgroundColor: 'transparent',
     color: '#8B4513',
     padding: '16px 24px',

@@ -70,18 +70,26 @@ export default function EventsPage() {
             </span>
           </div>
           {event.featured && (
-            <span style={styles.featuredBadge}>⭐ Featured</span>
+            <span style={styles.featuredBadge}>Featured</span>
           )}
         </div>
         <h3 style={styles.eventName}>{event.name}</h3>
         <p style={styles.eventDescription}>{event.description}</p>
         <div style={styles.eventMeta}>
           <div style={styles.metaItem}>
-            <span>📍 {event.location}</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+            <span>{event.location}</span>
           </div>
           {event.eventTime && (
             <div style={styles.metaItem}>
-              <span>🕐 {event.eventTime}</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 6v6l4 2"/>
+              </svg>
+              <span>{event.eventTime}</span>
             </div>
           )}
         </div>
@@ -304,6 +312,9 @@ const styles = {
     marginBottom: '16px',
   },
   metaItem: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
     fontSize: '14px',
     color: '#8B4513',
   },

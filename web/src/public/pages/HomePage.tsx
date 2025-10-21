@@ -102,7 +102,7 @@ export default function HomePage() {
     setSubmitting(true);
     setFormMessage('');
     setTimeout(() => {
-      setFormMessage('🎉 Thanks for signing up! We\'ll keep you updated.');
+      setFormMessage('Thanks for signing up! We\'ll keep you updated.');
       setEmail('');
       setSubmitting(false);
       setTimeout(() => setFormMessage(''), 3000);
@@ -316,7 +316,7 @@ export default function HomePage() {
                   {submitting ? 'Signing Up...' : 'Sign Up'}
                 </button>
               </div>
-              {formMessage && <p className={`form-message ${formMessage.includes('🎉') ? 'success' : 'error'}`}>{formMessage}</p>}
+              {formMessage && <p className={`form-message ${formMessage.includes('Thanks') ? 'success' : 'error'}`}>{formMessage}</p>}
             </form>
             <p className="privacy-note">We respect your privacy. Unsubscribe at any time.</p>
           </div>

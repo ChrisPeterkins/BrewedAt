@@ -118,11 +118,11 @@ export default function Events() {
       if (editingEvent) {
         // Update existing event
         await updateDoc(doc(db, 'events', editingEvent.id), eventData);
-        alert('✅ Event updated successfully!');
+        alert('Event updated successfully!');
       } else {
         // Create new event
         await addDoc(collection(db, 'events'), eventData);
-        alert('✅ Event created successfully!');
+        alert('Event created successfully!');
       }
 
       // Reset form and reload
@@ -133,7 +133,7 @@ export default function Events() {
       loadEvents();
     } catch (error) {
       console.error('Error saving event:', error);
-      alert('❌ Failed to save event: ' + (error as Error).message);
+      alert('Failed to save event: ' + (error as Error).message);
     } finally {
       setLoading(false);
     }
@@ -166,11 +166,11 @@ export default function Events() {
 
     try {
       await deleteDoc(doc(db, 'events', eventId));
-      alert('✅ Event deleted successfully!');
+      alert('Event deleted successfully!');
       loadEvents();
     } catch (error) {
       console.error('Error deleting event:', error);
-      alert('❌ Failed to delete event');
+      alert('Failed to delete event');
     }
   };
 
@@ -653,7 +653,7 @@ export default function Events() {
                             backgroundColor: '#FFF3E0',
                             color: '#E65100',
                           }}>
-                            ⭐ Featured
+                            Featured
                           </span>
                         )}
                       </div>

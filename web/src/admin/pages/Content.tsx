@@ -74,10 +74,10 @@ export default function Content() {
 
       await setDoc(docRef, dataToSave);
       setContent(dataToSave);
-      alert('✅ Homepage content updated successfully!');
+      alert('Homepage content updated successfully!');
     } catch (error) {
       console.error('Error saving content:', error);
-      alert('❌ Failed to save content: ' + (error as Error).message);
+      alert('Failed to save content: ' + (error as Error).message);
     } finally {
       setSaving(false);
     }
