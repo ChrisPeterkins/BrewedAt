@@ -1,387 +1,327 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { doc, getDoc, collection, getDocs, query, where, orderBy, limit } from 'firebase/firestore';
+import { useState, useEffect, useRef } from 'react';
+import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@shared/firebase.config';
-import type { HomePageContent, Event, SocialMediaStats } from '@shared/types';
+import type { SocialMediaStats } from '@shared/types';
 
 export default function HomePage() {
-  const [content, setContent] = useState<HomePageContent | null>(null);
-  const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
   const [socialStats, setSocialStats] = useState<SocialMediaStats | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [totalFollowers, setTotalFollowers] = useState('15,000+');
+  const [email, setEmail] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [formMessage, setFormMessage] = useState('');
+  const autoplayRef = useRef<NodeJS.Timeout | null>(null);
+
+  const slides = [
+    {
+      title: 'Gaming Tournaments',
+      desc: 'Mario Kart & Smash Bros at Local Breweries',
+      gradient: 'linear-gradient(135deg, #D4922A 0%, #8B4513 100%)'
+    },
+    {
+      title: 'Crafted in Philly',
+      desc: '11 Breweries, 2 Months of Craft Beer Tours',
+      gradient: 'linear-gradient(135deg, #654321 0%, #D4922A 100%)'
+    },
+    {
+      title: 'Brewery Partnerships',
+      desc: 'Connecting Communities Across PA & NJ',
+      gradient: 'linear-gradient(135deg, #8B4513 0%, #654321 100%)'
+    },
+    {
+      title: 'Live Events',
+      desc: 'Year-Round Activations & Experiences',
+      gradient: 'linear-gradient(135deg, #D4922A 0%, #654321 100%)'
+    },
+    {
+      title: 'Local Taprooms',
+      desc: 'Supporting Craft Beer Culture',
+      gradient: 'linear-gradient(135deg, #654321 0%, #8B4513 100%)'
+    }
+  ];
 
   useEffect(() => {
-    loadHomePageData();
+    loadSocialStats();
   }, []);
 
-  const loadHomePageData = async () => {
+  useEffect(() => {
+    startAutoplay();
+    return () => stopAutoplay();
+  }, []);
+
+  const loadSocialStats = async () => {
     try {
-      // Load homepage content
-      const contentDoc = await getDoc(doc(db, 'siteConfig', 'homepage'));
-      if (contentDoc.exists()) {
-        setContent(contentDoc.data() as HomePageContent);
+      const docRef = doc(db, 'siteConfig', 'socialMedia');
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data() as SocialMediaStats;
+        setSocialStats(data);
+        const total = (data.instagram?.followers || 0) + (data.facebook?.followers || 0) + (data.twitter?.followers || 0) + (data.youtube?.subscribers || 0);
+        if (total > 0) {
+          setTotalFollowers(total.toLocaleString() + '+');
+        }
       }
-
-      // Load social stats
-      const socialDoc = await getDoc(doc(db, 'siteConfig', 'socialMedia'));
-      if (socialDoc.exists()) {
-        setSocialStats(socialDoc.data() as SocialMediaStats);
-      }
-
-      // Load upcoming events
-      const eventsRef = collection(db, 'events');
-      const eventsQuery = query(
-        eventsRef,
-        where('approved', '==', true),
-        orderBy('eventDate', 'asc'),
-        limit(3)
-      );
-      const eventsSnapshot = await getDocs(eventsQuery);
-      const events = eventsSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as Event[];
-      setUpcomingEvents(events);
     } catch (error) {
-      console.error('Error loading homepage data:', error);
-    } finally {
-      setLoading(false);
+      console.error('Error loading social stats:', error);
     }
   };
 
-  const getTotalFollowers = () => {
-    if (!socialStats) return '15,000+';
-    const total = (socialStats.instagram?.followers || 0) +
-      (socialStats.facebook?.followers || 0) +
-      (socialStats.twitter?.followers || 0) +
-      (socialStats.youtube?.subscribers || 0);
-    return total > 0 ? `${(total / 1000).toFixed(1)}K+` : '15,000+';
+  const startAutoplay = () => {
+    stopAutoplay();
+    autoplayRef.current = setInterval(() => {
+      nextSlide();
+    }, 5000);
   };
 
-  if (loading) {
-    return (
-      <div style={styles.loading}>
-        <p>Loading...</p>
-      </div>
-    );
-  }
+  const stopAutoplay = () => {
+    if (autoplayRef.current) {
+      clearInterval(autoplayRef.current);
+    }
+  };
+
+  const nextSlide = () => {
+    setCurrentSlide(prev => (prev + 1) % slides.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide(prev => (prev - 1 + slides.length) % slides.length);
+  };
+
+  const goToSlide = (index: number) => {
+    setCurrentSlide(index);
+    stopAutoplay();
+    startAutoplay();
+  };
+
+  const handleEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email ||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setFormMessage('Please enter a valid email address');
+      return;
+    }
+    setSubmitting(true);
+    setFormMessage('');
+    setTimeout(() => {
+      setFormMessage('🎉 Thanks for signing up! We\'ll keep you updated.');
+      setEmail('');
+      setSubmitting(false);
+      setTimeout(() => setFormMessage(''), 3000);
+    }, 1000);
+  };
 
   return (
     <div>
       {/* Hero Section */}
-      <section style={styles.hero}>
-        <div style={styles.container}>
-          <div style={styles.heroContent}>
-            <h1 style={styles.heroTitle}>
-              {content?.heroTitle || 'Tap into the Local Craft Beverage Scene'}
-            </h1>
-            <p style={styles.heroSubtitle}>
-              {content?.heroSubtitle || "Something's always brewing in the craft beverage scene. Stay up to date on unforgettable events, local stories, and interactive campaigns!"}
+      <section className="hero">
+        <div className="hero-content">
+          <div className="hero-text">
+            <h1>Tap into the Local Craft Beverage Scene</h1>
+            <p className="hero-subtitle">
+              Something's always brewing in the craft beverage scene. Stay up to date on unforgettable events, local stories, and interactive campaigns that help you discover your next favorite brewery, beverage, or bar!
             </p>
-            <div style={styles.heroCTA}>
-              <Link to="/events" style={styles.primaryButton}>
-                Explore Events
-              </Link>
-              <Link to="/for-business" style={styles.secondaryButton}>
-                Partner With Us
-              </Link>
+            <div className="hero-cta">
+              <a href="#events" className="btn-large btn-primary">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2"/>
+                  <path d="M16 2V6M8 2V6M3 10H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+                Events
+              </a>
+              <a href="#podcast" className="btn-large btn-secondary">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="2" fill="none"/>
+                  <circle cx="12" cy="12" r="3" fill="currentColor"/>
+                  <path d="M12 4V8M12 16V20M4 12H8M16 12H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+                Podcast
+              </a>
+              <a href="#social" className="btn-large btn-secondary">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path d="M16 8C16 10.2091 14.2091 12 12 12C9.79086 12 8 10.2091 8 8C8 5.79086 9.79086 4 12 4C14.2091 4 16 5.79086 16 8Z" stroke="currentColor" strokeWidth="2"/>
+                  <path d="M12 14C8.13401 14 5 17.134 5 21H19C19 17.134 15.866 14 12 14Z" stroke="currentColor" strokeWidth="2"/>
+                </svg>
+                Social
+              </a>
             </div>
-            <div style={styles.stats}>
-              <div style={styles.stat}>
-                <span style={styles.statNumber}>{getTotalFollowers()}</span>
-                <span style={styles.statLabel}>Community Members</span>
+            <div className="hero-stats">
+              <div className="stat">
+                <span className="stat-number">{totalFollowers}</span>
+                <span className="stat-label">Community Members</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Carousel */}
+          <div className="hero-carousel">
+            <div className="carousel-container">
+              <div className="carousel-track" style={{ transform: `translateX(-${currentSlide * (33.333 + 2)}%)` }}>
+                {slides.map((slide, idx) => (
+                  <div key={idx} className="carousel-slide">
+                    <div className="carousel-image" style={{ background: slide.gradient }}>
+                      <div className="carousel-overlay">
+                        <h3>{slide.title}</h3>
+                        <p>{slide.desc}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <button className="carousel-button carousel-button-prev" onClick={prevSlide}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+              <button className="carousel-button carousel-button-next" onClick={nextSlide}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+              <div className="carousel-dots">
+                {slides.map((_, idx) => (
+                  <div key={idx} className={`carousel-dot ${idx === currentSlide ? 'active' : ''}`} onClick={() => goToSlide(idx)} />
+                ))}
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* About Section */}
-      <section style={styles.about}>
-        <div style={styles.container}>
-          <h2 style={styles.sectionTitle}>
-            {content?.aboutTitle || 'Connecting the Craft Beer Community'}
-          </h2>
-          <p style={styles.aboutText}>
-            {content?.aboutContent || 'We create unforgettable events, compelling content, and powerful marketing campaigns that bring breweries, bars, and beer lovers together across PA & NJ.'}
-          </p>
-
-          <div style={styles.statsGrid}>
-            {content && (
-              <>
-                <div style={styles.statCard}>
-                  <div style={styles.statCardNumber}>{content.statsValue1}</div>
-                  <div style={styles.statCardLabel}>{content.statsLabel1}</div>
+      {/* Events Section */}
+      <section id="events" className="events-highlight">
+        <div className="container">
+          <div className="content-split">
+            <div className="content-text">
+              <h2>Craft Beer Events Across PA & NJ</h2>
+              <p>From gaming tournaments at local breweries to brewery crawls and beer festivals, we bring the craft beer community together through unforgettable experiences. Whether you're a casual drinker or a seasoned enthusiast, there's always something happening at BrewedAt.</p>
+              <ul className="highlight-list">
+                <li>Gaming tournaments (Mario Kart, Super Smash Bros)</li>
+                <li>Brewery tours and crawls</li>
+                <li>Beer festivals and tastings</li>
+                <li>Community meetups</li>
+              </ul>
+              <a href="/events" className="btn-large btn-primary">View All Events</a>
+            </div>
+            <div className="content-visual">
+              <div className="visual-placeholder" style={{ background: 'linear-gradient(135deg, #D4922A 0%, #8B4513 100%)' }}>
+                <div className="placeholder-text">
+                  <h3>Upcoming Events</h3>
+                  <p>Check out what's happening this month</p>
                 </div>
-                <div style={styles.statCard}>
-                  <div style={styles.statCardNumber}>{content.statsValue2}</div>
-                  <div style={styles.statCardLabel}>{content.statsLabel2}</div>
-                </div>
-                <div style={styles.statCard}>
-                  <div style={styles.statCardNumber}>{content.statsValue3}</div>
-                  <div style={styles.statCardLabel}>{content.statsLabel3}</div>
-                </div>
-              </>
-            )}
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Upcoming Events */}
-      {upcomingEvents.length > 0 && (
-        <section style={styles.events}>
-          <div style={styles.container}>
-            <h2 style={styles.sectionTitle}>Upcoming Events</h2>
-            <div style={styles.eventsGrid}>
-              {upcomingEvents.map((event) => (
-                <Link to="/events" key={event.id} style={styles.eventCard}>
-                  <div style={styles.eventDate}>
-                    <span style={styles.eventMonth}>
-                      {event.eventDate.toDate().toLocaleDateString('en-US', { month: 'short' })}
-                    </span>
-                    <span style={styles.eventDay}>
-                      {event.eventDate.toDate().getDate()}
-                    </span>
-                  </div>
-                  <div style={styles.eventDetails}>
-                    <h3 style={styles.eventName}>{event.name}</h3>
-                    <p style={styles.eventLocation}>{event.location}</p>
-                  </div>
-                </Link>
-              ))}
+      {/* Podcast Section */}
+      <section id="podcast" className="podcast-highlight">
+        <div className="container">
+          <div className="content-split reverse">
+            <div className="content-visual">
+              <div className="podcast-embed">
+                <iframe width="100%" height="400" style={{ borderRadius: '12px' }} src="https://www.youtube.com/embed/qrZ15CiM0R8" title="The BrewedAt Podcast" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe>
+              </div>
             </div>
-            <div style={{ textAlign: 'center', marginTop: '32px' }}>
-              <Link to="/events" style={styles.primaryButton}>
-                View All Events
-              </Link>
+            <div className="content-text">
+              <h2>The BrewedAt Podcast</h2>
+              <p>An exploration of the movers and shakers in the Greater Philadelphia Area beer, bar and culture space. Join us as we sit down with brewery owners, bar operators, and community leaders for honest, in-depth conversations about what makes the local craft beer scene special.</p>
+              <div className="latest-episode">
+                <h4>Latest Episode</h4>
+                <p className="episode-title">#60 - BGS Beverage Consultants (John Stemler)</p>
+                <p className="episode-description">Hosted by Richie Tevlin, Owner and Brewmaster of Space Cadet Brewing Company</p>
+              </div>
+              <div className="podcast-platforms">
+                <span>Listen on:</span>
+                <div className="platform-badges">
+                  <a href="https://open.spotify.com/show/6CKeuqsJyF097FHhX4CCZH" target="_blank" rel="noopener noreferrer" className="badge">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+                    Spotify
+                  </a>
+                  <a href="https://podcasts.apple.com/us/podcast/the-brewedat-podcast/id1234567890" target="_blank" rel="noopener noreferrer" className="badge">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm3.271 17.728c-.195.281-.566.379-.848.195-2.28-1.402-5.148-1.719-8.522-0.941-.338.078-.656-.15-.734-.488-.078-.338.15-.656.488-.734 3.701-.852 6.826-.486 9.375 1.086.281.172.379.567.195.848l.046.034zm1.171-2.602c-.242.393-.758.516-1.148.281-2.609-1.605-6.582-2.07-9.668-1.133-.398.117-.82-.109-.938-.508-.117-.398.109-.82.508-.938 3.531-1.078 7.926-.555 10.969 1.289.39.242.516.758.281 1.148l-.004-.139zm.102-2.71c-3.129-1.859-8.289-2.031-11.277-1.125-.477.141-.984-.133-1.125-.609-.141-.477.133-.984.609-1.125 3.437-1.043 9.113-.844 12.738 1.301.453.266.602.847.336 1.301-.266.453-.847.602-1.301.336l.02-.079z"/></svg>
+                    Apple Podcasts
+                  </a>
+                  <a href="https://www.youtube.com/@brewedat" target="_blank" rel="noopener noreferrer" className="badge">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                    YouTube
+                  </a>
+                  <a href="https://thebrewedatpodcast.podbean.com/" target="_blank" rel="noopener noreferrer" className="badge">Podbean</a>
+                  <a href="https://music.amazon.com/podcasts" target="_blank" rel="noopener noreferrer" className="badge">Amazon Music</a>
+                </div>
+              </div>
+              <a href="/podcast" className="btn-large btn-primary">View All Episodes</a>
             </div>
           </div>
-        </section>
-      )}
+        </div>
+      </section>
 
-      {/* CTA Section */}
-      <section style={styles.cta}>
-        <div style={styles.container}>
-          <h2 style={styles.ctaTitle}>Ready to Join the Community?</h2>
-          <p style={styles.ctaText}>
-            Follow us on social media, attend our events, or partner with us to reach the craft beer audience.
-          </p>
-          <div style={styles.ctaButtons}>
-            <Link to="/events" style={styles.primaryButton}>
-              Find Events
-            </Link>
-            <Link to="/for-business" style={styles.secondaryButton}>
-              Partner With Us
-            </Link>
+      {/* Social Media Section */}
+      <section id="social" className="social-highlight">
+        <div className="container">
+          <div className="content-split">
+            <div className="content-text">
+              <h2>Follow Our Journey</h2>
+              <p>Stay connected with the latest beer news, event updates, and behind-the-scenes content. We share everything from brewery spotlights to event highlights, keeping you in the loop on all things craft beer in PA & NJ.</p>
+              <div className="social-stats">
+                <div className="social-stat">
+                  <span className="stat-number">{totalFollowers}</span>
+                  <span className="stat-label">Total Followers</span>
+                </div>
+                <div className="social-stat">
+                  <span className="stat-number">4</span>
+                  <span className="stat-label">Platforms</span>
+                </div>
+                <div className="social-stat">
+                  <span className="stat-number">Daily</span>
+                  <span className="stat-label">Updates</span>
+                </div>
+              </div>
+              <div className="social-links-large">
+                <a href={socialStats?.instagram?.handle ? `https://instagram.com/${socialStats.instagram.handle}` : '#'} className="social-button">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" strokeWidth="2" fill="none"/><circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="2" fill="none"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor"/></svg>
+                  Instagram
+                </a>
+                <a href={socialStats?.facebook?.handle ? `https://facebook.com/${socialStats.facebook.handle}` : '#'} className="social-button">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12C24 5.37258 18.6274 0 12 0C5.37258 0 0 5.37258 0 12C0 17.9895 4.38823 22.954 10.125 23.8542V15.4688H7.07812V12H10.125V9.35625C10.125 6.34875 11.9165 4.6875 14.6576 4.6875C15.9705 4.6875 17.3438 4.92188 17.3438 4.92188V7.875H15.8306C14.3399 7.875 13.875 8.80001 13.875 9.74899V12H17.2031L16.6711 15.4688H13.875V23.8542C19.6118 22.954 24 17.9895 24 12Z"/></svg>
+                  Facebook
+                </a>
+                <a href={socialStats?.twitter?.handle ? `https://twitter.com/${socialStats.twitter.handle}` : '#'} className="social-button">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3C22 3.5 21 4 20 4C19 3 18 2 16.5 2C13.5 2 11 4.5 11 7.5C11 8 11 8.5 11 9C7.5 9 4.5 7 2 4C1.5 5 1 6 1 7.5C1 9.5 2 11 3.5 12C2.5 12 2 11.5 1 11C1 14 3 16 5.5 16.5C5 16.5 4.5 17 4 17C3.5 17 3 17 2.5 16.5C3 18.5 5 20 7.5 20C5.5 21.5 3 22 1 22C3 23.5 5.5 24 8 24C16.5 24 21 17 21 8.5C21 8 21 8 21 7.5C22 7 22.5 6 23 5C22 5.5 21 6 20 6C21 5 22 4 23 3Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  Twitter
+                </a>
+              </div>
+            </div>
+            <div className="content-visual">
+              <div className="visual-placeholder" style={{ background: 'linear-gradient(135deg, #8B4513 0%, #654321 100%)' }}>
+                <div className="placeholder-text">
+                  <h3>Social Feed</h3>
+                  <p>Latest posts and updates</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Email Signup */}
+      <section id="signup" className="email-signup">
+        <div className="container">
+          <div className="signup-content">
+            <h2>Stay Connected</h2>
+            <p>Get updates about upcoming events, partnership opportunities, and the latest from the craft beer community.</p>
+            <form className="signup-form" onSubmit={handleEmailSubmit}>
+              <div className="form-group">
+                <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Enter your email address" required />
+                <button type="submit" className="btn-primary" disabled={submitting}>
+                  {submitting ? 'Signing Up...' : 'Sign Up'}
+                </button>
+              </div>
+              {formMessage && <p className={`form-message ${formMessage.includes('🎉') ? 'success' : 'error'}`}>{formMessage}</p>}
+            </form>
+            <p className="privacy-note">We respect your privacy. Unsubscribe at any time.</p>
           </div>
         </div>
       </section>
     </div>
   );
 }
-
-const styles = {
-  loading: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: '60vh',
-    fontSize: '18px',
-    color: '#8B4513',
-  },
-  hero: {
-    backgroundColor: '#FFF3E0',
-    padding: '80px 0',
-  },
-  container: {
-    maxWidth: '1200px',
-    margin: '0 auto',
-    padding: '0 24px',
-  },
-  heroContent: {
-    maxWidth: '800px',
-    margin: '0 auto',
-    textAlign: 'center' as const,
-  },
-  heroTitle: {
-    fontSize: '48px',
-    fontWeight: '800' as const,
-    color: '#654321',
-    marginBottom: '24px',
-    lineHeight: '1.2',
-  },
-  heroSubtitle: {
-    fontSize: '20px',
-    color: '#8B4513',
-    marginBottom: '32px',
-    lineHeight: '1.6',
-  },
-  heroCTA: {
-    display: 'flex',
-    gap: '16px',
-    justifyContent: 'center',
-    marginBottom: '48px',
-  },
-  primaryButton: {
-    backgroundColor: '#D4922A',
-    color: '#FFFFFF',
-    padding: '14px 32px',
-    borderRadius: '8px',
-    fontSize: '16px',
-    fontWeight: '600' as const,
-    textDecoration: 'none',
-    display: 'inline-block',
-    transition: 'background-color 0.2s',
-  },
-  secondaryButton: {
-    backgroundColor: 'transparent',
-    color: '#654321',
-    padding: '14px 32px',
-    borderRadius: '8px',
-    fontSize: '16px',
-    fontWeight: '600' as const,
-    textDecoration: 'none',
-    display: 'inline-block',
-    border: '2px solid #654321',
-    transition: 'all 0.2s',
-  },
-  stats: {
-    display: 'flex',
-    justifyContent: 'center',
-    gap: '48px',
-  },
-  stat: {
-    display: 'flex',
-    flexDirection: 'column' as const,
-    alignItems: 'center',
-  },
-  statNumber: {
-    fontSize: '36px',
-    fontWeight: '700' as const,
-    color: '#D4922A',
-  },
-  statLabel: {
-    fontSize: '14px',
-    color: '#8B4513',
-    marginTop: '8px',
-  },
-  about: {
-    padding: '80px 0',
-    backgroundColor: '#FFFFFF',
-  },
-  sectionTitle: {
-    fontSize: '36px',
-    fontWeight: '700' as const,
-    color: '#654321',
-    textAlign: 'center' as const,
-    marginBottom: '24px',
-  },
-  aboutText: {
-    fontSize: '18px',
-    color: '#666',
-    textAlign: 'center' as const,
-    maxWidth: '700px',
-    margin: '0 auto 48px',
-    lineHeight: '1.7',
-  },
-  statsGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-    gap: '24px',
-    maxWidth: '900px',
-    margin: '0 auto',
-  },
-  statCard: {
-    backgroundColor: '#FFF3E0',
-    padding: '32px 24px',
-    borderRadius: '12px',
-    textAlign: 'center' as const,
-  },
-  statCardNumber: {
-    fontSize: '32px',
-    fontWeight: '700' as const,
-    color: '#D4922A',
-    marginBottom: '8px',
-  },
-  statCardLabel: {
-    fontSize: '14px',
-    color: '#8B4513',
-    textTransform: 'uppercase' as const,
-    letterSpacing: '0.5px',
-  },
-  events: {
-    padding: '80px 0',
-    backgroundColor: '#FAFAF8',
-  },
-  eventsGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-    gap: '24px',
-    marginTop: '40px',
-  },
-  eventCard: {
-    backgroundColor: '#FFFFFF',
-    padding: '24px',
-    borderRadius: '12px',
-    display: 'flex',
-    gap: '16px',
-    textDecoration: 'none',
-    transition: 'transform 0.2s, box-shadow 0.2s',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-  },
-  eventDate: {
-    backgroundColor: '#FFF3E0',
-    padding: '12px',
-    borderRadius: '8px',
-    display: 'flex',
-    flexDirection: 'column' as const,
-    alignItems: 'center',
-    minWidth: '70px',
-  },
-  eventMonth: {
-    fontSize: '12px',
-    color: '#8B4513',
-    textTransform: 'uppercase' as const,
-    fontWeight: '600' as const,
-  },
-  eventDay: {
-    fontSize: '28px',
-    color: '#D4922A',
-    fontWeight: '700' as const,
-    marginTop: '4px',
-  },
-  eventDetails: {
-    flex: 1,
-  },
-  eventName: {
-    fontSize: '18px',
-    fontWeight: '600' as const,
-    color: '#654321',
-    marginBottom: '8px',
-  },
-  eventLocation: {
-    fontSize: '14px',
-    color: '#666',
-  },
-  cta: {
-    backgroundColor: '#654321',
-    padding: '80px 0',
-    textAlign: 'center' as const,
-  },
-  ctaTitle: {
-    fontSize: '36px',
-    fontWeight: '700' as const,
-    color: '#FFFFFF',
-    marginBottom: '16px',
-  },
-  ctaText: {
-    fontSize: '18px',
-    color: '#D4922A',
-    marginBottom: '32px',
-  },
-  ctaButtons: {
-    display: 'flex',
-    gap: '16px',
-    justifyContent: 'center',
-  },
-};
