@@ -5,9 +5,9 @@ import { resolve } from 'path';
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  root: './',
+  root: './src/admin',
   build: {
-    outDir: 'dist/admin',
+    outDir: '../../dist/admin',
     emptyOutDir: true,
     rollupOptions: {
       input: {
