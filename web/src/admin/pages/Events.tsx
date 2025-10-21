@@ -41,6 +41,13 @@ export default function Events() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
 
+  // Filtering and sorting state
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'approved' | 'pending'>('all');
+  const [typeFilter, setTypeFilter] = useState<'all' | 'brewedat' | 'local'>('all');
+  const [sortField, setSortField] = useState<'name' | 'eventDate' | 'location'>('eventDate');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+
   // Load events
   useEffect(() => {
     loadEvents();
@@ -180,6 +187,41 @@ export default function Events() {
       month: 'short',
       day: 'numeric',
     });
+  };
+
+  // Filter and sort events
+  const filteredAndSortedEvents = events
+    .filter(event => {
+      const matchesSearch =
+        event.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        event.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        event.description?.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesStatus =
+        statusFilter === 'all' ||
+        (statusFilter === 'approved' && event.approved) ||
+        (statusFilter === 'pending' && !event.approved);
+      const matchesType = typeFilter === 'all' || event.eventType === typeFilter;
+      return matchesSearch && matchesStatus && matchesType;
+    })
+    .sort((a, b) => {
+      let comparison = 0;
+      if (sortField === 'name') {
+        comparison = a.name.localeCompare(b.name);
+      } else if (sortField === 'eventDate') {
+        comparison = a.eventDate.toMillis() - b.eventDate.toMillis();
+      } else if (sortField === 'location') {
+        comparison = a.location.localeCompare(b.location);
+      }
+      return sortDirection === 'asc' ? comparison : -comparison;
+    });
+
+  const handleSort = (field: 'name' | 'eventDate' | 'location') => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
   };
 
   return (
@@ -587,25 +629,110 @@ export default function Events() {
           All Events ({events.length})
         </h2>
 
+        {/* Search and Filters */}
+        <div style={{ display: 'flex', gap: '12px', marginBottom: '20px', flexWrap: 'wrap' }}>
+          <input
+            type="text"
+            placeholder="Search events..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={{
+              flex: 1,
+              minWidth: '250px',
+              padding: '10px 12px',
+              border: '1px solid #ddd',
+              borderRadius: '6px',
+              fontSize: '14px',
+            }}
+          />
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value as 'all' | 'approved' | 'pending')}
+            style={{
+              padding: '10px 12px',
+              border: '1px solid #ddd',
+              borderRadius: '6px',
+              fontSize: '14px',
+              backgroundColor: 'white',
+            }}
+          >
+            <option value="all">All Status</option>
+            <option value="approved">Approved Only</option>
+            <option value="pending">Pending Only</option>
+          </select>
+          <select
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value as 'all' | 'brewedat' | 'local')}
+            style={{
+              padding: '10px 12px',
+              border: '1px solid #ddd',
+              borderRadius: '6px',
+              fontSize: '14px',
+              backgroundColor: 'white',
+            }}
+          >
+            <option value="all">All Types</option>
+            <option value="brewedat">BrewedAt Only</option>
+            <option value="local">Local Only</option>
+          </select>
+        </div>
+
         {events.length === 0 ? (
           <p style={{ textAlign: 'center', color: '#8B4513', padding: '40px' }}>
             No events yet. Create your first event above!
+          </p>
+        ) : filteredAndSortedEvents.length === 0 ? (
+          <p style={{ textAlign: 'center', color: '#8B4513', padding: '40px' }}>
+            No events match your filters.
           </p>
         ) : (
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ borderBottom: '2px solid #ddd' }}>
-                  <th style={{ padding: '12px', textAlign: 'left', color: '#654321' }}>Event</th>
-                  <th style={{ padding: '12px', textAlign: 'left', color: '#654321' }}>Date</th>
-                  <th style={{ padding: '12px', textAlign: 'left', color: '#654321' }}>Location</th>
+                  <th
+                    onClick={() => handleSort('name')}
+                    style={{
+                      padding: '12px',
+                      textAlign: 'left',
+                      color: '#654321',
+                      cursor: 'pointer',
+                      userSelect: 'none',
+                    }}
+                  >
+                    Event {sortField === 'name' && (sortDirection === 'asc' ? '↑' : '↓')}
+                  </th>
+                  <th
+                    onClick={() => handleSort('eventDate')}
+                    style={{
+                      padding: '12px',
+                      textAlign: 'left',
+                      color: '#654321',
+                      cursor: 'pointer',
+                      userSelect: 'none',
+                    }}
+                  >
+                    Date {sortField === 'eventDate' && (sortDirection === 'asc' ? '↑' : '↓')}
+                  </th>
+                  <th
+                    onClick={() => handleSort('location')}
+                    style={{
+                      padding: '12px',
+                      textAlign: 'left',
+                      color: '#654321',
+                      cursor: 'pointer',
+                      userSelect: 'none',
+                    }}
+                  >
+                    Location {sortField === 'location' && (sortDirection === 'asc' ? '↑' : '↓')}
+                  </th>
                   <th style={{ padding: '12px', textAlign: 'left', color: '#654321' }}>Type</th>
                   <th style={{ padding: '12px', textAlign: 'center', color: '#654321' }}>Status</th>
                   <th style={{ padding: '12px', textAlign: 'center', color: '#654321' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {events.map((event) => (
+                {filteredAndSortedEvents.map((event) => (
                   <tr key={event.id} style={{ borderBottom: '1px solid #eee' }}>
                     <td style={{ padding: '12px' }}>
                       <div style={{ fontWeight: '600', color: '#333' }}>{event.name}</div>

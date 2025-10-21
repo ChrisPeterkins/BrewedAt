@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, where } from 'firebase/firestore';
 import { db } from '@shared/firebase.config';
 import type { PodcastEpisode } from '@shared/types';
 
@@ -14,7 +14,11 @@ export default function PodcastPage() {
   const loadEpisodes = async () => {
     try {
       const episodesRef = collection(db, 'podcastEpisodes');
-      const q = query(episodesRef, orderBy('publishDate', 'desc'));
+      const q = query(
+        episodesRef,
+        where('videoType', '==', 'episode'),
+        orderBy('publishDate', 'desc')
+      );
       const snapshot = await getDocs(q);
       const data = snapshot.docs.map(doc => ({
         id: doc.id,

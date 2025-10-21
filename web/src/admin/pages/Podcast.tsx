@@ -28,6 +28,8 @@ const INITIAL_FORM_DATA: PodcastFormData = {
   guestName: '',
   thumbnailUrl: '',
   featured: false,
+  videoType: 'episode',
+  durationSeconds: 0,
 };
 
 export default function Podcast() {
@@ -38,6 +40,12 @@ export default function Podcast() {
   const [formData, setFormData] = useState<PodcastFormData>(INITIAL_FORM_DATA);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
+
+  // Filtering and sorting state
+  const [searchTerm, setSearchTerm] = useState('');
+  const [typeFilter, setTypeFilter] = useState<'all' | 'episode' | 'short'>('all');
+  const [sortField, setSortField] = useState<'title' | 'publishDate' | 'duration'>('publishDate');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
 
   useEffect(() => {
     loadEpisodes();
@@ -150,6 +158,8 @@ export default function Podcast() {
       guestName: episode.guestName || '',
       thumbnailUrl: episode.thumbnailUrl || '',
       featured: episode.featured,
+      videoType: episode.videoType || 'episode',
+      durationSeconds: episode.durationSeconds || 0,
     });
     setShowForm(true);
   };
@@ -173,6 +183,43 @@ export default function Podcast() {
       month: 'short',
       day: 'numeric',
     });
+  };
+
+  // Filter and sort episodes
+  const filteredAndSortedEpisodes = episodes
+    .filter(episode => {
+      // Search filter
+      const matchesSearch = episode.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          episode.description?.toLowerCase().includes(searchTerm.toLowerCase());
+
+      // Type filter
+      const matchesType = typeFilter === 'all' || episode.videoType === typeFilter;
+
+      return matchesSearch && matchesType;
+    })
+    .sort((a, b) => {
+      let comparison = 0;
+
+      if (sortField === 'title') {
+        comparison = a.title.localeCompare(b.title);
+      } else if (sortField === 'publishDate') {
+        comparison = a.publishDate.toMillis() - b.publishDate.toMillis();
+      } else if (sortField === 'duration') {
+        const aDuration = a.durationSeconds || 0;
+        const bDuration = b.durationSeconds || 0;
+        comparison = aDuration - bDuration;
+      }
+
+      return sortDirection === 'asc' ? comparison : -comparison;
+    });
+
+  const handleSort = (field: 'title' | 'publishDate' | 'duration') => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
   };
 
   return (
@@ -540,29 +587,83 @@ export default function Podcast() {
         borderRadius: '12px',
         boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
       }}>
-        <h2 style={{ marginTop: 0, color: '#654321', marginBottom: '20px' }}>
-          All Episodes ({episodes.length})
-        </h2>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+          <h2 style={{ margin: 0, color: '#654321' }}>
+            All Episodes ({filteredAndSortedEpisodes.length}{filteredAndSortedEpisodes.length !== episodes.length ? ` of ${episodes.length}` : ''})
+          </h2>
+        </div>
+
+        {/* Search and Filter Controls */}
+        <div style={{ display: 'flex', gap: '12px', marginBottom: '20px', flexWrap: 'wrap' }}>
+          <input
+            type="text"
+            placeholder="Search episodes..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={{
+              flex: 1,
+              minWidth: '250px',
+              padding: '10px 12px',
+              border: '1px solid #ddd',
+              borderRadius: '6px',
+              fontSize: '14px',
+            }}
+          />
+          <select
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value as 'all' | 'episode' | 'short')}
+            style={{
+              padding: '10px 12px',
+              border: '1px solid #ddd',
+              borderRadius: '6px',
+              fontSize: '14px',
+              backgroundColor: 'white',
+            }}
+          >
+            <option value="all">All Types</option>
+            <option value="episode">Episodes Only</option>
+            <option value="short">Shorts Only</option>
+          </select>
+        </div>
 
         {episodes.length === 0 ? (
           <p style={{ textAlign: 'center', color: '#8B4513', padding: '40px' }}>
             No episodes yet. Create your first episode above!
+          </p>
+        ) : filteredAndSortedEpisodes.length === 0 ? (
+          <p style={{ textAlign: 'center', color: '#8B4513', padding: '40px' }}>
+            No episodes match your filters.
           </p>
         ) : (
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ borderBottom: '2px solid #ddd' }}>
-                  <th style={{ padding: '12px', textAlign: 'left', color: '#654321' }}>Episode</th>
+                  <th
+                    onClick={() => handleSort('title')}
+                    style={{ padding: '12px', textAlign: 'left', color: '#654321', cursor: 'pointer', userSelect: 'none' }}
+                  >
+                    Episode {sortField === 'title' && (sortDirection === 'asc' ? '↑' : '↓')}
+                  </th>
                   <th style={{ padding: '12px', textAlign: 'left', color: '#654321' }}>Type</th>
-                  <th style={{ padding: '12px', textAlign: 'left', color: '#654321' }}>Date</th>
-                  <th style={{ padding: '12px', textAlign: 'center', color: '#654321' }}>Duration</th>
+                  <th
+                    onClick={() => handleSort('publishDate')}
+                    style={{ padding: '12px', textAlign: 'left', color: '#654321', cursor: 'pointer', userSelect: 'none' }}
+                  >
+                    Date {sortField === 'publishDate' && (sortDirection === 'asc' ? '↑' : '↓')}
+                  </th>
+                  <th
+                    onClick={() => handleSort('duration')}
+                    style={{ padding: '12px', textAlign: 'center', color: '#654321', cursor: 'pointer', userSelect: 'none' }}
+                  >
+                    Duration {sortField === 'duration' && (sortDirection === 'asc' ? '↑' : '↓')}
+                  </th>
                   <th style={{ padding: '12px', textAlign: 'center', color: '#654321' }}>Status</th>
                   <th style={{ padding: '12px', textAlign: 'center', color: '#654321' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {episodes.map((episode) => (
+                {filteredAndSortedEpisodes.map((episode) => (
                   <tr key={episode.id} style={{ borderBottom: '1px solid #eee' }}>
                     <td style={{ padding: '12px' }}>
                       <div style={{ fontWeight: '600', color: '#333' }}>
