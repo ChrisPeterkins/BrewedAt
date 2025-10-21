@@ -3,10 +3,13 @@ import { signOut } from 'firebase/auth';
 import { auth } from '../firebase.config';
 import BreweryTable from '../components/BreweryTable';
 import Events from './Events';
+import Podcast from './Podcast';
+import Content from './Content';
+import Analytics from './Analytics';
 import Raffles from './Raffles';
 import DataManagement from './DataManagement';
 
-type TabType = 'breweries' | 'events' | 'raffles' | 'data';
+type TabType = 'events' | 'podcast' | 'content' | 'analytics' | 'breweries' | 'raffles' | 'data';
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<TabType>('events');
@@ -41,6 +44,33 @@ export default function Dashboard() {
         <button
           style={{
             ...styles.navButton,
+            ...(activeTab === 'podcast' ? styles.navButtonActive : {})
+          }}
+          onClick={() => setActiveTab('podcast')}
+        >
+          🎙️ Podcast
+        </button>
+        <button
+          style={{
+            ...styles.navButton,
+            ...(activeTab === 'content' ? styles.navButtonActive : {})
+          }}
+          onClick={() => setActiveTab('content')}
+        >
+          ✏️ Content
+        </button>
+        <button
+          style={{
+            ...styles.navButton,
+            ...(activeTab === 'analytics' ? styles.navButtonActive : {})
+          }}
+          onClick={() => setActiveTab('analytics')}
+        >
+          📊 Analytics
+        </button>
+        <button
+          style={{
+            ...styles.navButton,
             ...(activeTab === 'breweries' ? styles.navButtonActive : {})
           }}
           onClick={() => setActiveTab('breweries')}
@@ -69,6 +99,9 @@ export default function Dashboard() {
 
       <main style={styles.main}>
         {activeTab === 'events' && <Events />}
+        {activeTab === 'podcast' && <Podcast />}
+        {activeTab === 'content' && <Content />}
+        {activeTab === 'analytics' && <Analytics />}
         {activeTab === 'breweries' && <BreweryTable />}
         {activeTab === 'raffles' && <Raffles />}
         {activeTab === 'data' && <DataManagement />}
