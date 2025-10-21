@@ -1,198 +1,186 @@
 # BrewedAt Web Platform
 
-This directory contains the unified web platform for BrewedAt, including both the public website and the admin dashboard.
+Modern React + TypeScript web platform with public site and admin dashboard.
 
-## 📁 Project Structure
+## Overview
 
-```
-web/
-├── src/
-│   ├── admin/               # Admin dashboard (React)
-│   │   ├── components/      # Reusable admin components
-│   │   ├── pages/           # Admin page components
-│   │   ├── App.jsx          # Main admin app component
-│   │   ├── main.jsx         # Admin entry point
-│   │   ├── index.html       # Admin HTML template
-│   │   └── firebase.config.js  # Re-exports shared Firebase config
-│   ├── public-site/         # Public website (Static HTML/CSS/JS)
-│   │   ├── *.html           # Website pages
-│   │   ├── script.js        # Website JavaScript
-│   │   ├── styles.css       # Website styles
-│   │   └── events.js        # Event-specific scripts
-│   └── shared/              # Shared utilities & config
-│       └── firebase.config.js  # Firebase configuration (single source of truth)
-├── dist/                    # Build output (generated)
-│   ├── admin/               # Built admin dashboard
-│   └── public/              # Built public website
-├── package.json             # Dependencies & scripts
-├── vite.admin.config.js     # Vite config for admin
-└── vite.public.config.js    # Vite config for public site
-```
+This directory contains two main applications:
+- **Public Site** - Customer-facing website (React + TypeScript SPA)
+- **Admin Dashboard** - Content management system (React + TypeScript)
 
-## 🚀 Getting Started
-
-### Installation
+## Installation
 
 ```bash
-cd web
 npm install
 ```
 
-### Development
+## Development
 
-**Run both sites simultaneously:**
+### Run Both Applications
+
 ```bash
 npm run dev
 ```
 
-**Run admin dashboard only:**
+This starts:
+- Admin Dashboard: http://localhost:5173
+- Public Site: http://localhost:5174
+
+### Run Individual Applications
+
 ```bash
+# Admin dashboard only
 npm run dev:admin
-# Opens at http://localhost:5173
-```
 
-**Run public website only:**
-```bash
+# Public site only
 npm run dev:public
-# Opens at http://localhost:5174
 ```
 
-### Building for Production
+## Building for Production
 
-**Build both sites:**
 ```bash
+# Build both applications
 npm run build
+
+# Build individually
+npm run build:admin
+npm run build:public
 ```
 
-**Build individually:**
-```bash
-npm run build:admin   # Outputs to dist/admin/
-npm run build:public  # Outputs to dist/public/
+Output will be in:
+- `dist/admin/` - Admin dashboard
+- `dist/public/` - Public website
+
+## Project Structure
+
+```
+web/
+├── src/
+│   ├── admin/              # Admin Dashboard
+│   │   ├── pages/          # Dashboard pages
+│   │   │   ├── Events.tsx       # Events CMS
+│   │   │   ├── Podcast.tsx      # Podcast CMS
+│   │   │   ├── Content.tsx      # Homepage content editor
+│   │   │   ├── Analytics.tsx    # Analytics dashboard
+│   │   │   ├── Raffles.tsx      # Raffles management
+│   │   │   └── DataManagement.tsx  # Settings
+│   │   ├── components/     # Admin components
+│   │   ├── App.tsx         # Admin app root
+│   │   └── main.tsx        # Admin entry point
+│   ├── public-site/        # Public Website
+│   │   └── (vanilla HTML/JS currently)
+│   └── shared/             # Shared Code
+│       ├── types.ts        # TypeScript type definitions
+│       └── firebase.config.ts  # Firebase configuration
+├── dist/                   # Production builds
+├── package.json
+├── tsconfig.json           # TypeScript configuration
+├── vite.admin.config.js    # Vite config for admin
+└── vite.public.config.js   # Vite config for public site
 ```
 
-## 🔥 Firebase Deployment
+## Admin Dashboard Features
 
-### Prerequisites
+### 📅 Events Management
+- Create, edit, and delete events
+- Image uploads with Firebase Storage
+- Event categorization (BrewedAt vs Local)
+- Approval workflow
+- Featured event highlighting
 
-1. Make sure you're in the **project root** (not the `web/` folder)
-2. Firebase CLI must be installed: `npm install -g firebase-tools`
-3. You must be logged in: `firebase login`
+### 🎙️ Podcast Episodes
+- Full CRUD for podcast episodes
+- Episode numbering and seasons
+- Multi-platform URLs (Spotify, Apple, YouTube)
+- Guest information
+- Thumbnail uploads
+- Featured episodes
 
-### Deploy
+### ✏️ Homepage Content
+- Edit hero section text
+- Manage about section
+- Update statistics display
+- Real-time content updates
 
-**From project root:**
+### 📊 Analytics
+- Event view tracking
+- Most popular events
+- Time range filtering (7d, 30d, all time)
+- Content performance metrics
+
+### 🍺 Breweries
+- Manage brewery listings
+- QR code generation
+
+### 🎟️ Raffles
+- Create and manage raffles
+- Track entries
+
+### ⚙️ Settings
+- Social media follower counts
+- Site configuration
+- Database management
+
+## Technology Stack
+
+- **Frontend**: React 19 with TypeScript
+- **Build Tool**: Vite
+- **Backend**: Firebase (Firestore, Auth, Storage)
+- **Styling**: Inline styles (CSS-in-JS)
+- **Routing**: React Router (for public site SPA)
+
+## Firebase Integration
+
+The platform uses Firebase for:
+- **Firestore**: Database for all content
+- **Authentication**: Admin login
+- **Storage**: Image and media uploads
+- **Hosting**: Production deployment
+
+Configuration is in `src/shared/firebase.config.ts`.
+
+## Deployment
+
+### Firebase Hosting
 
 ```bash
-# Build web projects first (from web folder)
-cd web && npm run build && cd ..
-
-# Deploy everything (Firestore rules + hosting)
-firebase deploy
-
-# Deploy only hosting
+# From project root
+npm run build
 firebase deploy --only hosting
-
-# Deploy only public site
-firebase deploy --only hosting:public
-
-# Deploy only admin dashboard
-firebase deploy --only hosting:admin
 ```
 
-### Hosting Targets
+The `firebase.json` in the project root is configured for dual-site hosting:
+- Admin dashboard → `brewedat-admin.web.app`
+- Public site → `brewedat.web.app`
 
-This project uses Firebase Hosting targets:
-- **public**: Main website (brewedat.web.app or your custom domain)
-- **admin**: Admin dashboard (brewedat-admin.web.app or admin.yourdomain.com)
+## Development Tips
 
-## 🏗️ Architecture Benefits
+- **Hot Module Replacement (HMR)**: Changes reload instantly during development
+- **TypeScript**: Full type safety and IntelliSense
+- **Firebase Emulator**: (Optional) Use local Firebase emulator for testing
+- **Error Handling**: Check browser console for detailed error messages
 
-### ✅ What This Solves
+## Admin Access
 
-1. **Single Codebase**: All web code in one place
-2. **Shared Configuration**: Firebase config used by both admin and public site
-3. **Unified Dependencies**: One `node_modules`, one `package.json`
-4. **Consistent Builds**: Single build command for everything
-5. **Easier Deployment**: Deploy both sites with one command
-6. **Better Developer Experience**: Run both sites simultaneously for testing
+Default login uses Firebase Authentication. Ensure your Firebase user has `isAdmin: true` in the Firestore `users` collection.
 
-### 🔒 Security
+## Contributing
 
-- Admin dashboard requires Firebase Authentication
-- Firestore rules protect admin-only operations
-- Admin can be deployed to separate subdomain (admin.brewedat.com)
-- Public site can read social media stats, but only admins can write
+1. Create a feature branch
+2. Make changes with TypeScript
+3. Test both admin and public site
+4. Ensure builds pass: `npm run build`
+5. Commit and push
 
-## 📝 Key Files
+## Troubleshooting
 
-### `src/shared/firebase.config.js`
-**Single source of truth** for Firebase configuration. Both admin and public site import from here.
+- **Port conflicts**: Kill processes with `pkill -f vite` or change ports in vite configs
+- **Build errors**: Run `npm install` and check TypeScript errors
+- **Firebase errors**: Verify `firebase.config.ts` has correct credentials
 
-### `vite.admin.config.js`
-Configures build for React admin dashboard:
-- Entry point: `src/admin/index.html`
-- Output: `dist/admin/`
-- Aliases: `@admin`, `@shared`
+## Learn More
 
-### `vite.public.config.js`
-Configures build for static public website:
-- Multiple HTML entry points (index, events, podcast, etc.)
-- Output: `dist/public/`
-- Alias: `@shared`
-
-## 🎯 Common Tasks
-
-### Adding a New Public Page
-
-1. Create `src/public-site/new-page.html`
-2. Add to `vite.public.config.js` rollupOptions.input
-3. Build and deploy
-
-### Updating Social Media Stats
-
-1. Go to admin dashboard
-2. Navigate to "Data Management" tab
-3. Update follower counts
-4. Click "Save Social Media Stats"
-5. Changes appear on public website immediately
-
-### Sharing Code Between Admin & Public
-
-Put shared utilities in `src/shared/` and import using `@shared` alias:
-
-```javascript
-// In admin or public site
-import { db, auth } from '@shared/firebase.config.js';
-```
-
-## 🐛 Troubleshooting
-
-**Build fails with "Cannot find module":**
-- Run `npm install` in the `web/` directory
-- Check that file paths in Vite configs are correct
-
-**Firebase deployment fails:**
-- Make sure you're in the **project root**, not `web/`
-- Run `npm run build` from `web/` folder first
-- Check that `dist/admin` and `dist/public` folders exist
-
-**Admin dashboard shows blank page:**
-- Check browser console for errors
-- Verify Firebase config is correct
-- Make sure you're logged in with an admin account
-
-## 📚 Related Documentation
-
-- Main project README: `../README.md`
-- Firebase integration: `../website/FIREBASE_INTEGRATION.md`
-- Firestore rules: `../firestore.rules`
-
-## 🎓 Learning Resources
-
-- [Vite Documentation](https://vite.dev)
-- [Firebase Hosting](https://firebase.google.com/docs/hosting)
-- [React Documentation](https://react.dev)
-
----
-
-**Need help?** Check the main project README or reach out to the team.
+- [Vite Documentation](https://vitejs.dev/)
+- [React Documentation](https://react.dev/)
+- [TypeScript Documentation](https://www.typescriptlang.org/)
+- [Firebase Documentation](https://firebase.google.com/docs)
