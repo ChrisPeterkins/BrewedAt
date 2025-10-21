@@ -554,7 +554,7 @@ export default function Podcast() {
               <thead>
                 <tr style={{ borderBottom: '2px solid #ddd' }}>
                   <th style={{ padding: '12px', textAlign: 'left', color: '#654321' }}>Episode</th>
-                  <th style={{ padding: '12px', textAlign: 'left', color: '#654321' }}>Guest</th>
+                  <th style={{ padding: '12px', textAlign: 'left', color: '#654321' }}>Type</th>
                   <th style={{ padding: '12px', textAlign: 'left', color: '#654321' }}>Date</th>
                   <th style={{ padding: '12px', textAlign: 'center', color: '#654321' }}>Duration</th>
                   <th style={{ padding: '12px', textAlign: 'center', color: '#654321' }}>Status</th>
@@ -566,14 +566,20 @@ export default function Podcast() {
                   <tr key={episode.id} style={{ borderBottom: '1px solid #eee' }}>
                     <td style={{ padding: '12px' }}>
                       <div style={{ fontWeight: '600', color: '#333' }}>
-                        Episode {episode.episodeNumber}{episode.season ? ` (S${episode.season})` : ''}
-                      </div>
-                      <div style={{ fontSize: '14px', color: '#666', marginTop: '4px' }}>
                         {episode.title}
                       </div>
                     </td>
-                    <td style={{ padding: '12px', color: '#666' }}>
-                      {episode.guestName || '-'}
+                    <td style={{ padding: '12px' }}>
+                      <span style={{
+                        padding: '4px 8px',
+                        borderRadius: '4px',
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        backgroundColor: episode.videoType === 'episode' ? '#E8F5E9' : '#FFF3E0',
+                        color: episode.videoType === 'episode' ? '#2E7D32' : '#E65100',
+                      }}>
+                        {episode.videoType === 'episode' ? 'Episode' : 'Short'}
+                      </span>
                     </td>
                     <td style={{ padding: '12px', color: '#666' }}>
                       {formatDate(episode.publishDate)}
