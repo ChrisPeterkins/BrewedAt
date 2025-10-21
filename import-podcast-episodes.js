@@ -12,7 +12,7 @@ const db = admin.firestore();
 
 // YouTube Data API Configuration
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY || 'YOUR_API_KEY_HERE';
-const CHANNEL_ID = 'UCCYw7P_TKld5pLs14U7_VNQ'; // The BrewedAt Podcast channel ID
+const CHANNEL_ID = 'UCNRWJgn_oy0OWR4oa3JEV2A'; // The BrewedAt Podcast channel ID
 
 async function fetchYouTubeVideos() {
   const videos = [];
