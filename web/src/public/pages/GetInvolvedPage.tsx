@@ -322,12 +322,12 @@ const styles = {
   selectionTitle: {
     fontSize: '28px',
     fontWeight: '700' as const,
-    color: '#654321',
+    color: '#1f3540',
     marginBottom: '12px',
   },
   selectionSubtitle: {
     fontSize: '16px',
-    color: '#8B4513',
+    color: '#25303d',
     marginBottom: '40px',
   },
   buttonGrid: {
@@ -341,7 +341,7 @@ const styles = {
     flexDirection: 'column' as const,
     alignItems: 'center',
     padding: '40px 32px',
-    backgroundColor: '#FFF9F0',
+    backgroundColor: '#fef5e7',
     border: '2px solid #E0E0E0',
     borderRadius: '12px',
     cursor: 'pointer',
@@ -351,7 +351,7 @@ const styles = {
   buttonIcon: {
     width: '64px',
     height: '64px',
-    backgroundColor: '#D4922A',
+    backgroundColor: '#fd5526',
     color: '#FFFFFF',
     borderRadius: '50%',
     display: 'flex',
@@ -362,12 +362,12 @@ const styles = {
   buttonTitle: {
     fontSize: '20px',
     fontWeight: '600' as const,
-    color: '#654321',
+    color: '#1f3540',
     marginBottom: '12px',
   },
   buttonDescription: {
     fontSize: '14px',
-    color: '#8B4513',
+    color: '#25303d',
     lineHeight: '1.6',
     margin: 0,
   },
@@ -379,7 +379,7 @@ const styles = {
     backgroundColor: 'transparent',
     border: '1px solid #E0E0E0',
     borderRadius: '6px',
-    color: '#8B4513',
+    color: '#25303d',
     fontSize: '14px',
     fontWeight: '600' as const,
     cursor: 'pointer',
@@ -395,12 +395,12 @@ const styles = {
   sectionTitle: {
     fontSize: '18px',
     fontWeight: '600' as const,
-    color: '#654321',
+    color: '#1f3540',
     marginBottom: '20px',
   },
   row: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' },
   field: { display: 'flex', flexDirection: 'column' as const, gap: '8px' },
-  label: { fontSize: '14px', fontWeight: '600' as const, color: '#654321' },
+  label: { fontSize: '14px', fontWeight: '600' as const, color: '#1f3540' },
   input: {
     padding: '12px',
     border: '1px solid #E0E0E0',
@@ -419,7 +419,7 @@ const styles = {
   },
   submitButton: {
     padding: '14px 32px',
-    backgroundColor: '#D4922A',
+    backgroundColor: '#fd5526',
     color: '#FFFFFF',
     border: 'none',
     borderRadius: '8px',
@@ -429,5 +429,5 @@ const styles = {
     marginTop: '12px',
     transition: 'background-color 0.3s ease',
   },
-  success: { textAlign: 'center' as const, padding: '40px', color: '#654321' },
+  success: { textAlign: 'center' as const, padding: '40px', color: '#1f3540' },
 };

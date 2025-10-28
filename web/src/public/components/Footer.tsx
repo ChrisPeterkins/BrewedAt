@@ -109,8 +109,8 @@ export default function Footer() {
 
 const styles = {
   footer: {
-    backgroundColor: '#2C1810',
-    color: '#FFFFFF',
+    backgroundColor: '#fef5e7',
+    color: '#1f3540',
     padding: '48px 0 24px',
     marginTop: 'auto',
   },
@@ -135,7 +135,7 @@ const styles = {
     width: 'auto',
   },
   tagline: {
-    color: '#D4922A',
+    color: '#25303d',
     fontSize: '14px',
     margin: 0,
   },
@@ -148,7 +148,7 @@ const styles = {
     gap: '12px',
   },
   columnTitle: {
-    color: '#D4922A',
+    color: '#1f3540',
     fontSize: '14px',
     fontWeight: '600' as const,
     textTransform: 'uppercase' as const,
@@ -156,18 +156,18 @@ const styles = {
     margin: '0 0 8px 0',
   },
   link: {
-    color: '#CCCCCC',
+    color: '#25303d',
     fontSize: '14px',
     textDecoration: 'none',
     transition: 'color 0.2s',
   },
   bottom: {
-    borderTop: '1px solid #3D2A1F',
+    borderTop: '1px solid rgba(31, 53, 64, 0.15)',
     paddingTop: '24px',
     textAlign: 'center' as const,
   },
   copyright: {
-    color: '#999999',
+    color: '#6b7580',
     fontSize: '13px',
     margin: 0,
   },

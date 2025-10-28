@@ -46,17 +46,17 @@ export default function HallOfChampionsPage() {
 }
 
 const styles = {
-  header: { backgroundColor: '#FFF3E0', padding: '60px 0', textAlign: 'center' as const },
+  header: { backgroundColor: '#fef5e7', padding: '60px 0', textAlign: 'center' as const },
   container: { maxWidth: '1200px', margin: '0 auto', padding: '0 24px' },
-  title: { fontSize: '42px', fontWeight: '700' as const, color: '#654321', marginBottom: '16px' },
-  subtitle: { fontSize: '18px', color: '#8B4513' },
+  title: { fontSize: '42px', fontWeight: '700' as const, color: '#1f3540', marginBottom: '16px' },
+  subtitle: { fontSize: '18px', color: '#25303d' },
   section: { padding: '60px 0' },
   championsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '32px' },
   championCard: { backgroundColor: '#FFFFFF', padding: '40px', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', textAlign: 'center' as const },
   icon: { fontSize: '64px', marginBottom: '16px' },
-  gameTitle: { fontSize: '24px', fontWeight: '600' as const, color: '#654321', marginBottom: '8px' },
-  platform: { fontSize: '13px', color: '#D4922A', marginBottom: '16px', fontWeight: '600' as const, textTransform: 'uppercase' as const },
+  gameTitle: { fontSize: '24px', fontWeight: '600' as const, color: '#1f3540', marginBottom: '8px' },
+  platform: { fontSize: '13px', color: '#fd5526', marginBottom: '16px', fontWeight: '600' as const, textTransform: 'uppercase' as const },
   description: { fontSize: '15px', color: '#666', marginBottom: '24px', lineHeight: '1.6' },
-  placeholder: { backgroundColor: '#FFF3E0', padding: '32px', borderRadius: '8px' },
+  placeholder: { backgroundColor: '#fef5e7', padding: '32px', borderRadius: '8px' },
   trophy: { fontSize: '48px', marginBottom: '8px' },
 };

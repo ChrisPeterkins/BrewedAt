@@ -206,10 +206,10 @@ const styles = {
     justifyContent: 'center',
     minHeight: '60vh',
     fontSize: '18px',
-    color: '#8B4513',
+    color: '#25303d',
   },
   header: {
-    backgroundColor: '#FFF3E0',
+    backgroundColor: '#fef5e7',
     padding: '60px 0',
     textAlign: 'center' as const,
   },
@@ -221,12 +221,12 @@ const styles = {
   pageTitle: {
     fontSize: '42px',
     fontWeight: '700' as const,
-    color: '#654321',
+    color: '#1f3540',
     marginBottom: '16px',
   },
   pageSubtitle: {
     fontSize: '18px',
-    color: '#8B4513',
+    color: '#25303d',
   },
   section: {
     padding: '60px 0',
@@ -234,7 +234,7 @@ const styles = {
   sectionTitle: {
     fontSize: '32px',
     fontWeight: '700' as const,
-    color: '#654321',
+    color: '#1f3540',
     marginBottom: '32px',
   },
   eventsGrid: {
@@ -265,7 +265,7 @@ const styles = {
     marginBottom: '16px',
   },
   eventDate: {
-    backgroundColor: '#FFF3E0',
+    backgroundColor: '#fef5e7',
     padding: '12px 16px',
     borderRadius: '8px',
     display: 'flex',
@@ -275,18 +275,18 @@ const styles = {
   },
   month: {
     fontSize: '12px',
-    color: '#8B4513',
+    color: '#25303d',
     textTransform: 'uppercase' as const,
     fontWeight: '600' as const,
   },
   day: {
     fontSize: '24px',
-    color: '#D4922A',
+    color: '#fd5526',
     fontWeight: '700' as const,
     marginTop: '4px',
   },
   featuredBadge: {
-    backgroundColor: '#D4922A',
+    backgroundColor: '#fd5526',
     color: '#FFFFFF',
     padding: '6px 12px',
     borderRadius: '6px',
@@ -296,7 +296,7 @@ const styles = {
   eventName: {
     fontSize: '20px',
     fontWeight: '600' as const,
-    color: '#654321',
+    color: '#1f3540',
     marginBottom: '12px',
   },
   eventDescription: {
@@ -316,7 +316,7 @@ const styles = {
     alignItems: 'center',
     gap: '6px',
     fontSize: '14px',
-    color: '#8B4513',
+    color: '#25303d',
   },
   eventActions: {
     display: 'flex',
@@ -325,8 +325,8 @@ const styles = {
   linkButton: {
     padding: '10px 20px',
     backgroundColor: 'transparent',
-    color: '#654321',
-    border: '1px solid #654321',
+    color: '#1f3540',
+    border: '1px solid #1f3540',
     borderRadius: '6px',
     fontSize: '14px',
     fontWeight: '600' as const,
@@ -336,7 +336,7 @@ const styles = {
   },
   primaryLinkButton: {
     padding: '10px 20px',
-    backgroundColor: '#D4922A',
+    backgroundColor: '#fd5526',
     color: '#FFFFFF',
     border: 'none',
     borderRadius: '6px',
@@ -349,10 +349,10 @@ const styles = {
   noEvents: {
     textAlign: 'center' as const,
     padding: '60px 24px',
-    color: '#8B4513',
+    color: '#25303d',
   },
   cta: {
-    backgroundColor: '#654321',
+    backgroundColor: '#1f3540',
     padding: '60px 0',
     textAlign: 'center' as const,
   },
@@ -364,12 +364,12 @@ const styles = {
   },
   ctaText: {
     fontSize: '16px',
-    color: '#D4922A',
+    color: '#fd5526',
     marginBottom: '24px',
   },
   ctaButton: {
     padding: '14px 32px',
-    backgroundColor: '#D4922A',
+    backgroundColor: '#fd5526',
     color: '#FFFFFF',
     borderRadius: '8px',
     fontSize: '16px',

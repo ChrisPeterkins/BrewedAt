@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { doc, getDoc, collection, query, where, orderBy, limit, getDocs } from 'firebase/firestore';
 import { db } from '@shared/firebase.config';
 import type { SocialMediaStats, Event } from '@shared/types';
@@ -6,49 +6,15 @@ import type { SocialMediaStats, Event } from '@shared/types';
 export default function HomePage() {
   const [socialStats, setSocialStats] = useState<SocialMediaStats | null>(null);
   const [featuredEvents, setFeaturedEvents] = useState<Event[]>([]);
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const [currentEventSlide, setCurrentEventSlide] = useState(0);
   const [totalFollowers, setTotalFollowers] = useState('15,000+');
   const [email, setEmail] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [formMessage, setFormMessage] = useState('');
-  const autoplayRef = useRef<NodeJS.Timeout | null>(null);
-
-  const slides = [
-    {
-      title: 'Gaming Tournaments',
-      desc: 'Mario Kart & Smash Bros at Local Breweries',
-      gradient: 'linear-gradient(135deg, #D4922A 0%, #8B4513 100%)'
-    },
-    {
-      title: 'Crafted in Philly',
-      desc: '11 Breweries, 2 Months of Craft Beer Tours',
-      gradient: 'linear-gradient(135deg, #654321 0%, #D4922A 100%)'
-    },
-    {
-      title: 'Brewery Partnerships',
-      desc: 'Connecting Communities Across PA & NJ',
-      gradient: 'linear-gradient(135deg, #8B4513 0%, #654321 100%)'
-    },
-    {
-      title: 'Live Events',
-      desc: 'Year-Round Activations & Experiences',
-      gradient: 'linear-gradient(135deg, #D4922A 0%, #654321 100%)'
-    },
-    {
-      title: 'Local Taprooms',
-      desc: 'Supporting Craft Beer Culture',
-      gradient: 'linear-gradient(135deg, #654321 0%, #8B4513 100%)'
-    }
-  ];
 
   useEffect(() => {
     loadSocialStats();
     loadFeaturedEvents();
-  }, []);
-
-  useEffect(() => {
-    startAutoplay();
-    return () => stopAutoplay();
   }, []);
 
   const loadSocialStats = async () => {
@@ -71,50 +37,37 @@ export default function HomePage() {
   const loadFeaturedEvents = async () => {
     try {
       const eventsRef = collection(db, 'events');
+      const now = new Date();
       const q = query(
         eventsRef,
         where('approved', '==', true),
-        where('featured', '==', true),
-        orderBy('eventDate', 'asc'),
-        limit(3)
+        orderBy('eventDate', 'asc')
       );
       const snapshot = await getDocs(q);
       const events = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       })) as Event[];
-      setFeaturedEvents(events);
+      // Filter to only show upcoming events
+      const upcomingEvents = events.filter(event => event.eventDate.toDate() >= now);
+      setFeaturedEvents(upcomingEvents);
     } catch (error) {
       console.error('Error loading featured events:', error);
     }
   };
 
-  const startAutoplay = () => {
-    stopAutoplay();
-    autoplayRef.current = setInterval(() => {
-      nextSlide();
-    }, 5000);
+  const nextEventSlide = () => {
+    setCurrentEventSlide((prev) => (prev + 1) % featuredEvents.length);
   };
 
-  const stopAutoplay = () => {
-    if (autoplayRef.current) {
-      clearInterval(autoplayRef.current);
-    }
+  const prevEventSlide = () => {
+    setCurrentEventSlide((prev) => (prev - 1 + featuredEvents.length) % featuredEvents.length);
   };
 
-  const nextSlide = () => {
-    setCurrentSlide(prev => (prev + 1) % slides.length);
+  const goToEventSlide = (index: number) => {
+    setCurrentEventSlide(index);
   };
 
-  const prevSlide = () => {
-    setCurrentSlide(prev => (prev - 1 + slides.length) % slides.length);
-  };
-
-  const goToSlide = (index: number) => {
-    setCurrentSlide(index);
-    stopAutoplay();
-    startAutoplay();
-  };
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -138,10 +91,12 @@ export default function HomePage() {
       <section className="hero">
         <div className="hero-content">
           <div className="hero-text">
-            <h1>Tap into the Local Craft Beverage Scene</h1>
-            <p className="hero-subtitle">
-              Something's always brewing in the craft beverage scene. Stay up to date on unforgettable events, local stories, and interactive campaigns that help you discover your next favorite brewery, beverage, or bar!
-            </p>
+            <img
+              src="/brewedat-logo.png"
+              alt="BrewedAt Logo"
+              className="hero-logo"
+            />
+            <h1>Tap into the Local Craft&nbsp;Beverage Scene</h1>
             <div className="hero-cta">
               <a href="#events" className="btn-large btn-primary">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -150,7 +105,7 @@ export default function HomePage() {
                 </svg>
                 Events
               </a>
-              <a href="#podcast" className="btn-large btn-secondary">
+              <a href="#podcast" className="btn-large btn-primary">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                   <circle cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="2" fill="none"/>
                   <circle cx="12" cy="12" r="3" fill="currentColor"/>
@@ -158,52 +113,13 @@ export default function HomePage() {
                 </svg>
                 Podcast
               </a>
-              <a href="#social" className="btn-large btn-secondary">
+              <a href="#social" className="btn-large btn-primary">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                   <path d="M16 8C16 10.2091 14.2091 12 12 12C9.79086 12 8 10.2091 8 8C8 5.79086 9.79086 4 12 4C14.2091 4 16 5.79086 16 8Z" stroke="currentColor" strokeWidth="2"/>
                   <path d="M12 14C8.13401 14 5 17.134 5 21H19C19 17.134 15.866 14 12 14Z" stroke="currentColor" strokeWidth="2"/>
                 </svg>
                 Social
               </a>
-            </div>
-            <div className="hero-stats">
-              <div className="stat">
-                <span className="stat-number">{totalFollowers}</span>
-                <span className="stat-label">Community Members</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Carousel */}
-          <div className="hero-carousel">
-            <div className="carousel-container">
-              <div className="carousel-track" style={{ transform: `translateX(-${currentSlide * (33.333 + 2)}%)` }}>
-                {slides.map((slide, idx) => (
-                  <div key={idx} className="carousel-slide">
-                    <div className="carousel-image" style={{ background: slide.gradient }}>
-                      <div className="carousel-overlay">
-                        <h3>{slide.title}</h3>
-                        <p>{slide.desc}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <button className="carousel-button carousel-button-prev" onClick={prevSlide}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                  <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </button>
-              <button className="carousel-button carousel-button-next" onClick={nextSlide}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                  <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </button>
-              <div className="carousel-dots">
-                {slides.map((_, idx) => (
-                  <div key={idx} className={`carousel-dot ${idx === currentSlide ? 'active' : ''}`} onClick={() => goToSlide(idx)} />
-                ))}
-              </div>
             </div>
           </div>
         </div>
@@ -229,28 +145,100 @@ export default function HomePage() {
             </div>
             <div className="content-visual">
               {featuredEvents.length > 0 ? (
-                <div className="featured-events-list">
-                  {featuredEvents.map((event) => (
-                    <a key={event.id} href="/events" className="featured-event-card">
-                      <div className="featured-event-date">
-                        <span className="month">{event.eventDate.toDate().toLocaleDateString('en-US', { month: 'short' })}</span>
-                        <span className="day">{event.eventDate.toDate().getDate()}</span>
-                      </div>
-                      <div className="featured-event-info">
-                        <h4>{event.name}</h4>
-                        <div className="event-meta">
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                            <circle cx="12" cy="10" r="3"/>
-                          </svg>
-                          <span>{event.location}</span>
+                <div className="events-carousel">
+                  <div className="events-carousel-container">
+                    {featuredEvents.map((event, idx) => (
+                      <a
+                        key={event.id}
+                        href="/events"
+                        className="featured-event-card"
+                        style={{
+                          display: idx === currentEventSlide ? 'flex' : 'none'
+                        }}
+                      >
+                        <div className="featured-event-date">
+                          <span className="month">{event.eventDate.toDate().toLocaleDateString('en-US', { month: 'short' })}</span>
+                          <span className="day">{event.eventDate.toDate().getDate()}</span>
                         </div>
-                      </div>
-                    </a>
-                  ))}
+                        <div className="featured-event-info">
+                          <div className="featured-event-header">
+                            <h4>{event.name}</h4>
+                            {event.eventType && (
+                              <span className={`event-type-badge ${event.eventType}`}>
+                                {event.eventType === 'brewedat' ? 'BrewedAt Event' : 'Local Event'}
+                              </span>
+                            )}
+                          </div>
+                          {event.description && (
+                            <p className="featured-event-description">
+                              {event.description.length > 150 ? event.description.substring(0, 150) + '...' : event.description}
+                            </p>
+                          )}
+                          <div className="featured-event-details">
+                            <div className="event-meta">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                                <circle cx="12" cy="10" r="3"/>
+                              </svg>
+                              <span>{event.location}</span>
+                            </div>
+                            {event.eventTime && (
+                              <div className="event-meta">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <circle cx="12" cy="12" r="10"/>
+                                  <path d="M12 6v6l4 2"/>
+                                </svg>
+                                <span>{event.eventTime}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </a>
+                    ))}
+                    {featuredEvents.length > 1 && (
+                      <>
+                        <button
+                          className="events-carousel-button events-carousel-button-prev"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            prevEventSlide();
+                          }}
+                          type="button"
+                        >
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </button>
+                        <button
+                          className="events-carousel-button events-carousel-button-next"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            nextEventSlide();
+                          }}
+                          type="button"
+                        >
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </button>
+                        <div className="events-carousel-dots">
+                          {featuredEvents.map((_, idx) => (
+                            <div
+                              key={idx}
+                              className={`carousel-dot ${idx === currentEventSlide ? 'active' : ''}`}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                goToEventSlide(idx);
+                              }}
+                            />
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </div>
               ) : (
-                <div className="visual-placeholder" style={{ background: 'linear-gradient(135deg, #D4922A 0%, #8B4513 100%)' }}>
+                <div className="visual-placeholder" style={{ background: 'linear-gradient(135deg, #fd5526 0%, #e04515 100%)' }}>
                   <div className="placeholder-text">
                     <h3>Upcoming Events</h3>
                     <p>Check out what's happening this month</p>

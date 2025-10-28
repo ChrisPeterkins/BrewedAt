@@ -44,14 +44,14 @@ export default function PressPage() {
 }
 
 const styles = {
-  header: { backgroundColor: '#FFF3E0', padding: '60px 0', textAlign: 'center' as const },
+  header: { backgroundColor: '#fef5e7', padding: '60px 0', textAlign: 'center' as const },
   container: { maxWidth: '1200px', margin: '0 auto', padding: '0 24px' },
-  title: { fontSize: '42px', fontWeight: '700' as const, color: '#654321', marginBottom: '16px' },
-  subtitle: { fontSize: '18px', color: '#8B4513' },
+  title: { fontSize: '42px', fontWeight: '700' as const, color: '#1f3540', marginBottom: '16px' },
+  subtitle: { fontSize: '18px', color: '#25303d' },
   section: { padding: '60px 0' },
   pressGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' },
   pressCard: { backgroundColor: '#FFFFFF', padding: '32px', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' },
-  pressTitle: { fontSize: '20px', fontWeight: '600' as const, color: '#654321', marginBottom: '12px' },
+  pressTitle: { fontSize: '20px', fontWeight: '600' as const, color: '#1f3540', marginBottom: '12px' },
   pressExcerpt: { fontSize: '15px', color: '#666', marginBottom: '16px', lineHeight: '1.6' },
-  readMore: { color: '#D4922A', fontSize: '14px', fontWeight: '600' as const, textDecoration: 'none' },
+  readMore: { color: '#fd5526', fontSize: '14px', fontWeight: '600' as const, textDecoration: 'none' },
 };

@@ -158,10 +158,10 @@ export default function SubmitEventPage() {
 }
 
 const styles = {
-  header: { backgroundColor: '#FFF3E0', padding: '60px 0', textAlign: 'center' as const },
+  header: { backgroundColor: '#fef5e7', padding: '60px 0', textAlign: 'center' as const },
   container: { maxWidth: '1200px', margin: '0 auto', padding: '0 24px' },
-  title: { fontSize: '42px', fontWeight: '700' as const, color: '#654321', marginBottom: '16px' },
-  subtitle: { fontSize: '18px', color: '#8B4513' },
+  title: { fontSize: '42px', fontWeight: '700' as const, color: '#1f3540', marginBottom: '16px' },
+  subtitle: { fontSize: '18px', color: '#25303d' },
   section: {
     marginBottom: '32px',
     paddingBottom: '32px',
@@ -170,16 +170,16 @@ const styles = {
   sectionTitle: {
     fontSize: '18px',
     fontWeight: '600' as const,
-    color: '#654321',
+    color: '#1f3540',
     marginBottom: '20px',
   },
   formContainer: { maxWidth: '700px', margin: '0 auto', backgroundColor: '#FFFFFF', padding: '40px', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' },
   form: { display: 'flex', flexDirection: 'column' as const, gap: '20px' },
   row: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' },
   field: { display: 'flex', flexDirection: 'column' as const, gap: '8px' },
-  label: { fontSize: '14px', fontWeight: '600' as const, color: '#654321' },
+  label: { fontSize: '14px', fontWeight: '600' as const, color: '#1f3540' },
   input: { padding: '12px', border: '1px solid #E0E0E0', borderRadius: '6px', fontSize: '15px', fontFamily: 'inherit' },
   textarea: { padding: '12px', border: '1px solid #E0E0E0', borderRadius: '6px', fontSize: '15px', fontFamily: 'inherit', resize: 'vertical' as const },
-  submitButton: { padding: '14px 32px', backgroundColor: '#D4922A', color: '#FFFFFF', border: 'none', borderRadius: '8px', fontSize: '16px', fontWeight: '600' as const, cursor: 'pointer', marginTop: '12px' },
-  success: { textAlign: 'center' as const, padding: '40px', color: '#654321' },
+  submitButton: { padding: '14px 32px', backgroundColor: '#fd5526', color: '#FFFFFF', border: 'none', borderRadius: '8px', fontSize: '16px', fontWeight: '600' as const, cursor: 'pointer', marginTop: '12px' },
+  success: { textAlign: 'center' as const, padding: '40px', color: '#1f3540' },
 };
