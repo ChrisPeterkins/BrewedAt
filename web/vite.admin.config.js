@@ -6,6 +6,7 @@ import { resolve } from 'path';
 export default defineConfig({
   plugins: [react()],
   root: './src/admin',
+  base: '/brewedat/admin/',
   build: {
     outDir: '../../dist/admin',
     emptyOutDir: true,

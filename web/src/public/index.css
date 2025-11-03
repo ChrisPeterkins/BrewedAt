@@ -8,6 +8,17 @@
     box-sizing: border-box;
 }
 
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+#root {
+    overflow-x: hidden;
+    width: 100%;
+}
+
 :root {
     /* Theme colors - set by ThemeContext */
     --color-primary: #1f3540;
@@ -34,12 +45,20 @@
     --gradient-end: var(--color-surface);
 }
 
+html {
+    overflow-x: hidden;
+    width: 100%;
+}
+
 body {
     font-family: var(--font-family);
     background-color: var(--color-background);
     color: var(--color-text);
     line-height: 1.6;
     overflow-x: hidden;
+    width: 100%;
+    margin: 0;
+    padding: 0;
 }
 
 .container {
@@ -200,7 +219,7 @@ p {
     display: flex;
     align-items: center;
     position: relative;
-    background-image: url('/beer background.png');
+    background-image: url('/beer-background-optimized.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -812,15 +831,22 @@ p {
 
     .hero {
         padding: 100px 20px 60px;
+        min-height: auto;
     }
 
     .hero-logo {
         height: 140px;
+        max-width: 90%;
     }
 
     .hero-stats {
         grid-template-columns: 1fr;
         gap: 1rem;
+    }
+
+    .hero-cta {
+        flex-direction: column;
+        align-items: stretch;
     }
 
     .phone-mockup {
@@ -845,6 +871,29 @@ p {
     .footer-links,
     .footer-social {
         flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    /* Prevent horizontal overflow */
+    .container {
+        padding: 0 16px;
+        max-width: 100%;
+    }
+
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .hero-text h1 {
+        font-size: 2rem;
+        word-wrap: break-word;
+    }
+
+    .btn-large,
+    .btn-primary,
+    .btn-secondary {
+        width: 100%;
         justify-content: center;
     }
 }
@@ -1192,6 +1241,28 @@ html {
 
     .champion-description {
         padding: 20px;
+    }
+
+    /* Additional mobile overflow fixes */
+    .features-grid,
+    .value-grid,
+    .events-grid,
+    .press-grid,
+    .partnership-grid,
+    .stories-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    section,
+    .section {
+        overflow-x: hidden;
+    }
+
+    .hero-content,
+    .content-split {
+        width: 100%;
+        max-width: 100%;
     }
 }
 

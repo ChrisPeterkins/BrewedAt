@@ -12,7 +12,7 @@ import HallOfChampionsPage from './pages/HallOfChampionsPage';
 function App() {
   return (
     <ThemeProvider>
-      <Router>
+      <Router basename="/brewedat">
         <Layout>
           <Routes>
             <Route path="/" element={<HomePage />} />

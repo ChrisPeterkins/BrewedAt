@@ -31,7 +31,7 @@ export default function Footer() {
         <div style={styles.content}>
           <div style={styles.logoSection}>
             <img
-              src="/brewedat-logo.png"
+              src="/brewedat/brewedat-logo.png"
               alt="BrewedAt Logo"
               style={styles.logo}
             />

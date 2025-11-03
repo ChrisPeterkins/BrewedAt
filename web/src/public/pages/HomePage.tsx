@@ -92,7 +92,7 @@ export default function HomePage() {
         <div className="hero-content">
           <div className="hero-text">
             <img
-              src="/brewedat-logo.png"
+              src="/brewedat/brewedat-logo.png"
               alt="BrewedAt Logo"
               className="hero-logo"
             />

@@ -20,14 +20,14 @@ export default function Navigation() {
       <div style={styles.container}>
         <Link to="/" style={styles.logo}>
           <img
-            src="/brewedat-logo.png"
+            src="/brewedat/brewedat-logo.png"
             alt="BrewedAt Logo"
             style={styles.logoImg}
           />
         </Link>
 
         {/* Desktop Navigation */}
-        <div style={styles.desktopLinks}>
+        <div className="nav-desktop-links" style={styles.desktopLinks}>
           {navLinks.map((link) => (
             <Link
               key={link.path}
@@ -47,6 +47,7 @@ export default function Navigation() {
 
         {/* Mobile Menu Button */}
         <button
+          className="nav-mobile-button"
           style={styles.mobileMenuButton}
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           aria-label="Toggle menu"
@@ -178,18 +179,25 @@ const styles = {
 // Add media query styles
 const mediaQueryStyles = `
   @media (max-width: 768px) {
-    nav [style*="desktopLinks"] {
+    .nav-desktop-links {
       display: none !important;
     }
-    nav button[aria-label="Toggle menu"] {
+    .nav-mobile-button {
       display: block !important;
+    }
+  }
+
+  @media (min-width: 769px) {
+    .nav-mobile-button {
+      display: none !important;
     }
   }
 `;
 
-// Inject styles
-if (typeof document !== 'undefined') {
+// Inject styles only once
+if (typeof document !== 'undefined' && !document.getElementById('nav-responsive-styles')) {
   const styleElement = document.createElement('style');
+  styleElement.id = 'nav-responsive-styles';
   styleElement.textContent = mediaQueryStyles;
   document.head.appendChild(styleElement);
 }
