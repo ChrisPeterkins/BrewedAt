@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 import { usersDb } from '../db';
 
 // Extend Express Request to include user
@@ -59,8 +60,6 @@ export const generateToken = (userId: string, email: string, role: string): stri
 
 // Login function
 export const login = async (email: string, password: string): Promise<{ token: string; user: any } | null> => {
-  const bcrypt = require('bcrypt');
-
   // Get user from database
   const user = usersDb.getByEmail(email);
 
@@ -92,7 +91,6 @@ export const login = async (email: string, password: string): Promise<{ token: s
 
 // Helper function to hash password (for creating users)
 export const hashPassword = async (password: string): Promise<string> => {
-  const bcrypt = require('bcrypt');
   const saltRounds = 10;
   return await bcrypt.hash(password, saltRounds);
 };

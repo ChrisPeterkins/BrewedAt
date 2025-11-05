@@ -192,6 +192,64 @@ app.post('/api/raffles/:id/image',
 );
 
 // ============================================================================
+// CUSTOM SQL QUERY (admin only - for db-viewer)
+// ============================================================================
+
+app.post('/api/query',
+  authenticateToken,
+  requireAdmin,
+  async (req: Request, res: Response) => {
+    try {
+      const { sql } = req.body;
+
+      if (!sql || typeof sql !== 'string') {
+        return res.status(400).json({
+          success: false,
+          error: 'SQL query is required'
+        });
+      }
+
+      // Security: Only allow SELECT queries
+      const trimmedSql = sql.trim().toLowerCase();
+      if (!trimmedSql.startsWith('select')) {
+        return res.status(403).json({
+          success: false,
+          error: 'Only SELECT queries are allowed'
+        });
+      }
+
+      // Prevent dangerous SQL operations
+      const dangerousKeywords = ['drop', 'delete', 'update', 'insert', 'alter', 'create', 'truncate', 'pragma'];
+      for (const keyword of dangerousKeywords) {
+        if (trimmedSql.includes(keyword)) {
+          return res.status(403).json({
+            success: false,
+            error: `SQL keyword '${keyword.toUpperCase()}' is not allowed`
+          });
+        }
+      }
+
+      // Import db at the top if not already imported
+      const db = (await import('./db.js')).default;
+
+      // Execute the query
+      const result = db.prepare(sql).all();
+
+      res.json({
+        success: true,
+        data: result
+      });
+    } catch (error: any) {
+      console.error('Query error:', error);
+      res.status(400).json({
+        success: false,
+        error: error.message || 'Query execution failed'
+      });
+    }
+  }
+);
+
+// ============================================================================
 // ERROR HANDLING
 // ============================================================================
 
