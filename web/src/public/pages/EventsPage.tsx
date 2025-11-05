@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
-import { collection, getDocs, query, where, orderBy } from 'firebase/firestore';
-import { db } from '@shared/firebase.config';
-import type { Event } from '@shared/types';
+import { apiClient } from '@shared/api-client';
+import type { Event } from '@shared/api-client';
 import { trackEventView } from '../utils/analytics';
 
 export default function EventsPage() {
@@ -15,28 +14,25 @@ export default function EventsPage() {
 
   const loadEvents = async () => {
     try {
-      const eventsRef = collection(db, 'events');
-      const eventsQuery = query(
-        eventsRef,
-        where('approved', '==', true),
-        orderBy('eventDate', 'asc')
-      );
-      const snapshot = await getDocs(eventsQuery);
+      const response = await apiClient.getEvents();
 
-      const brewedat: Event[] = [];
-      const local: Event[] = [];
+      if (response.success && response.data) {
+        const brewedat: Event[] = [];
+        const local: Event[] = [];
 
-      snapshot.forEach((doc) => {
-        const event = { id: doc.id, ...doc.data() } as Event;
-        if (event.eventType === 'brewedat') {
-          brewedat.push(event);
-        } else {
-          local.push(event);
-        }
-      });
+        response.data.forEach((event) => {
+          if (event.eventType === 'brewedat') {
+            brewedat.push(event);
+          } else {
+            local.push(event);
+          }
+        });
 
-      setBrewedAtEvents(brewedat);
-      setLocalEvents(local);
+        setBrewedAtEvents(brewedat);
+        setLocalEvents(local);
+      } else {
+        console.error('Error loading events:', response.error);
+      }
     } catch (error) {
       console.error('Error loading events:', error);
     } finally {
@@ -46,82 +42,74 @@ export default function EventsPage() {
 
   const handleEventClick = async (event: Event) => {
     // Track event view for analytics
-    await trackEventView(event.id, event.name);
+    await trackEventView(event.id, event.title);
   };
 
-  const EventCard = ({ event }: { event: Event }) => (
-    <div
-      style={styles.eventCard}
-      onClick={() => handleEventClick(event)}
-    >
-      {event.imageUrl && (
-        <div style={styles.eventImage}>
-          <img src={event.imageUrl} alt={event.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-        </div>
-      )}
-      <div style={styles.eventContent}>
-        <div style={styles.eventHeader}>
-          <div style={styles.eventDate}>
-            <span style={styles.month}>
-              {event.eventDate.toDate().toLocaleDateString('en-US', { month: 'short' })}
-            </span>
-            <span style={styles.day}>
-              {event.eventDate.toDate().getDate()}
-            </span>
+  const EventCard = ({ event }: { event: Event }) => {
+    // Parse date from ISO string
+    const eventDate = new Date(event.date);
+
+    return (
+      <div
+        style={styles.eventCard}
+        onClick={() => handleEventClick(event)}
+      >
+        {event.imageUrl && (
+          <div style={styles.eventImage}>
+            <img src={event.imageUrl} alt={event.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
-          {event.featured && (
-            <span style={styles.featuredBadge}>Featured</span>
-          )}
-        </div>
-        <h3 style={styles.eventName}>{event.name}</h3>
-        <p style={styles.eventDescription}>{event.description}</p>
-        <div style={styles.eventMeta}>
-          <div style={styles.metaItem}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-              <circle cx="12" cy="10" r="3"/>
-            </svg>
-            <span>{event.location}</span>
+        )}
+        <div style={styles.eventContent}>
+          <div style={styles.eventHeader}>
+            <div style={styles.eventDate}>
+              <span style={styles.month}>
+                {eventDate.toLocaleDateString('en-US', { month: 'short' })}
+              </span>
+              <span style={styles.day}>
+                {eventDate.getDate()}
+              </span>
+            </div>
+            {event.featured === 1 && (
+              <span style={styles.featuredBadge}>Featured</span>
+            )}
           </div>
-          {event.eventTime && (
+          <h3 style={styles.eventName}>{event.title}</h3>
+          <p style={styles.eventDescription}>{event.description}</p>
+          <div style={styles.eventMeta}>
             <div style={styles.metaItem}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="10"/>
-                <path d="M12 6v6l4 2"/>
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
               </svg>
-              <span>{event.eventTime}</span>
+              <span>{event.location}</span>
             </div>
-          )}
-        </div>
-        {(event.websiteUrl || event.ticketUrl) && (
-          <div style={styles.eventActions}>
-            {event.websiteUrl && (
-              <a
-                href={event.websiteUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={styles.linkButton}
-                onClick={(e) => e.stopPropagation()}
-              >
-                Learn More
-              </a>
+            {event.time && (
+              <div style={styles.metaItem}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <path d="M12 6v6l4 2"/>
+                </svg>
+                <span>{event.time}</span>
+              </div>
             )}
-            {event.ticketUrl && (
+          </div>
+          {event.externalUrl && (
+            <div style={styles.eventActions}>
               <a
-                href={event.ticketUrl}
+                href={event.externalUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={styles.primaryLinkButton}
                 onClick={(e) => e.stopPropagation()}
               >
-                Get Tickets
+                Learn More
               </a>
-            )}
-          </div>
-        )}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   if (loading) {
     return (

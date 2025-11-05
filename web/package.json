@@ -10,6 +10,8 @@
     "build": "npm run build:admin && npm run build:public",
     "build:admin": "vite build --config vite.admin.config.js",
     "build:public": "vite build --config vite.public.config.js",
+    "prerender": "node scripts/prerender-standalone.cjs",
+    "build:public:prerender": "npm run build:public && npm run prerender",
     "preview": "vite preview"
   },
   "keywords": [
@@ -26,6 +28,7 @@
     "qrcode.react": "^4.2.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "react-helmet-async": "^2.0.5",
     "react-router-dom": "^7.9.4"
   },
   "devDependencies": {
@@ -38,7 +41,11 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.4.0",
+    "puppeteer": "^24.28.0",
+    "serve-handler": "^6.1.6",
     "typescript": "^5.9.3",
-    "vite": "^7.1.7"
+    "vite": "^7.1.7",
+    "vite-plugin-html": "^3.2.2",
+    "vite-plugin-ssr": "^0.4.142"
   }
 }

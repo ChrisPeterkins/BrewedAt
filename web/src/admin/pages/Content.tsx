@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { doc, getDoc, setDoc, Timestamp } from 'firebase/firestore';
-import { db } from '../firebase.config';
+import { apiClient } from '@shared/api-client';
 import type { HomePageContent } from '@shared/types';
 
 const INITIAL_CONTENT: Omit<HomePageContent, 'updatedAt'> = {
@@ -29,11 +28,10 @@ export default function Content() {
   const loadContent = async () => {
     setLoading(true);
     try {
-      const docRef = doc(db, 'siteConfig', 'homepage');
-      const docSnap = await getDoc(docRef);
+      const response = await apiClient.getConfigValue('homepage');
 
-      if (docSnap.exists()) {
-        const data = docSnap.data() as HomePageContent;
+      if (response.success && response.data) {
+        const data = response.data as HomePageContent;
         setContent(data);
         setFormData({
           heroTitle: data.heroTitle,
@@ -66,15 +64,19 @@ export default function Content() {
     setSaving(true);
 
     try {
-      const docRef = doc(db, 'siteConfig', 'homepage');
-      const dataToSave: HomePageContent = {
+      const dataToSave = {
         ...formData,
-        updatedAt: Timestamp.now(),
+        updatedAt: new Date().toISOString(),
       };
 
-      await setDoc(docRef, dataToSave);
-      setContent(dataToSave);
-      alert('Homepage content updated successfully!');
+      const response = await apiClient.setConfigValue('homepage', JSON.stringify(dataToSave));
+
+      if (response.success) {
+        setContent(dataToSave as HomePageContent);
+        alert('Homepage content updated successfully!');
+      } else {
+        alert('Failed to save content: ' + response.error);
+      }
     } catch (error) {
       console.error('Error saving content:', error);
       alert('Failed to save content: ' + (error as Error).message);
@@ -415,9 +417,9 @@ export default function Content() {
           </button>
         </div>
 
-        {content && (
+        {content && content.updatedAt && (
           <p style={{ marginTop: '16px', fontSize: '12px', color: '#666' }}>
-            Last updated: {content.updatedAt.toDate().toLocaleString()}
+            Last updated: {new Date(content.updatedAt).toLocaleString()}
           </p>
         )}
       </form>

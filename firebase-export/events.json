@@ -1,0 +1,537 @@
+[
+  {
+    "id": "2tHs4AjL9o8HX8A3Wz2H",
+    "isActive": true,
+    "styles": [
+      "Pale Ale",
+      "IPA",
+      "Lager"
+    ],
+    "createdAt": "2025-09-26T17:59:17.582Z",
+    "pointsReward": 10,
+    "coordinates": {
+      "latitude": 39.9617,
+      "longitude": -75.1522
+    },
+    "address": "500 Spring Garden St, Philadelphia, PA 19123",
+    "eventType": "brewery",
+    "name": "Yards Brewing Company",
+    "description": "Philadelphia's original craft brewery since 1994"
+  },
+  {
+    "id": "5741mNJ4Pp41BcBaY3ia",
+    "name": "Philadelphia Brewing Company",
+    "address": "2440 Frankford Ave, Philadelphia, PA",
+    "pointsReward": 50,
+    "coordinates": {
+      "latitude": 39.978,
+      "longitude": -75.1265
+    }
+  },
+  {
+    "id": "6uVGZzFowpQFbrgU2m5Y",
+    "ticketUrl": "http://brewedat.com/tickets",
+    "organizerEmail": "cpeterkins@gmail.com",
+    "updatedAt": "2025-10-21T19:43:29.202Z",
+    "featured": false,
+    "createdAt": "2025-10-21T19:34:40.799Z",
+    "name": "Test Event",
+    "organizerPhone": "2672548815",
+    "organizerName": "Chris Peterkins",
+    "address": "1115 Spruce Street\n4",
+    "eventDate": "2025-10-21T00:00:00.000Z",
+    "imageUrl": "",
+    "location": "Yards",
+    "eventTime": "6:00 PM",
+    "description": "Test Description",
+    "eventType": "local",
+    "approved": true,
+    "websiteUrl": "http://brewedat.com"
+  },
+  {
+    "id": "8UBCbOeC3y8P7ru9I2Uw",
+    "address": "1939 Fairmount Ave, Philadelphia, PA",
+    "coordinates": {
+      "longitude": -75.1724,
+      "latitude": 39.9677
+    },
+    "name": "Second District Brewing",
+    "pointsReward": 50
+  },
+  {
+    "id": "9sCI4ckHvSzWXnW4as3c",
+    "address": "1290 E Hortter St, Philadelphia, PA 19150",
+    "name": "Two Locals Brewing",
+    "description": "Pennsylvania's first Black-owned brewery with unique flavors",
+    "createdAt": "2025-09-26T17:59:17.582Z",
+    "coordinates": {
+      "longitude": -75.1627,
+      "latitude": 40.0595
+    },
+    "eventType": "brewery",
+    "pointsReward": 15,
+    "isActive": true,
+    "styles": [
+      "IPA",
+      "Sour",
+      "Wheat Beer"
+    ]
+  },
+  {
+    "id": "BEqSd5T4koJ4N4gXronC",
+    "name": "Crime & Punishment Brewing",
+    "coordinates": {
+      "latitude": 39.9727,
+      "longitude": -75.1825
+    },
+    "address": "2711 W Girard Ave, Philadelphia, PA",
+    "pointsReward": 50
+  },
+  {
+    "id": "C7sHmqxwmfkIJbATLmSp",
+    "updatedAt": "2025-10-21T21:44:32.418Z",
+    "ticketUrl": "http://brewedat.com/tickets",
+    "organizerEmail": "cpeterkins@gmail.com",
+    "featured": true,
+    "location": "Yards",
+    "eventType": "local",
+    "imageUrl": "",
+    "organizerName": "Christopher Peterkins",
+    "organizerPhone": "2672548815",
+    "eventDate": "2025-10-21T00:00:00.000Z",
+    "websiteUrl": "http://brewedat.com",
+    "createdAt": "2025-10-21T21:41:19.676Z",
+    "eventTime": "6:00 PM",
+    "description": "Description",
+    "address": "1115 Spruce Street\n4",
+    "approved": true,
+    "name": "Cole's Event"
+  },
+  {
+    "id": "Coc2pp3xvbpZAXTmVF3C",
+    "address": "144 W Chelten Ave, Philadelphia, PA",
+    "name": "Victory Brewing Company",
+    "coordinates": {
+      "latitude": 40.0348,
+      "longitude": -75.1804
+    },
+    "pointsReward": 50
+  },
+  {
+    "id": "Du7dEbTadRU9AeRWFTzt",
+    "pointsReward": 50,
+    "coordinates": {
+      "longitude": -75.1544,
+      "latitude": 39.9589
+    },
+    "name": "Love City Brewing",
+    "address": "1023 Hamilton St, Philadelphia, PA"
+  },
+  {
+    "id": "EbioSwk8H1tFJotzVvFX",
+    "coordinates": {
+      "longitude": -75.1825,
+      "latitude": 39.9727
+    },
+    "address": "2711 W Girard Ave, Philadelphia, PA",
+    "pointsReward": 50,
+    "name": "Crime & Punishment Brewing"
+  },
+  {
+    "id": "MBBy3Ymx4ylCssDSj956",
+    "name": "Yards Brewing Company",
+    "pointsReward": 50,
+    "coordinates": {
+      "latitude": 39.9615,
+      "longitude": -75.149
+    },
+    "address": "500 Spring Garden St, Philadelphia, PA"
+  },
+  {
+    "id": "N0n5LVSb6o57wrS7YHtZ",
+    "coordinates": {
+      "latitude": 39.9615,
+      "longitude": -75.149
+    },
+    "address": "500 Spring Garden St, Philadelphia, PA",
+    "name": "Yards Brewing Company",
+    "pointsReward": 50
+  },
+  {
+    "id": "NDXKnNXcb9OvzcUZoTJt",
+    "pointsReward": 50,
+    "coordinates": {
+      "latitude": 39.9435,
+      "longitude": -75.2195
+    },
+    "name": "Dock Street Brewery",
+    "address": "701 S 50th St, Philadelphia, PA"
+  },
+  {
+    "id": "OgdRCqTioYGFSCQTMOei",
+    "coordinates": {
+      "latitude": 39.9627,
+      "longitude": -75.1515
+    },
+    "createdAt": "2025-09-26T17:59:17.582Z",
+    "address": "1023 Hamilton St, Philadelphia, PA 19123",
+    "eventType": "brewery",
+    "styles": [
+      "Lager",
+      "IPA",
+      "Pilsner"
+    ],
+    "name": "Love City Brewing Company",
+    "pointsReward": 10,
+    "isActive": true,
+    "description": "Philadelphia neighborhood brewery with local vibes"
+  },
+  {
+    "id": "P28ADq1sfaiZN61m7SE1",
+    "address": "1939 Fairmount Ave, Philadelphia, PA",
+    "pointsReward": 50,
+    "coordinates": {
+      "longitude": -75.1724,
+      "latitude": 39.9677
+    },
+    "name": "Second District Brewing"
+  },
+  {
+    "id": "Q6BrGcxprcRj0VbiSeq8",
+    "name": "Love City Brewing",
+    "address": "1023 Hamilton St, Philadelphia, PA",
+    "pointsReward": 50,
+    "coordinates": {
+      "longitude": -75.1544,
+      "latitude": 39.9589
+    }
+  },
+  {
+    "id": "QMMSoHWbMcu08CBY0JF5",
+    "address": "1727 N Front St, Philadelphia, PA",
+    "pointsReward": 50,
+    "coordinates": {
+      "latitude": 39.9779,
+      "longitude": -75.1334
+    },
+    "name": "Evil Genius Beer Company"
+  },
+  {
+    "id": "QztOF5jMEJVpN66NxhJ7",
+    "address": "1939 Fairmount Ave, Philadelphia, PA",
+    "coordinates": {
+      "latitude": 39.9677,
+      "longitude": -75.1724
+    },
+    "name": "Second District Brewing",
+    "pointsReward": 50
+  },
+  {
+    "id": "TEWlPOIehEzAWG1ZyazE",
+    "name": "Yards Brewing Company",
+    "address": "500 Spring Garden St, Philadelphia, PA",
+    "pointsReward": 50,
+    "coordinates": {
+      "latitude": 39.9615,
+      "longitude": -75.149
+    }
+  },
+  {
+    "id": "TcOCPb0aT81NXYPoAyyx",
+    "coordinates": {
+      "latitude": 39.9677,
+      "longitude": -75.1724
+    },
+    "pointsReward": 50,
+    "address": "1939 Fairmount Ave, Philadelphia, PA",
+    "name": "Second District Brewing"
+  },
+  {
+    "id": "V57FTsscuJ56NEnvKk3U",
+    "address": "1023 Hamilton St, Philadelphia, PA",
+    "name": "Love City Brewing",
+    "coordinates": {
+      "latitude": 39.9589,
+      "longitude": -75.1544
+    },
+    "pointsReward": 50
+  },
+  {
+    "id": "YAaA2tv0PscfQg1BMTxj",
+    "createdAt": "2025-09-26T17:59:17.582Z",
+    "coordinates": {
+      "latitude": 40.0065,
+      "longitude": -75.7033
+    },
+    "styles": [
+      "IPA",
+      "Lager",
+      "Stout"
+    ],
+    "pointsReward": 10,
+    "isActive": true,
+    "eventType": "brewery",
+    "address": "420 Acorn Ln, Downingtown, PA 19335",
+    "name": "Victory Brewing Company",
+    "description": "Craft brewery with a wide selection of IPAs and seasonal brews"
+  },
+  {
+    "id": "c66Onvxza0DCBWfW6uIq",
+    "name": "Love City Brewing",
+    "pointsReward": 50,
+    "coordinates": {
+      "latitude": 39.9589,
+      "longitude": -75.1544
+    },
+    "address": "1023 Hamilton St, Philadelphia, PA"
+  },
+  {
+    "id": "cEjTyN8LZmfKrPp8R17L",
+    "coordinates": {
+      "longitude": -75.1825,
+      "latitude": 39.9727
+    },
+    "name": "Crime & Punishment Brewing",
+    "address": "2711 W Girard Ave, Philadelphia, PA",
+    "pointsReward": 50
+  },
+  {
+    "id": "coSm6HA17nxnM5Gwv4UX",
+    "name": "Yards Brewing Company",
+    "pointsReward": 50,
+    "address": "500 Spring Garden St, Philadelphia, PA",
+    "coordinates": {
+      "longitude": -75.149,
+      "latitude": 39.9615
+    }
+  },
+  {
+    "id": "dunhv36DMQxCKwsb7n1q",
+    "pointsReward": 50,
+    "name": "Philadelphia Brewing Company",
+    "coordinates": {
+      "longitude": -75.1265,
+      "latitude": 39.978
+    },
+    "address": "2440 Frankford Ave, Philadelphia, PA"
+  },
+  {
+    "id": "eQNXGl850grrIuhB9b9E",
+    "pointsReward": 50,
+    "address": "2440 Frankford Ave, Philadelphia, PA",
+    "coordinates": {
+      "latitude": 39.978,
+      "longitude": -75.1265
+    },
+    "name": "Philadelphia Brewing Company"
+  },
+  {
+    "id": "h3wjrM2WRgD1ZwgkYWo2",
+    "coordinates": {
+      "latitude": 39.9779,
+      "longitude": -75.1334
+    },
+    "pointsReward": 50,
+    "address": "1727 N Front St, Philadelphia, PA",
+    "name": "Evil Genius Beer Company"
+  },
+  {
+    "id": "j4WxOPqJamIt1tsebJdQ",
+    "pointsReward": 50,
+    "name": "Philadelphia Brewing Company",
+    "coordinates": {
+      "latitude": 39.978,
+      "longitude": -75.1265
+    },
+    "address": "2440 Frankford Ave, Philadelphia, PA"
+  },
+  {
+    "id": "k25wIBrXkhh6D6QKwKid",
+    "name": "Crime & Punishment Brewing",
+    "pointsReward": 50,
+    "address": "2711 W Girard Ave, Philadelphia, PA",
+    "coordinates": {
+      "latitude": 39.9727,
+      "longitude": -75.1825
+    }
+  },
+  {
+    "id": "m0ETaF5yEVmFny5X2zei",
+    "address": "1727 N Front St, Philadelphia, PA 19122",
+    "name": "Evil Genius Beer Company",
+    "styles": [
+      "IPA",
+      "Stout",
+      "Sour"
+    ],
+    "isActive": true,
+    "pointsReward": 10,
+    "eventType": "brewery",
+    "description": "Experimental brews and inventive flavors",
+    "coordinates": {
+      "latitude": 39.9785,
+      "longitude": -75.1337
+    },
+    "createdAt": "2025-09-26T17:59:17.582Z"
+  },
+  {
+    "id": "n2oYH8YXV1Oi84PI2oJp",
+    "name": "Victory Brewing Company",
+    "address": "144 W Chelten Ave, Philadelphia, PA",
+    "pointsReward": 50,
+    "coordinates": {
+      "longitude": -75.1804,
+      "latitude": 40.0348
+    }
+  },
+  {
+    "id": "nx69YpW74MqWFIpwH289",
+    "address": "2711 W Girard Ave, Philadelphia, PA",
+    "coordinates": {
+      "longitude": -75.1825,
+      "latitude": 39.9727
+    },
+    "name": "Crime & Punishment Brewing",
+    "pointsReward": 50
+  },
+  {
+    "id": "ozAcUEypPyH9EgEIgvVM",
+    "address": "2440 Frankford Ave, Philadelphia, PA",
+    "name": "Philadelphia Brewing Company",
+    "pointsReward": 50,
+    "coordinates": {
+      "longitude": -75.1265,
+      "latitude": 39.978
+    }
+  },
+  {
+    "id": "qsOBjlFcA7UidGhwCK8J",
+    "pointsReward": 50,
+    "address": "701 S 50th St, Philadelphia, PA",
+    "coordinates": {
+      "longitude": -75.2195,
+      "latitude": 39.9435
+    },
+    "name": "Dock Street Brewery"
+  },
+  {
+    "id": "sKscmfBEdyphdLDrqqeB",
+    "coordinates": {
+      "latitude": 39.9589,
+      "longitude": -75.1544
+    },
+    "address": "1023 Hamilton St, Philadelphia, PA",
+    "name": "Love City Brewing",
+    "pointsReward": 50
+  },
+  {
+    "id": "sm5ymcz1CYEXzsL3rbTE",
+    "name": "Victory Brewing Company",
+    "address": "144 W Chelten Ave, Philadelphia, PA",
+    "pointsReward": 50,
+    "coordinates": {
+      "longitude": -75.1804,
+      "latitude": 40.0348
+    }
+  },
+  {
+    "id": "tUmyqjHw24qrljTa13UD",
+    "pointsReward": 50,
+    "address": "701 S 50th St, Philadelphia, PA",
+    "coordinates": {
+      "longitude": -75.2195,
+      "latitude": 39.9435
+    },
+    "name": "Dock Street Brewery"
+  },
+  {
+    "id": "twOtRcnUaiYOIXCX4Oqn",
+    "coordinates": {
+      "longitude": -75.2195,
+      "latitude": 39.9435
+    },
+    "pointsReward": 50,
+    "name": "Dock Street Brewery",
+    "address": "701 S 50th St, Philadelphia, PA"
+  },
+  {
+    "id": "uKVgU8FcOFlKHd3eZVMy",
+    "pointsReward": 50,
+    "address": "1939 Fairmount Ave, Philadelphia, PA",
+    "coordinates": {
+      "longitude": -75.1724,
+      "latitude": 39.9677
+    },
+    "name": "Second District Brewing"
+  },
+  {
+    "id": "uOof6PaRP4bK4IYsy66N",
+    "address": "500 Spring Garden St, Philadelphia, PA",
+    "pointsReward": 50,
+    "coordinates": {
+      "longitude": -75.149,
+      "latitude": 39.9615
+    },
+    "name": "Yards Brewing Company"
+  },
+  {
+    "id": "uPOlq20cPuDjuT4X5lyf",
+    "pointsReward": 50,
+    "coordinates": {
+      "longitude": -75.1804,
+      "latitude": 40.0348
+    },
+    "name": "Victory Brewing Company",
+    "address": "144 W Chelten Ave, Philadelphia, PA"
+  },
+  {
+    "id": "uhvNqqzRuKIpTeoIsHbL",
+    "address": "1727 N Front St, Philadelphia, PA",
+    "name": "Evil Genius Beer Company",
+    "pointsReward": 50,
+    "coordinates": {
+      "longitude": -75.1334,
+      "latitude": 39.9779
+    }
+  },
+  {
+    "id": "wICI4tQm6SW8SfstJLdC",
+    "coordinates": {
+      "longitude": -75.1334,
+      "latitude": 39.9779
+    },
+    "address": "1727 N Front St, Philadelphia, PA",
+    "pointsReward": 50,
+    "name": "Evil Genius Beer Company"
+  },
+  {
+    "id": "wdtVSkHbFhO3wksIFnpo",
+    "address": "144 W Chelten Ave, Philadelphia, PA",
+    "pointsReward": 50,
+    "name": "Victory Brewing Company",
+    "coordinates": {
+      "longitude": -75.1804,
+      "latitude": 40.0348
+    }
+  },
+  {
+    "id": "xWbKEcvn9dwyvticcKM9",
+    "name": "Evil Genius Beer Company",
+    "pointsReward": 50,
+    "address": "1727 N Front St, Philadelphia, PA",
+    "coordinates": {
+      "latitude": 39.9779,
+      "longitude": -75.1334
+    }
+  },
+  {
+    "id": "z9gVy5s3ro8zoWN50TXS",
+    "address": "701 S 50th St, Philadelphia, PA",
+    "name": "Dock Street Brewery",
+    "pointsReward": 50,
+    "coordinates": {
+      "latitude": 39.9435,
+      "longitude": -75.2195
+    }
+  }
+]

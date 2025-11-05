@@ -1,17 +1,5 @@
 import { useState, useEffect } from 'react';
-import {
-  collection,
-  getDocs,
-  addDoc,
-  doc,
-  deleteDoc,
-  updateDoc,
-  Timestamp,
-  query,
-  orderBy
-} from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { db, storage } from '../firebase.config';
+import { apiClient } from '@shared/api-client';
 import type { PodcastEpisode, PodcastFormData } from '@shared/types';
 
 const INITIAL_FORM_DATA: PodcastFormData = {
@@ -53,14 +41,12 @@ export default function Podcast() {
 
   const loadEpisodes = async () => {
     try {
-      const episodesRef = collection(db, 'podcastEpisodes');
-      const q = query(episodesRef, orderBy('publishDate', 'desc'));
-      const snapshot = await getDocs(q);
-      const episodesData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as PodcastEpisode[];
-      setEpisodes(episodesData);
+      const response = await apiClient.getPodcastEpisodes();
+      if (response.success && response.data) {
+        setEpisodes(response.data);
+      } else {
+        alert('Failed to load episodes: ' + response.error);
+      }
     } catch (error) {
       console.error('Error loading episodes:', error);
       alert('Failed to load episodes');
@@ -88,16 +74,17 @@ export default function Podcast() {
     }
   };
 
-  const uploadImage = async (): Promise<string> => {
+  const uploadImage = async (episodeId: string): Promise<string> => {
     if (!imageFile) return formData.thumbnailUrl;
 
     setUploadingImage(true);
     try {
-      const timestamp = Date.now();
-      const storageRef = ref(storage, `podcast/${timestamp}_${imageFile.name}`);
-      await uploadBytes(storageRef, imageFile);
-      const url = await getDownloadURL(storageRef);
-      return url;
+      const response = await apiClient.uploadPodcastImage(episodeId, imageFile);
+      if (response.success && response.data) {
+        return response.data.imageUrl;
+      } else {
+        throw new Error(response.error || 'Failed to upload image');
+      }
     } catch (error) {
       console.error('Error uploading image:', error);
       throw new Error('Failed to upload image');
@@ -111,24 +98,52 @@ export default function Podcast() {
     setLoading(true);
 
     try {
-      const thumbnailUrl = await uploadImage();
-
-      const episodeData = {
-        ...formData,
-        publishDate: formData.publishDate ? Timestamp.fromDate(formData.publishDate) : Timestamp.now(),
-        thumbnailUrl,
-        createdAt: editingEpisode?.createdAt || Timestamp.now(),
-        updatedAt: Timestamp.now(),
+      // Transform form data to API format
+      const apiData = {
+        title: formData.title,
+        description: formData.description,
+        episodeNumber: formData.episodeNumber,
+        season: formData.season,
+        publishDate: formData.publishDate ? formData.publishDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+        duration: formData.duration || null,
+        audioUrl: formData.audioUrl || null,
+        spotifyUrl: formData.spotifyUrl || null,
+        appleUrl: formData.appleUrl || null,
+        youtubeUrl: formData.youtubeUrl || null,
+        guestName: formData.guestName || null,
+        thumbnailUrl: formData.thumbnailUrl || null,
+        featured: formData.featured ? 1 : 0,
+        videoType: formData.videoType,
+        durationSeconds: formData.durationSeconds || 0,
       };
 
+      let response;
+      let episodeId: string;
+
       if (editingEpisode) {
-        await updateDoc(doc(db, 'podcastEpisodes', editingEpisode.id), episodeData);
-        alert('Episode updated successfully!');
+        // Update existing episode
+        response = await apiClient.updatePodcastEpisode(editingEpisode.id, apiData);
+        episodeId = editingEpisode.id;
       } else {
-        await addDoc(collection(db, 'podcastEpisodes'), episodeData);
-        alert('Episode created successfully!');
+        // Create new episode
+        response = await apiClient.createPodcastEpisode(apiData);
+        if (response.success && response.data) {
+          episodeId = response.data.id;
+        } else {
+          throw new Error(response.error || 'Failed to create episode');
+        }
       }
 
+      if (!response.success) {
+        throw new Error(response.error || 'Failed to save episode');
+      }
+
+      // Upload image if one was selected
+      if (imageFile && episodeId) {
+        await uploadImage(episodeId);
+      }
+
+      alert(editingEpisode ? 'Episode updated successfully!' : 'Episode created successfully!');
       setFormData(INITIAL_FORM_DATA);
       setEditingEpisode(null);
       setShowForm(false);
@@ -149,7 +164,7 @@ export default function Podcast() {
       description: episode.description,
       episodeNumber: episode.episodeNumber,
       season: episode.season || 1,
-      publishDate: episode.publishDate.toDate(),
+      publishDate: new Date(episode.publishDate),
       duration: episode.duration || '',
       audioUrl: episode.audioUrl || '',
       spotifyUrl: episode.spotifyUrl || '',
@@ -157,7 +172,7 @@ export default function Podcast() {
       youtubeUrl: episode.youtubeUrl || '',
       guestName: episode.guestName || '',
       thumbnailUrl: episode.thumbnailUrl || '',
-      featured: episode.featured,
+      featured: episode.featured === 1,
       videoType: episode.videoType || 'episode',
       durationSeconds: episode.durationSeconds || 0,
     });
@@ -168,17 +183,21 @@ export default function Podcast() {
     if (!confirm('Are you sure you want to delete this episode?')) return;
 
     try {
-      await deleteDoc(doc(db, 'podcastEpisodes', episodeId));
-      alert('Episode deleted successfully!');
-      loadEpisodes();
+      const response = await apiClient.deletePodcastEpisode(episodeId);
+      if (response.success) {
+        alert('Episode deleted successfully!');
+        loadEpisodes();
+      } else {
+        alert('Failed to delete episode: ' + response.error);
+      }
     } catch (error) {
       console.error('Error deleting episode:', error);
       alert('Failed to delete episode');
     }
   };
 
-  const formatDate = (timestamp: Timestamp) => {
-    return timestamp.toDate().toLocaleDateString('en-US', {
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -203,7 +222,7 @@ export default function Podcast() {
       if (sortField === 'title') {
         comparison = a.title.localeCompare(b.title);
       } else if (sortField === 'publishDate') {
-        comparison = a.publishDate.toMillis() - b.publishDate.toMillis();
+        comparison = new Date(a.publishDate).getTime() - new Date(b.publishDate).getTime();
       } else if (sortField === 'duration') {
         const aDuration = a.durationSeconds || 0;
         const bDuration = b.durationSeconds || 0;
@@ -689,7 +708,7 @@ export default function Podcast() {
                       {episode.duration || '-'}
                     </td>
                     <td style={{ padding: '12px', textAlign: 'center' }}>
-                      {episode.featured && (
+                      {episode.featured === 1 && (
                         <span style={{
                           padding: '4px 8px',
                           borderRadius: '4px',

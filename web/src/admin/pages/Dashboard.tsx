@@ -1,23 +1,28 @@
 import { useState } from 'react';
-import { signOut } from 'firebase/auth';
-import { auth } from '../firebase.config';
-import BreweryTable from '../components/BreweryTable';
+import { apiClient } from '@shared/api-client';
+// import BreweryTable from '../components/BreweryTable';
 import Events from './Events';
 import Podcast from './Podcast';
 import Content from './Content';
-import Analytics from './Analytics';
+// import Analytics from './Analytics';
 import Raffles from './Raffles';
-import DataManagement from './DataManagement';
-import ContactSubmissions from './ContactSubmissions';
+// import DataManagement from './DataManagement';
+// import ContactSubmissions from './ContactSubmissions';
 
 type TabType = 'events' | 'podcast' | 'content' | 'analytics' | 'breweries' | 'raffles' | 'data' | 'contact';
 
-export default function Dashboard() {
+interface DashboardProps {
+  user: any;
+  onLogout: () => void;
+}
+
+export default function Dashboard({ user, onLogout }: DashboardProps) {
   const [activeTab, setActiveTab] = useState<TabType>('events');
 
   const handleSignOut = async () => {
     try {
-      await signOut(auth);
+      apiClient.logout();
+      onLogout();
     } catch (error) {
       console.error('Sign out error:', error);
     }
@@ -144,11 +149,11 @@ export default function Dashboard() {
         {activeTab === 'events' && <Events />}
         {activeTab === 'podcast' && <Podcast />}
         {activeTab === 'content' && <Content />}
-        {activeTab === 'analytics' && <Analytics />}
-        {activeTab === 'breweries' && <BreweryTable />}
-        {activeTab === 'contact' && <ContactSubmissions />}
+        {/* {activeTab === 'analytics' && <Analytics />} */}
+        {/* {activeTab === 'breweries' && <BreweryTable />} */}
+        {/* {activeTab === 'contact' && <ContactSubmissions />} */}
         {activeTab === 'raffles' && <Raffles />}
-        {activeTab === 'data' && <DataManagement />}
+        {/* {activeTab === 'data' && <DataManagement />} */}
       </main>
     </div>
   );

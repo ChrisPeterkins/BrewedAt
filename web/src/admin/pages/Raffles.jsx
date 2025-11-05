@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, addDoc, getDocs, doc, updateDoc, query, where, orderBy, Timestamp } from 'firebase/firestore';
-import { db } from '../firebase.config';
+import { apiClient } from '@shared/api-client';
 
 export default function Raffles() {
   const [raffles, setRaffles] = useState([]);
@@ -29,13 +28,12 @@ export default function Raffles() {
 
   const fetchRaffles = async () => {
     try {
-      const rafflesQuery = query(collection(db, 'raffles'), orderBy('createdAt', 'desc'));
-      const snapshot = await getDocs(rafflesQuery);
-      const raffleData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      setRaffles(raffleData);
+      const response = await apiClient.getRaffles();
+      if (response.success && response.data) {
+        setRaffles(response.data);
+      } else {
+        alert('Failed to load raffles: ' + response.error);
+      }
     } catch (error) {
       console.error('Error fetching raffles:', error);
     }
@@ -44,29 +42,30 @@ export default function Raffles() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const endDateTimestamp = Timestamp.fromDate(new Date(formData.endDate));
-
-      await addDoc(collection(db, 'raffles'), {
+      const response = await apiClient.createRaffle({
         prizeName: formData.prizeName,
         description: formData.description,
         costPerEntry: parseInt(formData.costPerEntry),
         maxEntriesPerUser: parseInt(formData.maxEntriesPerUser),
-        endDate: endDateTimestamp,
+        endDate: new Date(formData.endDate).toISOString(),
         status: 'active',
         totalEntries: 0,
-        createdAt: Timestamp.now()
       });
 
-      setFormData({
-        prizeName: '',
-        description: '',
-        costPerEntry: 100,
-        maxEntriesPerUser: 10,
-        endDate: '',
-      });
-      setShowForm(false);
-      fetchRaffles();
-      alert('Raffle created successfully!');
+      if (response.success) {
+        setFormData({
+          prizeName: '',
+          description: '',
+          costPerEntry: 100,
+          maxEntriesPerUser: 10,
+          endDate: '',
+        });
+        setShowForm(false);
+        fetchRaffles();
+        alert('Raffle created successfully!');
+      } else {
+        alert('Error creating raffle: ' + response.error);
+      }
     } catch (error) {
       console.error('Error creating raffle:', error);
       alert('Error creating raffle');
@@ -79,35 +78,14 @@ export default function Raffles() {
     }
 
     try {
-      const entriesSnapshot = await getDocs(
-        query(collection(db, 'raffleEntries'), where('raffleId', '==', raffleId))
-      );
+      const response = await apiClient.drawRaffleWinner(raffleId);
 
-      const entries = [];
-      entriesSnapshot.docs.forEach(doc => {
-        const data = doc.data();
-        for (let i = 0; i < data.entriesCount; i++) {
-          entries.push(data.userId);
-        }
-      });
-
-      if (entries.length === 0) {
-        alert('No entries for this raffle!');
-        return;
+      if (response.success && response.data) {
+        fetchRaffles();
+        alert(`Winner selected! User ID: ${response.data.winnerId}\nTotal entries: ${response.data.totalEntries}`);
+      } else {
+        alert('Error drawing winner: ' + response.error);
       }
-
-      const winnerIndex = Math.floor(Math.random() * entries.length);
-      const winnerId = entries[winnerIndex];
-
-      await updateDoc(doc(db, 'raffles', raffleId), {
-        status: 'completed',
-        winnerId: winnerId,
-        winnerDrawnAt: Timestamp.now(),
-        totalEntries: entries.length
-      });
-
-      fetchRaffles();
-      alert(`Winner selected! User ID: ${winnerId}\nTotal entries: ${entries.length}`);
     } catch (error) {
       console.error('Error drawing winner:', error);
       alert('Error drawing winner');
@@ -120,11 +98,13 @@ export default function Raffles() {
     }
 
     try {
-      await updateDoc(doc(db, 'raffles', raffleId), {
-        status: 'cancelled'
-      });
-      fetchRaffles();
-      alert('Raffle cancelled');
+      const response = await apiClient.updateRaffle(raffleId, { status: 'cancelled' });
+      if (response.success) {
+        fetchRaffles();
+        alert('Raffle cancelled');
+      } else {
+        alert('Error ending raffle: ' + response.error);
+      }
     } catch (error) {
       console.error('Error ending raffle:', error);
       alert('Error ending raffle');
@@ -134,46 +114,14 @@ export default function Raffles() {
   const fetchRaffleEntrants = async (raffleId) => {
     try {
       console.log('Fetching entrants for raffle:', raffleId);
-      const entriesSnapshot = await getDocs(
-        query(collection(db, 'raffleEntries'), where('raffleId', '==', raffleId))
-      );
+      const response = await apiClient.getRaffleEntries(raffleId);
 
-      console.log('Found entries:', entriesSnapshot.docs.length);
-
-      const entrantsMap = {};
-      entriesSnapshot.docs.forEach(doc => {
-        const data = doc.data();
-        console.log('Entry data:', data);
-        if (entrantsMap[data.userId]) {
-          entrantsMap[data.userId].entries += data.entriesCount;
-        } else {
-          entrantsMap[data.userId] = {
-            userId: data.userId,
-            entries: data.entriesCount,
-            timestamp: data.timestamp
-          };
-        }
-      });
-
-      console.log('Entrants map:', entrantsMap);
-
-      const usersSnapshot = await getDocs(collection(db, 'users'));
-      const usersMap = {};
-      usersSnapshot.docs.forEach(doc => {
-        const userData = doc.data();
-        usersMap[doc.id] = userData.displayName || userData.name || 'Anonymous';
-      });
-
-      console.log('Users map:', usersMap);
-
-      const entrants = Object.values(entrantsMap).map(entrant => ({
-        ...entrant,
-        displayName: usersMap[entrant.userId] || 'Unknown User'
-      }));
-
-      console.log('Final entrants:', entrants);
-
-      setRaffleEntrants(prev => ({ ...prev, [raffleId]: entrants }));
+      if (response.success && response.data) {
+        console.log('Found entries:', response.data.length);
+        setRaffleEntrants(prev => ({ ...prev, [raffleId]: response.data }));
+      } else {
+        alert('Error fetching entrants: ' + response.error);
+      }
     } catch (error) {
       console.error('Error fetching entrants:', error);
       console.error('Error details:', error.message);
@@ -199,44 +147,36 @@ export default function Raffles() {
     }
 
     try {
-      const userDoc = await getDocs(query(collection(db, 'users'), where('__name__', '==', manualEntryData.userId)));
-      if (userDoc.empty) {
-        alert('User not found');
-        return;
-      }
-
       const entriesCount = parseInt(manualEntryData.entries);
 
-      await addDoc(collection(db, 'raffleEntries'), {
-        raffleId: raffleId,
+      const response = await apiClient.enterRaffle(raffleId, {
         userId: manualEntryData.userId,
-        entriesCount: entriesCount,
-        timestamp: Timestamp.now()
+        entriesCount: entriesCount
       });
 
-      await updateDoc(doc(db, 'raffles', raffleId), {
-        totalEntries: increment(entriesCount)
-      });
-
-      setShowManualEntryForm(null);
-      setManualEntryData({ userId: '', entries: 1 });
-      fetchRaffleEntrants(raffleId);
-      fetchRaffles();
-      alert('Entry added successfully!');
+      if (response.success) {
+        setShowManualEntryForm(null);
+        setManualEntryData({ userId: '', entries: 1 });
+        fetchRaffleEntrants(raffleId);
+        fetchRaffles();
+        alert('Entry added successfully!');
+      } else {
+        alert('Error adding entry: ' + response.error);
+      }
     } catch (error) {
       console.error('Error adding manual entry:', error);
       alert('Error adding entry');
     }
   };
 
-  const formatDate = (timestamp) => {
-    if (!timestamp) return 'N/A';
-    return timestamp.toDate().toLocaleString();
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleString();
   };
 
   const isRaffleExpired = (raffle) => {
     if (!raffle.endDate) return false;
-    return raffle.endDate.toDate() < currentTime;
+    return new Date(raffle.endDate) < currentTime;
   };
 
   const getFilteredRaffles = () => {

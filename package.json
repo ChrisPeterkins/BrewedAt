@@ -1,6 +1,36 @@
 {
+  "name": "brewedat",
+  "version": "1.0.0",
+  "description": "BrewedAt Platform - API Server",
+  "type": "module",
+  "scripts": {
+    "api:dev": "tsx watch api/server.ts",
+    "api:start": "tsx api/server.ts",
+    "api:create-admin": "tsx scripts/create-admin.ts",
+    "export:firebase": "tsx scripts/export-firebase-simple.ts",
+    "import:sqlite": "tsx scripts/import-to-sqlite.ts"
+  },
   "dependencies": {
+    "bcrypt": "^6.0.0",
+    "better-sqlite3": "^12.4.1",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
     "firebase-admin": "^13.5.0",
-    "node-fetch": "^2.7.0"
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.2",
+    "node-fetch": "^2.7.0",
+    "uuid": "^13.0.0"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.5",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.0.0",
+    "@types/node": "^22.19.0",
+    "@types/uuid": "^11.0.0",
+    "tsx": "^4.20.6"
   }
 }

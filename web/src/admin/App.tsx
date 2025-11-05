@@ -1,21 +1,50 @@
 import { useState, useEffect } from 'react';
-import { onAuthStateChanged, User } from 'firebase/auth';
-import { auth } from './firebase.config';
+import { apiClient } from '@shared/api-client';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+
+interface User {
+  id: string;
+  email: string;
+  displayName?: string;
+  role: string;
+}
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+    // Verify token on mount
+    const verifyAuth = async () => {
+      const token = apiClient.getToken();
+      if (token) {
+        const response = await apiClient.verifyToken();
+        if (response.success && response.data) {
+          setUser(response.data);
+        } else {
+          // Token invalid or expired
+          apiClient.setToken(null);
+        }
+      }
       setLoading(false);
-    });
+    };
 
-    return () => unsubscribe();
+    verifyAuth();
   }, []);
+
+  const handleLoginSuccess = async () => {
+    // Re-verify to get user data
+    const response = await apiClient.verifyToken();
+    if (response.success && response.data) {
+      setUser(response.data);
+    }
+  };
+
+  const handleLogout = () => {
+    apiClient.logout();
+    setUser(null);
+  };
 
   if (loading) {
     return (
@@ -25,7 +54,11 @@ function App() {
     );
   }
 
-  return user ? <Dashboard /> : <Login onLoginSuccess={() => setUser(auth.currentUser)} />;
+  return user ? (
+    <Dashboard user={user} onLogout={handleLogout} />
+  ) : (
+    <Login onLoginSuccess={handleLoginSuccess} />
+  );
 }
 
 const styles = {

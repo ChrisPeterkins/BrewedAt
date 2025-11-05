@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '@shared/firebase.config';
+import { apiClient } from '@shared/api-client';
 import type { SocialMediaStats } from '@shared/types';
 
 export default function Footer() {
@@ -13,10 +12,9 @@ export default function Footer() {
 
   const loadSocialStats = async () => {
     try {
-      const docRef = doc(db, 'siteConfig', 'socialMedia');
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        setSocialStats(docSnap.data() as SocialMediaStats);
+      const response = await apiClient.getConfigValue('socialMedia');
+      if (response.success && response.data) {
+        setSocialStats(response.data as SocialMediaStats);
       }
     } catch (error) {
       console.error('Error loading social stats:', error);

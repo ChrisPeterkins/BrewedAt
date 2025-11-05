@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
-import { collection, getDocs, query, orderBy, where } from 'firebase/firestore';
-import { db } from '@shared/firebase.config';
-import type { PodcastEpisode } from '@shared/types';
+import { apiClient } from '@shared/api-client';
+import type { PodcastEpisode } from '@shared/api-client';
 
 export default function PodcastPage() {
   const [episodes, setEpisodes] = useState<PodcastEpisode[]>([]);
@@ -13,18 +12,13 @@ export default function PodcastPage() {
 
   const loadEpisodes = async () => {
     try {
-      const episodesRef = collection(db, 'podcastEpisodes');
-      const q = query(
-        episodesRef,
-        where('videoType', '==', 'episode'),
-        orderBy('publishDate', 'desc')
-      );
-      const snapshot = await getDocs(q);
-      const data = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as PodcastEpisode[];
-      setEpisodes(data);
+      const response = await apiClient.getPodcastEpisodes();
+
+      if (response.success && response.data) {
+        setEpisodes(response.data);
+      } else {
+        console.error('Error loading episodes:', response.error);
+      }
     } catch (error) {
       console.error('Error loading episodes:', error);
     } finally {

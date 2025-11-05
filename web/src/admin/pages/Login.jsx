@@ -1,7 +1,5 @@
 import { useState } from 'react';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
-import { auth, db } from '../firebase.config';
+import { apiClient } from '@shared/api-client';
 
 export default function Login({ onLoginSuccess }) {
   const [email, setEmail] = useState('');
@@ -15,23 +13,23 @@ export default function Login({ onLoginSuccess }) {
     setLoading(true);
 
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const userDoc = await getDoc(doc(db, 'users', userCredential.user.uid));
+      const response = await apiClient.login(email, password);
 
-      if (!userDoc.exists()) {
-        setError('User profile not found');
-        await auth.signOut();
-        return;
+      if (response.success && response.data) {
+        // Token is automatically stored by apiClient
+        const { user } = response.data;
+
+        // Check if user has admin role
+        if (user.role !== 'admin') {
+          setError('Access denied. Admin privileges required.');
+          apiClient.logout();
+          return;
+        }
+
+        onLoginSuccess();
+      } else {
+        setError(response.error || 'Failed to sign in');
       }
-
-      const userData = userDoc.data();
-      if (!userData.isAdmin) {
-        setError('Access denied. Admin privileges required.');
-        await auth.signOut();
-        return;
-      }
-
-      onLoginSuccess();
     } catch (err) {
       console.error('Login error:', err);
       setError(err.message || 'Failed to sign in');

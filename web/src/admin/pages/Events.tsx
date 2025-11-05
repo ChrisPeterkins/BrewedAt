@@ -1,18 +1,24 @@
 import { useState, useEffect } from 'react';
-import {
-  collection,
-  getDocs,
-  addDoc,
-  doc,
-  deleteDoc,
-  updateDoc,
-  Timestamp,
-  query,
-  orderBy
-} from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { db, storage } from '../firebase.config';
-import type { Event, EventFormData } from '@shared/types';
+import { apiClient } from '@shared/api-client';
+import type { Event } from '@shared/api-client';
+
+interface EventFormData {
+  name: string;
+  description: string;
+  eventDate: Date | null;
+  eventTime: string;
+  location: string;
+  address: string;
+  eventType: string;
+  organizerName: string;
+  organizerEmail: string;
+  organizerPhone: string;
+  websiteUrl: string;
+  ticketUrl: string;
+  imageUrl: string;
+  approved: boolean;
+  featured: boolean;
+}
 
 const INITIAL_FORM_DATA: EventFormData = {
   name: '',
@@ -55,14 +61,13 @@ export default function Events() {
 
   const loadEvents = async () => {
     try {
-      const eventsRef = collection(db, 'events');
-      const q = query(eventsRef, orderBy('eventDate', 'desc'));
-      const snapshot = await getDocs(q);
-      const eventsData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Event[];
-      setEvents(eventsData);
+      const response = await apiClient.getEvents();
+      if (response.success && response.data) {
+        setEvents(response.data);
+      } else {
+        console.error('Error loading events:', response.error);
+        alert('Failed to load events: ' + (response.error || 'Unknown error'));
+      }
     } catch (error) {
       console.error('Error loading events:', error);
       alert('Failed to load events');
@@ -88,16 +93,17 @@ export default function Events() {
     }
   };
 
-  const uploadImage = async (): Promise<string> => {
+  const uploadImage = async (eventId: string): Promise<string> => {
     if (!imageFile) return formData.imageUrl;
 
     setUploadingImage(true);
     try {
-      const timestamp = Date.now();
-      const storageRef = ref(storage, `events/${timestamp}_${imageFile.name}`);
-      await uploadBytes(storageRef, imageFile);
-      const url = await getDownloadURL(storageRef);
-      return url;
+      const response = await apiClient.uploadEventImage(eventId, imageFile);
+      if (response.success && response.data) {
+        return response.data.imageUrl;
+      } else {
+        throw new Error(response.error || 'Failed to upload image');
+      }
     } catch (error) {
       console.error('Error uploading image:', error);
       throw new Error('Failed to upload image');
@@ -111,25 +117,39 @@ export default function Events() {
     setLoading(true);
 
     try {
-      // Upload image if provided
-      const imageUrl = await uploadImage();
-
-      const eventData = {
-        ...formData,
-        eventDate: formData.eventDate ? Timestamp.fromDate(formData.eventDate) : Timestamp.now(),
-        imageUrl,
-        createdAt: editingEvent?.createdAt || Timestamp.now(),
-        updatedAt: Timestamp.now(),
+      // Transform form data to API format
+      const apiData = {
+        title: formData.name,
+        description: formData.description,
+        date: formData.eventDate ? formData.eventDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+        time: formData.eventTime || null,
+        location: formData.address,
+        brewery: formData.location,
+        eventType: formData.eventType,
+        imageUrl: formData.imageUrl,
+        externalUrl: formData.websiteUrl || formData.ticketUrl || null,
+        featured: formData.featured ? 1 : 0,
       };
+
+      let response;
+      let eventId = editingEvent?.id;
 
       if (editingEvent) {
         // Update existing event
-        await updateDoc(doc(db, 'events', editingEvent.id), eventData);
+        response = await apiClient.updateEvent(editingEvent.id, apiData);
+        if (!response.success) throw new Error(response.error);
         alert('Event updated successfully!');
       } else {
         // Create new event
-        await addDoc(collection(db, 'events'), eventData);
+        response = await apiClient.createEvent(apiData);
+        if (!response.success || !response.data) throw new Error(response.error);
+        eventId = response.data.id;
         alert('Event created successfully!');
+      }
+
+      // Upload image if provided and we have an event ID
+      if (imageFile && eventId) {
+        await uploadImage(eventId);
       }
 
       // Reset form and reload
@@ -149,20 +169,20 @@ export default function Events() {
   const handleEdit = (event: Event) => {
     setEditingEvent(event);
     setFormData({
-      name: event.name,
-      description: event.description,
-      eventDate: event.eventDate.toDate(),
-      eventTime: event.eventTime || '',
-      location: event.location,
-      address: event.address,
-      eventType: event.eventType,
-      organizerName: event.organizerName,
-      organizerEmail: event.organizerEmail,
-      organizerPhone: event.organizerPhone || '',
-      websiteUrl: event.websiteUrl || '',
-      ticketUrl: event.ticketUrl || '',
+      name: event.title,
+      description: event.description || '',
+      eventDate: new Date(event.date),
+      eventTime: event.time || '',
+      location: event.brewery || '',
+      address: event.location || '',
+      eventType: event.eventType || 'local',
+      organizerName: '',
+      organizerEmail: '',
+      organizerPhone: '',
+      websiteUrl: event.externalUrl || '',
+      ticketUrl: '',
       imageUrl: event.imageUrl || '',
-      approved: event.approved,
+      approved: true,
       featured: event.featured,
     });
     setShowForm(true);
@@ -172,17 +192,21 @@ export default function Events() {
     if (!confirm('Are you sure you want to delete this event?')) return;
 
     try {
-      await deleteDoc(doc(db, 'events', eventId));
-      alert('Event deleted successfully!');
-      loadEvents();
+      const response = await apiClient.deleteEvent(eventId);
+      if (response.success) {
+        alert('Event deleted successfully!');
+        loadEvents();
+      } else {
+        alert('Failed to delete event: ' + (response.error || 'Unknown error'));
+      }
     } catch (error) {
       console.error('Error deleting event:', error);
       alert('Failed to delete event');
     }
   };
 
-  const formatDate = (timestamp: Timestamp) => {
-    return timestamp.toDate().toLocaleDateString('en-US', {
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -193,13 +217,13 @@ export default function Events() {
   const filteredAndSortedEvents = events
     .filter(event => {
       const matchesSearch =
-        event.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         event.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
         event.description?.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesStatus =
         statusFilter === 'all' ||
-        (statusFilter === 'approved' && event.approved) ||
-        (statusFilter === 'pending' && !event.approved);
+        (statusFilter === 'approved' && true) ||
+        (statusFilter === 'pending' && false);
       const matchesType = typeFilter === 'all' || event.eventType === typeFilter;
       return matchesSearch && matchesStatus && matchesType;
     })
@@ -735,15 +759,15 @@ export default function Events() {
                 {filteredAndSortedEvents.map((event) => (
                   <tr key={event.id} style={{ borderBottom: '1px solid #eee' }}>
                     <td style={{ padding: '12px' }}>
-                      <div style={{ fontWeight: '600', color: '#333' }}>{event.name}</div>
+                      <div style={{ fontWeight: '600', color: '#333' }}>{event.title}</div>
                       <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
                         {event.description.substring(0, 60)}...
                       </div>
                     </td>
                     <td style={{ padding: '12px', color: '#666' }}>
-                      {formatDate(event.eventDate)}
-                      {event.eventTime && (
-                        <div style={{ fontSize: '12px', marginTop: '4px' }}>{event.eventTime}</div>
+                      {formatDate(event.date)}
+                      {event.time && (
+                        <div style={{ fontSize: '12px', marginTop: '4px' }}>{event.time}</div>
                       )}
                     </td>
                     <td style={{ padding: '12px', color: '#666' }}>{event.location}</td>
@@ -766,12 +790,12 @@ export default function Events() {
                           borderRadius: '4px',
                           fontSize: '12px',
                           fontWeight: '600',
-                          backgroundColor: event.approved ? '#E8F5E9' : '#FFEBEE',
-                          color: event.approved ? '#2E7D32' : '#C62828',
+                          backgroundColor: '#E8F5E9',
+                          color: '#2E7D32',
                         }}>
-                          {event.approved ? 'Approved' : 'Pending'}
+                          Approved
                         </span>
-                        {event.featured && (
+                        {event.featured === 1 && (
                           <span style={{
                             padding: '4px 8px',
                             borderRadius: '4px',
