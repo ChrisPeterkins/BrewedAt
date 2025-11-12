@@ -525,6 +525,12 @@ export const usersDb = {
     stmt.run(now, id);
   },
 
+  updatePassword: (id: string, passwordHash: string) => {
+    const stmt = db.prepare('UPDATE users SET passwordHash = ? WHERE id = ?');
+    const result = stmt.run(passwordHash, id);
+    return result.changes > 0;
+  },
+
   delete: (id: string) => {
     const stmt = db.prepare('DELETE FROM users WHERE id = ?');
     const result = stmt.run(id);

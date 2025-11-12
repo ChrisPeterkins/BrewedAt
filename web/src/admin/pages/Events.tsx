@@ -232,7 +232,9 @@ export default function Events() {
       if (sortField === 'name') {
         comparison = a.name.localeCompare(b.name);
       } else if (sortField === 'eventDate') {
-        comparison = a.eventDate.toMillis() - b.eventDate.toMillis();
+        const dateA = a.eventDate ? new Date(a.eventDate).getTime() : 0;
+        const dateB = b.eventDate ? new Date(b.eventDate).getTime() : 0;
+        comparison = dateA - dateB;
       } else if (sortField === 'location') {
         comparison = a.location.localeCompare(b.location);
       }
@@ -761,7 +763,7 @@ export default function Events() {
                     <td style={{ padding: '12px' }}>
                       <div style={{ fontWeight: '600', color: '#333' }}>{event.title}</div>
                       <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
-                        {event.description.substring(0, 60)}...
+                        {event.description ? event.description.substring(0, 60) + '...' : 'No description'}
                       </div>
                     </td>
                     <td style={{ padding: '12px', color: '#666' }}>

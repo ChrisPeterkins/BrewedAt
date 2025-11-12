@@ -19,6 +19,8 @@ import {
   uploadEventImage,
   uploadPodcastImage,
   uploadRaffleImage,
+  uploadImage,
+  uploadDocument,
   getFileUrl
 } from './middleware/upload';
 
@@ -187,6 +189,375 @@ app.post('/api/raffles/:id/image',
     } catch (error: any) {
       console.error('Error uploading raffle image:', error);
       res.status(500).json({ success: false, error: 'Failed to upload image' });
+    }
+  }
+);
+
+// Upload general image (for media library)
+app.post('/api/upload/image',
+  authenticateToken,
+  requireAdmin,
+  uploadImage.single('image'),
+  (req: Request, res: Response) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ success: false, error: 'No file uploaded' });
+      }
+
+      const imageUrl = getFileUrl(req, req.file);
+      res.json({
+        success: true,
+        data: {
+          imageUrl,
+          filename: req.file.filename,
+          originalName: req.file.originalname,
+          size: req.file.size,
+          uploadedAt: new Date().toISOString()
+        }
+      });
+    } catch (error: any) {
+      console.error('Error uploading image:', error);
+      res.status(500).json({ success: false, error: 'Failed to upload image' });
+    }
+  }
+);
+
+// ============================================================================
+// DOCUMENT MANAGEMENT ROUTES (admin only)
+// ============================================================================
+
+// Upload document
+app.post('/api/upload/document',
+  authenticateToken,
+  requireAdmin,
+  uploadDocument.single('document'),
+  async (req: Request, res: Response) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ success: false, error: 'No file uploaded' });
+      }
+
+      const { v4: uuidv4 } = await import('uuid');
+      const db = (await import('./db.js')).default;
+      const documentUrl = getFileUrl(req, req.file);
+      const documentId = uuidv4();
+
+      // Save document metadata to database
+      db.prepare(`
+        INSERT INTO documents (id, filename, original_name, file_type, file_size, file_url, uploaded_by, description)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `).run(
+        documentId,
+        req.file.filename,
+        req.file.originalname,
+        req.file.mimetype,
+        req.file.size,
+        documentUrl,
+        req.user!.email,
+        req.body.description || null
+      );
+
+      res.json({
+        success: true,
+        data: {
+          id: documentId,
+          documentUrl,
+          filename: req.file.filename,
+          originalName: req.file.originalname,
+          fileType: req.file.mimetype,
+          size: req.file.size,
+          uploadedAt: new Date().toISOString()
+        }
+      });
+    } catch (error: any) {
+      console.error('Error uploading document:', error);
+      res.status(500).json({ success: false, error: 'Failed to upload document' });
+    }
+  }
+);
+
+// Get all documents
+app.get('/api/documents',
+  authenticateToken,
+  requireAdmin,
+  async (req: Request, res: Response) => {
+    try {
+      const db = (await import('./db.js')).default;
+      const documents = db.prepare('SELECT * FROM documents ORDER BY created_at DESC').all();
+
+      res.json({
+        success: true,
+        data: documents
+      });
+    } catch (error: any) {
+      console.error('Error getting documents:', error);
+      res.status(500).json({ success: false, error: 'Failed to get documents' });
+    }
+  }
+);
+
+// Delete document
+app.delete('/api/documents/:id',
+  authenticateToken,
+  requireAdmin,
+  async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const db = (await import('./db.js')).default;
+      const fs = await import('fs');
+      const path = await import('path');
+
+      // Get document info
+      const document = db.prepare('SELECT * FROM documents WHERE id = ?').get(id) as any;
+
+      if (!document) {
+        return res.status(404).json({
+          success: false,
+          error: 'Document not found'
+        });
+      }
+
+      // Delete file from filesystem
+      const filePath = path.join(process.cwd(), 'uploads', 'documents', document.filename);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+
+      // Delete from database
+      db.prepare('DELETE FROM documents WHERE id = ?').run(id);
+
+      res.json({
+        success: true,
+        message: 'Document deleted successfully'
+      });
+    } catch (error: any) {
+      console.error('Error deleting document:', error);
+      res.status(500).json({ success: false, error: 'Failed to delete document' });
+    }
+  }
+);
+
+// ============================================================================
+// USER MANAGEMENT ROUTES (admin only)
+// ============================================================================
+
+// Get all users
+app.get('/api/users',
+  authenticateToken,
+  requireAdmin,
+  async (req: Request, res: Response) => {
+    try {
+      const { usersDb } = await import('./db.js');
+      const users = usersDb.getAll();
+
+      // Remove password hashes from response
+      const usersWithoutPasswords = users.map(({ passwordHash, ...user }) => user);
+
+      res.json({
+        success: true,
+        data: usersWithoutPasswords
+      });
+    } catch (error: any) {
+      console.error('Error getting users:', error);
+      res.status(500).json({ success: false, error: 'Failed to get users' });
+    }
+  }
+);
+
+// Create new user
+app.post('/api/users',
+  authenticateToken,
+  requireAdmin,
+  async (req: Request, res: Response) => {
+    try {
+      const { email, password, displayName, role, sendEmail } = req.body;
+
+      if (!email || !password) {
+        return res.status(400).json({
+          success: false,
+          error: 'Email and password are required'
+        });
+      }
+
+      const { usersDb } = await import('./db.js');
+      const { hashPassword } = await import('./middleware/auth.js');
+      const { v4: uuidv4 } = await import('uuid');
+
+      // Check if user already exists
+      const existingUser = usersDb.getByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({
+          success: false,
+          error: 'User with this email already exists'
+        });
+      }
+
+      // Hash password
+      const passwordHash = await hashPassword(password);
+
+      // Create user
+      const newUser = usersDb.create({
+        id: uuidv4(),
+        email,
+        displayName: displayName || null,
+        photoUrl: null,
+        role: role || 'admin',
+        passwordHash
+      });
+
+      // Send welcome email if requested
+      let emailSent = false;
+      if (sendEmail) {
+        const { sendWelcomeEmail } = await import('./utils/email.js');
+        emailSent = await sendWelcomeEmail(email, displayName || email, password);
+      }
+
+      // Remove password hash from response
+      const { passwordHash: _, ...userWithoutPassword } = newUser;
+
+      res.json({
+        success: true,
+        data: {
+          ...userWithoutPassword,
+          emailSent
+        }
+      });
+    } catch (error: any) {
+      console.error('Error creating user:', error);
+      res.status(500).json({ success: false, error: 'Failed to create user' });
+    }
+  }
+);
+
+// Change password
+app.post('/api/users/change-password',
+  authenticateToken,
+  async (req: Request, res: Response) => {
+    try {
+      const { currentPassword, newPassword } = req.body;
+      const userId = req.user!.id;
+
+      if (!currentPassword || !newPassword) {
+        return res.status(400).json({
+          success: false,
+          error: 'Current password and new password are required'
+        });
+      }
+
+      if (newPassword.length < 6) {
+        return res.status(400).json({
+          success: false,
+          error: 'New password must be at least 6 characters'
+        });
+      }
+
+      const { usersDb } = await import('./db.js');
+      const bcrypt = await import('bcrypt');
+      const { hashPassword } = await import('./middleware/auth.js');
+
+      // Get user
+      const user = usersDb.getById(userId);
+      if (!user || !user.passwordHash) {
+        return res.status(404).json({
+          success: false,
+          error: 'User not found'
+        });
+      }
+
+      // Verify current password
+      const passwordMatch = await bcrypt.compare(currentPassword, user.passwordHash);
+      if (!passwordMatch) {
+        return res.status(401).json({
+          success: false,
+          error: 'Current password is incorrect'
+        });
+      }
+
+      // Hash new password
+      const newPasswordHash = await hashPassword(newPassword);
+
+      // Update password
+      usersDb.updatePassword(userId, newPasswordHash);
+
+      res.json({
+        success: true,
+        message: 'Password changed successfully'
+      });
+    } catch (error: any) {
+      console.error('Error changing password:', error);
+      res.status(500).json({ success: false, error: 'Failed to change password' });
+    }
+  }
+);
+
+// Delete user
+app.delete('/api/users/:id',
+  authenticateToken,
+  requireAdmin,
+  async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+
+      // Prevent deleting yourself
+      if (id === req.user!.id) {
+        return res.status(400).json({
+          success: false,
+          error: 'Cannot delete your own account'
+        });
+      }
+
+      const { usersDb } = await import('./db.js');
+      const deleted = usersDb.delete(id);
+
+      if (!deleted) {
+        return res.status(404).json({
+          success: false,
+          error: 'User not found'
+        });
+      }
+
+      res.json({
+        success: true,
+        message: 'User deleted successfully'
+      });
+    } catch (error: any) {
+      console.error('Error deleting user:', error);
+      res.status(500).json({ success: false, error: 'Failed to delete user' });
+    }
+  }
+);
+
+// ============================================================================
+// EMAIL LOGS (admin only)
+// ============================================================================
+
+// Get email logs
+app.get('/api/email-logs',
+  authenticateToken,
+  requireAdmin,
+  async (req: Request, res: Response) => {
+    try {
+      const { limit = '50', offset = '0' } = req.query;
+      const db = (await import('./db.js')).default;
+
+      const logs = db.prepare(`
+        SELECT * FROM email_logs
+        ORDER BY sent_at DESC
+        LIMIT ? OFFSET ?
+      `).all(parseInt(limit as string), parseInt(offset as string));
+
+      const total = db.prepare('SELECT COUNT(*) as count FROM email_logs').get() as { count: number };
+
+      res.json({
+        success: true,
+        data: {
+          logs,
+          total: total.count
+        }
+      });
+    } catch (error: any) {
+      console.error('Error getting email logs:', error);
+      res.status(500).json({ success: false, error: 'Failed to get email logs' });
     }
   }
 );

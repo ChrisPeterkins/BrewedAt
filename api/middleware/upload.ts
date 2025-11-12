@@ -1,6 +1,10 @@
 import multer from 'multer';
 import path from 'path';
 import { Request } from 'express';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Configure storage for different upload types
 const createStorage = (uploadDir: string) => {
@@ -58,6 +62,36 @@ export const uploadImage = multer({
   fileFilter: imageFilter,
   limits: {
     fileSize: 5 * 1024 * 1024 // 5MB limit
+  }
+});
+
+// Document filter for CSVs, spreadsheets, PDFs, etc.
+const documentFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+  // Accept common document types
+  const allowedMimes = [
+    'text/csv',
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+    'application/vnd.oasis.opendocument.spreadsheet', // .ods
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+    'text/plain',
+    'application/json'
+  ];
+
+  if (!allowedMimes.includes(file.mimetype)) {
+    return cb(new Error('Only document files are allowed (CSV, Excel, PDF, Word, Text)'));
+  }
+  cb(null, true);
+};
+
+// Document upload
+export const uploadDocument = multer({
+  storage: createStorage('documents'),
+  fileFilter: documentFilter,
+  limits: {
+    fileSize: 10 * 1024 * 1024 // 10MB limit for documents
   }
 });
 

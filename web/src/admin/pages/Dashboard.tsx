@@ -3,13 +3,17 @@ import { apiClient } from '@shared/api-client';
 // import BreweryTable from '../components/BreweryTable';
 import Events from './Events';
 import Podcast from './Podcast';
-import Content from './Content';
 // import Analytics from './Analytics';
 import Raffles from './Raffles';
-// import DataManagement from './DataManagement';
+import MediaLibrary from './MediaLibrary';
+import UserManagement from './UserManagement';
+import Settings from './Settings';
+import EmailLogs from './EmailLogs';
+import Documents from './Documents';
+import ChangePasswordModal from '../components/ChangePasswordModal';
 // import ContactSubmissions from './ContactSubmissions';
 
-type TabType = 'events' | 'podcast' | 'content' | 'analytics' | 'breweries' | 'raffles' | 'data' | 'contact';
+type TabType = 'events' | 'podcast' | 'analytics' | 'breweries' | 'raffles' | 'settings' | 'contact' | 'media' | 'users' | 'emails' | 'documents';
 
 interface DashboardProps {
   user: any;
@@ -18,6 +22,7 @@ interface DashboardProps {
 
 export default function Dashboard({ user, onLogout }: DashboardProps) {
   const [activeTab, setActiveTab] = useState<TabType>('events');
+  const [showChangePassword, setShowChangePassword] = useState(false);
 
   const handleSignOut = async () => {
     try {
@@ -32,10 +37,22 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
     <div style={styles.container}>
       <header style={styles.header}>
         <h1 style={styles.title}>BrewedAt Admin Dashboard</h1>
-        <button style={styles.signOutButton} onClick={handleSignOut}>
-          Sign Out
-        </button>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <button
+            style={styles.changePasswordButton}
+            onClick={() => setShowChangePassword(true)}
+          >
+            Change Password
+          </button>
+          <button style={styles.signOutButton} onClick={handleSignOut}>
+            Sign Out
+          </button>
+        </div>
       </header>
+
+      {showChangePassword && (
+        <ChangePasswordModal onClose={() => setShowChangePassword(false)} />
+      )}
 
       <nav style={styles.nav}>
         <button
@@ -63,19 +80,6 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
             <path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/>
           </svg>
           Podcast
-        </button>
-        <button
-          style={{
-            ...styles.navButton,
-            ...(activeTab === 'content' ? styles.navButtonActive : {})
-          }}
-          onClick={() => setActiveTab('content')}
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-          </svg>
-          Content
         </button>
         <button
           style={{
@@ -133,9 +137,63 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
         <button
           style={{
             ...styles.navButton,
-            ...(activeTab === 'data' ? styles.navButtonActive : {})
+            ...(activeTab === 'media' ? styles.navButtonActive : {})
           }}
-          onClick={() => setActiveTab('data')}
+          onClick={() => setActiveTab('media')}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+            <circle cx="8.5" cy="8.5" r="1.5"/>
+            <polyline points="21 15 16 10 5 21"/>
+          </svg>
+          Media
+        </button>
+        <button
+          style={{
+            ...styles.navButton,
+            ...(activeTab === 'users' ? styles.navButtonActive : {})
+          }}
+          onClick={() => setActiveTab('users')}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          Users
+        </button>
+        <button
+          style={{
+            ...styles.navButton,
+            ...(activeTab === 'documents' ? styles.navButtonActive : {})
+          }}
+          onClick={() => setActiveTab('documents')}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          Documents
+        </button>
+        <button
+          style={{
+            ...styles.navButton,
+            ...(activeTab === 'emails' ? styles.navButtonActive : {})
+          }}
+          onClick={() => setActiveTab('emails')}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <polyline points="22,6 12,13 2,6"/>
+          </svg>
+          Email Logs
+        </button>
+        <button
+          style={{
+            ...styles.navButton,
+            ...(activeTab === 'settings' ? styles.navButtonActive : {})
+          }}
+          onClick={() => setActiveTab('settings')}
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <circle cx="12" cy="12" r="3"/>
@@ -148,12 +206,15 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
       <main style={styles.main}>
         {activeTab === 'events' && <Events />}
         {activeTab === 'podcast' && <Podcast />}
-        {activeTab === 'content' && <Content />}
         {/* {activeTab === 'analytics' && <Analytics />} */}
         {/* {activeTab === 'breweries' && <BreweryTable />} */}
         {/* {activeTab === 'contact' && <ContactSubmissions />} */}
         {activeTab === 'raffles' && <Raffles />}
-        {/* {activeTab === 'data' && <DataManagement />} */}
+        {activeTab === 'media' && <MediaLibrary />}
+        {activeTab === 'documents' && <Documents />}
+        {activeTab === 'users' && <UserManagement />}
+        {activeTab === 'emails' && <EmailLogs />}
+        {activeTab === 'settings' && <Settings />}
       </main>
     </div>
   );
@@ -177,6 +238,16 @@ const styles = {
     fontWeight: '700',
     color: '#654321',
     margin: 0,
+  },
+  changePasswordButton: {
+    backgroundColor: '#8B4513',
+    color: '#FFFFFF',
+    padding: '10px 20px',
+    fontSize: '14px',
+    fontWeight: '600',
+    border: 'none',
+    borderRadius: '6px',
+    cursor: 'pointer',
   },
   signOutButton: {
     backgroundColor: '#D32F2F',

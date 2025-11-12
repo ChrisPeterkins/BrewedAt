@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { apiClient } from '@shared/api-client';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import { ToastProvider } from './context/ToastContext';
 
 interface User {
   id: string;
@@ -54,10 +55,14 @@ function App() {
     );
   }
 
-  return user ? (
-    <Dashboard user={user} onLogout={handleLogout} />
-  ) : (
-    <Login onLoginSuccess={handleLoginSuccess} />
+  return (
+    <ToastProvider>
+      {user ? (
+        <Dashboard user={user} onLogout={handleLogout} />
+      ) : (
+        <Login onLoginSuccess={handleLoginSuccess} />
+      )}
+    </ToastProvider>
   );
 }
 

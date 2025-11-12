@@ -379,6 +379,63 @@ class ApiClient {
   }
 
   // ============================================================================
+  // MEDIA UPLOADS
+  // ============================================================================
+
+  async uploadImage(file: File): Promise<ApiResponse<{ imageUrl: string; filename: string; originalName: string; size: number; uploadedAt: string }>> {
+    const formData = new FormData();
+    formData.append('image', file);
+
+    const headers: HeadersInit = {};
+    if (this.token) {
+      headers['Authorization'] = `Bearer ${this.token}`;
+    }
+
+    try {
+      const response = await fetch(`${this.baseUrl}/upload/image`, {
+        method: 'POST',
+        headers,
+        body: formData,
+      });
+
+      return await response.json();
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.message || 'Upload failed',
+      };
+    }
+  }
+
+  // ============================================================================
+  // USER MANAGEMENT
+  // ============================================================================
+
+  async getUsers(): Promise<ApiResponse<any[]>> {
+    return this.request('/users');
+  }
+
+  async createUser(user: { email: string; password: string; displayName?: string; role?: string; sendEmail?: boolean }): Promise<ApiResponse<any>> {
+    return this.request('/users', {
+      method: 'POST',
+      body: JSON.stringify(user),
+    });
+  }
+
+  async changePassword(currentPassword: string, newPassword: string): Promise<ApiResponse<{ message: string }>> {
+    return this.request('/users/change-password', {
+      method: 'POST',
+      body: JSON.stringify({ currentPassword, newPassword }),
+    });
+  }
+
+  async deleteUser(id: string): Promise<ApiResponse<void>> {
+    return this.request(`/users/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // ============================================================================
   // SITE CONFIG
   // ============================================================================
 
@@ -396,6 +453,85 @@ class ApiClient {
       body: JSON.stringify({ value }),
     });
   }
+
+  // ============================================================================
+  // EMAIL LOGS
+  // ============================================================================
+
+  async getEmailLogs(params?: { limit?: number; offset?: number }): Promise<ApiResponse<{ logs: EmailLog[]; total: number }>> {
+    const queryParams = new URLSearchParams();
+    if (params?.limit) queryParams.set('limit', params.limit.toString());
+    if (params?.offset) queryParams.set('offset', params.offset.toString());
+
+    const query = queryParams.toString();
+    return this.request<{ logs: EmailLog[]; total: number }>(`/email-logs${query ? `?${query}` : ''}`);
+  }
+
+  // ============================================================================
+  // DOCUMENTS
+  // ============================================================================
+
+  async uploadDocument(file: File, description?: string): Promise<ApiResponse<Document>> {
+    const formData = new FormData();
+    formData.append('document', file);
+    if (description) {
+      formData.append('description', description);
+    }
+
+    const headers: HeadersInit = {};
+    if (this.token) {
+      headers['Authorization'] = `Bearer ${this.token}`;
+    }
+
+    try {
+      const response = await fetch(`${this.baseUrl}/upload/document`, {
+        method: 'POST',
+        headers,
+        body: formData,
+      });
+
+      return await response.json();
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.message || 'Upload failed',
+      };
+    }
+  }
+
+  async getDocuments(): Promise<ApiResponse<Document[]>> {
+    return this.request<Document[]>('/documents');
+  }
+
+  async deleteDocument(id: string): Promise<ApiResponse<void>> {
+    return this.request<void>(`/documents/${id}`, {
+      method: 'DELETE',
+    });
+  }
+}
+
+export interface EmailLog {
+  id: string;
+  recipient: string;
+  subject: string;
+  from_email: string;
+  status: 'sending' | 'sent' | 'failed';
+  error_message?: string;
+  sent_at: string;
+  delivered_at?: string;
+  created_at: string;
+}
+
+export interface Document {
+  id: string;
+  filename: string;
+  original_name: string;
+  file_type: string;
+  file_size: number;
+  file_url: string;
+  uploaded_by?: string;
+  description?: string;
+  created_at: string;
 }
 
 // ============================================================================
