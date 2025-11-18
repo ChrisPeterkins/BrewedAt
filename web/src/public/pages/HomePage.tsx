@@ -21,9 +21,44 @@ export default function HomePage() {
   const [email, setEmail] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [formMessage, setFormMessage] = useState('');
+  const [activeSocial, setActiveSocial] = useState<'instagram' | 'tiktok'>('instagram');
+  const [podcastCarouselIndex, setPodcastCarouselIndex] = useState(0);
+
+  // Reload social embeds when switching platforms
+  useEffect(() => {
+    if (activeSocial === 'instagram') {
+      // Process Instagram embeds - wait for DOM to update
+      const timer = setTimeout(() => {
+        if ((window as any).instgrm) {
+          // Process all Instagram blockquotes
+          const instagramBlockquotes = document.querySelectorAll('.instagram-media');
+          instagramBlockquotes.forEach((blockquote: any) => {
+            // Remove any existing iframes to force re-render
+            const existingIframe = blockquote.querySelector('iframe');
+            if (existingIframe) {
+              existingIframe.remove();
+            }
+          });
+          (window as any).instgrm.Embeds.process();
+        }
+      }, 500);
+
+      return () => clearTimeout(timer);
+    } else if (activeSocial === 'tiktok') {
+      // Reload TikTok script to process embeds
+      const timer = setTimeout(() => {
+        const script = document.createElement('script');
+        script.src = 'https://www.tiktok.com/embed.js';
+        script.async = true;
+        document.body.appendChild(script);
+      }, 300);
+
+      return () => clearTimeout(timer);
+    }
+  }, [activeSocial]);
 
   useEffect(() => {
-    loadSocialStats();
+    // loadSocialStats(); // Commented out - not using social stats API
     loadFeaturedEvents();
     loadFeaturedEpisodes();
   }, []);
@@ -143,6 +178,10 @@ export default function HomePage() {
         <meta name="twitter:title" content="BrewedAt | Local Beer Events & Happenings" />
         <meta name="twitter:description" content="Tap into the local craft beverage scene. Discover events, podcasts, and connect with the craft beer community in PA & NJ." />
         <meta name="twitter:image" content="https://chrispeterkins.com/brewedat/beer-background-optimized.jpg" />
+
+        {/* Social Media Embed Scripts */}
+        <script async src="//www.instagram.com/embed.js"></script>
+        <script async src="https://www.tiktok.com/embed.js"></script>
       </Helmet>
 
       <div>
@@ -155,7 +194,7 @@ export default function HomePage() {
               alt="BrewedAt Logo"
               className="hero-logo"
             />
-            <h1>Tap into the Local Craft&nbsp;Beverage Scene</h1>
+            <h1>Tap into the Craft Beer & Beverage Scene</h1>
             <div className="hero-cta">
               <a href="#events" className="btn-large btn-primary">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -189,10 +228,10 @@ export default function HomePage() {
         <div className="container">
           <div className="content-split">
             <div className="content-text">
-              <h2>Craft Beer Events Across PA & NJ</h2>
-              <p>From gaming tournaments at local breweries to brewery crawls and beer festivals, we bring the craft beer community together through unforgettable experiences. Whether you're a casual drinker or a seasoned enthusiast, there's always something happening at BrewedAt.</p>
+              <h2>Stay connected to what's happening in your local craft beverage scene.</h2>
+              <p>From pop-ups to brewery crawls and festivals, discover fun new ways to explore the craft beverage scene in PA and NJ. Something is always brewing.</p>
               <ul className="highlight-list">
-                <li>Gaming tournaments (Mario Kart, Super Smash Bros)</li>
+                <li>Unique Pop-ups</li>
                 <li>Brewery tours and crawls</li>
                 <li>Beer festivals and tastings</li>
                 <li>Community meetups</li>
@@ -397,77 +436,208 @@ export default function HomePage() {
       </section>
 
       {/* Podcast Section */}
-      <section id="podcast" className="podcast-highlight">
+      <section
+        id="podcast"
+        className="podcast-highlight"
+        style={{
+          position: 'relative',
+          background: 'linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(/brewedat/api/uploads/general/PodcastBackground2-1762980833203-514936744.jpeg) center/cover no-repeat'
+        }}
+      >
         <div className="container">
           <div className="podcast-header">
             <h2>The BrewedAt Podcast</h2>
             <p>An exploration of the movers and shakers in the Greater Philadelphia Area beer, bar and culture space. Join us as we sit down with brewery owners, bar operators, and community leaders for honest, in-depth conversations about what makes the local craft beer scene special.</p>
           </div>
 
-          {/* Featured Episodes Grid */}
-          <div className="featured-episodes-grid">
-            {featuredEpisodes.length > 0 ? (
-              featuredEpisodes.map((episode) => (
-                <a
-                  key={episode.id}
-                  href={episode.youtubeUrl || episode.spotifyUrl || episode.appleUrl || '/brewedat/podcast'}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="featured-episode-card"
+          {/* Featured Episodes - YouTube Embeds */}
+          <div className="podcast-carousel-wrapper">
+            {/* Carousel Navigation - Mobile Only */}
+            {featuredEpisodes.length > 1 && (
+              <>
+                <button
+                  className="podcast-carousel-nav podcast-carousel-prev"
+                  onClick={() => setPodcastCarouselIndex(Math.max(0, podcastCarouselIndex - 1))}
+                  disabled={podcastCarouselIndex === 0}
+                  aria-label="Previous episode"
                 >
-                  {episode.thumbnailUrl && (
-                    <div className="episode-thumbnail">
-                      <img src={episode.thumbnailUrl} alt={episode.title} />
-                      <div className="play-overlay">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="white">
+                  ‹
+                </button>
+                <button
+                  className="podcast-carousel-nav podcast-carousel-next"
+                  onClick={() => setPodcastCarouselIndex(Math.min(featuredEpisodes.length - 1, podcastCarouselIndex + 1))}
+                  disabled={podcastCarouselIndex === featuredEpisodes.length - 1}
+                  aria-label="Next episode"
+                >
+                  ›
+                </button>
+              </>
+            )}
+
+            <div
+              className="podcast-episodes-grid"
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+                gap: '24px',
+                marginBottom: '40px'
+              }}
+            >
+              {featuredEpisodes.length > 0 ? (
+                featuredEpisodes.map((episode, index) => {
+                // Extract YouTube video ID from URL
+                const getYouTubeId = (url: string | undefined) => {
+                  if (!url) return null;
+                  const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+                  return match ? match[1] : null;
+                };
+
+                const videoId = getYouTubeId(episode.youtubeUrl);
+
+                return (
+                  <div
+                    key={episode.id}
+                    className={`podcast-episode-card ${index === podcastCarouselIndex ? 'active' : ''}`}
+                    style={{
+                      background: '#1f3540',
+                      borderRadius: '12px',
+                      overflow: 'hidden',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      transition: 'transform 0.2s, box-shadow 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-4px)';
+                      e.currentTarget.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.3)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
+                  >
+                    {videoId ? (
+                      <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0 }}>
+                        <iframe
+                          src={`https://www.youtube.com/embed/${videoId}`}
+                          title={episode.title}
+                          frameBorder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                          style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            height: '100%'
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <div style={{
+                        position: 'relative',
+                        paddingBottom: '56.25%',
+                        background: 'linear-gradient(135deg, #FD5526 0%, #E04515 100%)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}>
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="white" style={{ position: 'absolute' }}>
                           <path d="M8 5v14l11-7z"/>
                         </svg>
                       </div>
-                    </div>
-                  )}
-                  <div className="episode-content">
-                    <div className="episode-number">Episode #{episode.episodeNumber}</div>
-                    <h3>{episode.title}</h3>
-                    {episode.guestName && (
-                      <p className="episode-guest">Guest: {episode.guestName}</p>
                     )}
-                    {episode.description && (
-                      <p className="episode-description">
-                        {episode.description.length > 120 ? episode.description.substring(0, 120) + '...' : episode.description}
-                      </p>
-                    )}
-                    {episode.duration && (
-                      <div className="episode-duration">{episode.duration}</div>
-                    )}
-                  </div>
-                </a>
-              ))
-            ) : (
-              <>
-                {[
-                  { num: '?', title: 'New Episodes Coming Soon', desc: 'Join us for in-depth conversations with brewery owners, bar operators, and craft beer innovators.' },
-                  { num: '?', title: 'Subscribe & Stay Updated', desc: 'Follow us on your favorite podcast platform to never miss an episode.' },
-                  { num: '?', title: 'Have a Story to Share?', desc: 'Reach out if you\'d like to be featured on the BrewedAt Podcast.' }
-                ].map((placeholder, i) => (
-                  <div key={i} className="featured-episode-card placeholder">
-                    <div className="episode-thumbnail placeholder-image">
-                      <div className="placeholder-icon">
-                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                          <rect x="9" y="3" width="6" height="11" rx="3"/>
-                          <path d="M12 14V18M12 18H8M12 18H16" strokeLinecap="round"/>
-                          <path d="M5 11C5 14.866 8.13401 18 12 18C15.866 18 19 14.866 19 11" strokeLinecap="round"/>
-                        </svg>
+                    <div style={{ padding: '16px' }}>
+                      <h3 style={{
+                        fontSize: '16px',
+                        fontWeight: '600',
+                        color: '#fff',
+                        margin: '0 0 8px 0',
+                        lineHeight: '1.4'
+                      }}>
+                        {episode.title}
+                      </h3>
+                      {episode.description && (
+                        <p style={{
+                          fontSize: '13px',
+                          color: '#b8c5d0',
+                          margin: '0 0 12px 0',
+                          lineHeight: '1.5',
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden'
+                        }}>
+                          {episode.description}
+                        </p>
+                      )}
+                      <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                        {episode.spotifyUrl && (
+                          <a
+                            href={episode.spotifyUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '6px',
+                              padding: '6px 12px',
+                              background: '#1DB954',
+                              color: '#fff',
+                              fontSize: '12px',
+                              fontWeight: '600',
+                              borderRadius: '20px',
+                              textDecoration: 'none',
+                              transition: 'opacity 0.2s'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
+                            onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+                          >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+                            </svg>
+                            Spotify
+                          </a>
+                        )}
+                        {episode.appleUrl && (
+                          <a
+                            href={episode.appleUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '6px',
+                              padding: '6px 12px',
+                              background: '#A561E8',
+                              color: '#fff',
+                              fontSize: '12px',
+                              fontWeight: '600',
+                              borderRadius: '20px',
+                              textDecoration: 'none',
+                              transition: 'opacity 0.2s'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
+                            onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+                          >
+                            Apple
+                          </a>
+                        )}
                       </div>
                     </div>
-                    <div className="episode-content">
-                      <div className="episode-number">Episode {placeholder.num}</div>
-                      <h3>{placeholder.title}</h3>
-                      <p className="episode-description">{placeholder.desc}</p>
-                    </div>
                   </div>
-                ))}
-              </>
+                );
+              })
+            ) : (
+              <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '60px 20px', color: '#b8c5d0' }}>
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ margin: '0 auto 20px', opacity: 0.3 }}>
+                  <rect x="9" y="3" width="6" height="11" rx="3"/>
+                  <path d="M12 14V18M12 18H8M12 18H16" strokeLinecap="round"/>
+                  <path d="M5 11C5 14.866 8.13401 18 12 18C15.866 18 19 14.866 19 11" strokeLinecap="round"/>
+                </svg>
+                <h3 style={{ fontSize: '20px', color: '#fff', marginBottom: '8px' }}>New Episodes Coming Soon</h3>
+                <p>Join us for in-depth conversations with brewery owners, bar operators, and craft beer innovators.</p>
+              </div>
             )}
+            </div>
           </div>
 
           {/* Podcast Platforms */}
@@ -486,8 +656,6 @@ export default function HomePage() {
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
                 YouTube
               </a>
-              <a href="https://thebrewedatpodcast.podbean.com/" target="_blank" rel="noopener noreferrer" className="badge">Podbean</a>
-              <a href="https://music.amazon.com/podcasts" target="_blank" rel="noopener noreferrer" className="badge">Amazon Music</a>
             </div>
           </div>
 
@@ -506,11 +674,15 @@ export default function HomePage() {
 
             {/* Compact Social Buttons */}
             <div className="social-buttons-compact">
-              <a
-                href="https://www.instagram.com/brewedat/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="social-button-compact instagram"
+              <button
+                onClick={() => setActiveSocial('instagram')}
+                className={`social-button-compact instagram ${activeSocial === 'instagram' ? 'active' : ''}`}
+                style={{
+                  border: 'none',
+                  cursor: 'pointer',
+                  opacity: activeSocial === 'instagram' ? 1 : 0.6,
+                  transition: 'opacity 0.3s'
+                }}
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                   <rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" strokeWidth="2" fill="none"/>
@@ -518,67 +690,93 @@ export default function HomePage() {
                   <circle cx="17.5" cy="6.5" r="1.5" fill="currentColor"/>
                 </svg>
                 Instagram
-              </a>
+              </button>
 
-              <a
-                href="https://www.facebook.com/brewedat"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="social-button-compact facebook"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M24 12C24 5.37258 18.6274 0 12 0C5.37258 0 0 5.37258 0 12C0 17.9895 4.38823 22.954 10.125 23.8542V15.4688H7.07812V12H10.125V9.35625C10.125 6.34875 11.9165 4.6875 14.6576 4.6875C15.9705 4.6875 17.3438 4.92188 17.3438 4.92188V7.875H15.8306C14.3399 7.875 13.875 8.80001 13.875 9.74899V12H17.2031L16.6711 15.4688H13.875V23.8542C19.6118 22.954 24 17.9895 24 12Z"/>
-                </svg>
-                Facebook
-              </a>
-
-              <a
-                href="https://www.tiktok.com/@brewedat"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="social-button-compact tiktok"
+              <button
+                onClick={() => setActiveSocial('tiktok')}
+                className={`social-button-compact tiktok ${activeSocial === 'tiktok' ? 'active' : ''}`}
+                style={{
+                  border: 'none',
+                  cursor: 'pointer',
+                  opacity: activeSocial === 'tiktok' ? 1 : 0.6,
+                  transition: 'opacity 0.3s'
+                }}
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
                 </svg>
                 TikTok
-              </a>
+              </button>
             </div>
           </div>
 
           {/* Social Content Grid */}
-          <div className="social-content-grid">
-            <div className="social-feed-card">
-              <div className="social-feed-header instagram-theme">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                  <rect x="2" y="2" width="20" height="20" rx="5" stroke="white" strokeWidth="2" fill="none"/>
-                  <circle cx="12" cy="12" r="4" stroke="white" strokeWidth="2" fill="none"/>
-                  <circle cx="17.5" cy="6.5" r="1.5" fill="white"/>
-                </svg>
-                <span>Instagram</span>
-              </div>
-              <div className="social-feed-embed">
-                <blockquote className="instagram-media" data-instgrm-permalink="https://www.instagram.com/brewedat/" data-instgrm-version="14"></blockquote>
-                <script async src="//www.instagram.com/embed.js"></script>
-              </div>
-            </div>
+          <div className="social-content-grid" key={activeSocial}>
+            {activeSocial === 'instagram' ? (
+              <>
+                <div className="social-feed-card" key="instagram-brewedat">
+                  <div className="social-feed-header instagram-theme">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                      <rect x="2" y="2" width="20" height="20" rx="5" stroke="white" strokeWidth="2" fill="none"/>
+                      <circle cx="12" cy="12" r="4" stroke="white" strokeWidth="2" fill="none"/>
+                      <circle cx="17.5" cy="6.5" r="1.5" fill="white"/>
+                    </svg>
+                    <span>@brewedat</span>
+                  </div>
+                  <div className="social-feed-embed">
+                    <blockquote className="instagram-media" data-instgrm-permalink="https://www.instagram.com/brewedat/" data-instgrm-version="14"></blockquote>
+                  </div>
+                </div>
 
-            <div className="social-feed-card">
-              <div className="social-feed-header tiktok-theme">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
-                </svg>
-                <span>TikTok</span>
-              </div>
-              <div className="social-feed-embed">
-                <blockquote className="tiktok-embed" cite="https://www.tiktok.com/@brewedat" data-unique-id="brewedat" data-embed-type="creator" style={{maxWidth: '780px', minWidth: '288px'}}>
-                  <section>
-                    <a target="_blank" href="https://www.tiktok.com/@brewedat?refer=creator_embed">@brewedat</a>
-                  </section>
-                </blockquote>
-                <script async src="https://www.tiktok.com/embed.js"></script>
-              </div>
-            </div>
+                <div className="social-feed-card" key="instagram-podcast">
+                  <div className="social-feed-header instagram-theme">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                      <rect x="2" y="2" width="20" height="20" rx="5" stroke="white" strokeWidth="2" fill="none"/>
+                      <circle cx="12" cy="12" r="4" stroke="white" strokeWidth="2" fill="none"/>
+                      <circle cx="17.5" cy="6.5" r="1.5" fill="white"/>
+                    </svg>
+                    <span>@thebrewedatpodcast</span>
+                  </div>
+                  <div className="social-feed-embed">
+                    <blockquote className="instagram-media" data-instgrm-permalink="https://www.instagram.com/thebrewedatpodcast/" data-instgrm-version="14"></blockquote>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="social-feed-card" key="tiktok-brewedat">
+                  <div className="social-feed-header tiktok-theme">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+                    </svg>
+                    <span>@brewedat</span>
+                  </div>
+                  <div className="social-feed-embed">
+                    <blockquote className="tiktok-embed" cite="https://www.tiktok.com/@brewedat" data-unique-id="brewedat" data-embed-type="creator" style={{maxWidth: '780px', minWidth: '288px'}}>
+                      <section>
+                        <a target="_blank" href="https://www.tiktok.com/@brewedat?refer=creator_embed">@brewedat</a>
+                      </section>
+                    </blockquote>
+                  </div>
+                </div>
+
+                <div className="social-feed-card" key="tiktok-podcast">
+                  <div className="social-feed-header tiktok-theme">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+                    </svg>
+                    <span>@thebrewedatpodcast</span>
+                  </div>
+                  <div className="social-feed-embed">
+                    <blockquote className="tiktok-embed" cite="https://www.tiktok.com/@thebrewedatpodcast" data-unique-id="thebrewedatpodcast" data-embed-type="creator" style={{maxWidth: '780px', minWidth: '288px'}}>
+                      <section>
+                        <a target="_blank" href="https://www.tiktok.com/@thebrewedatpodcast?refer=creator_embed">@thebrewedatpodcast</a>
+                      </section>
+                    </blockquote>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -616,9 +814,10 @@ export default function HomePage() {
             }}>
               Reach 10,000+ craft beer enthusiasts and 765+ brewery decision-makers through our podcast, social media, and event network. Flexible retainer packages starting at $1,000/month.
             </p>
-            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <div className="business-cta-buttons" style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
               <a
                 href="/brewedat/for-business#packages"
+                className="business-cta-btn"
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -645,6 +844,7 @@ export default function HomePage() {
               </a>
               <a
                 href="mailto:info@brewedat.com"
+                className="business-cta-btn"
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',

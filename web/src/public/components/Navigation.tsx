@@ -1,11 +1,33 @@
 import { Link, useLocation } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function Navigation() {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showNav, setShowNav] = useState(false);
 
   const isActive = (path: string) => location.pathname === path;
+
+  // On homepage, detect scroll to show/hide navbar on mobile
+  useEffect(() => {
+    if (location.pathname !== '/') {
+      setShowNav(true);
+      return;
+    }
+
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      const viewportHeight = window.innerHeight;
+      // Show nav when scrolled past 70% of viewport (into events section)
+      const shouldShow = scrollPosition > viewportHeight * 0.7;
+      setShowNav(shouldShow);
+      console.log('Scroll position:', scrollPosition, 'Viewport height:', viewportHeight, 'Should show nav:', shouldShow);
+    };
+
+    handleScroll(); // Check initial position
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [location.pathname]);
 
   const navLinks = [
     { path: '/', label: 'Home' },
@@ -15,76 +37,97 @@ export default function Navigation() {
     { path: '/for-business', label: 'Partner With Us' },
   ];
 
-  return (
-    <nav style={styles.nav}>
-      <div style={styles.container}>
-        <Link to="/" style={styles.logo}>
-          <img
-            src="/brewedat/brewedat-logo.png"
-            alt="BrewedAt Logo"
-            style={styles.logoImg}
-          />
-        </Link>
+  const isHomepageHidden = location.pathname === '/' && !showNav;
 
-        {/* Desktop Navigation */}
-        <div className="nav-desktop-links" style={styles.desktopLinks}>
-          {navLinks.map((link) => (
-            <Link
-              key={link.path}
-              to={link.path}
-              style={{
-                ...styles.navLink,
-                ...(isActive(link.path) ? styles.navLinkActive : {})
-              }}
-            >
-              {link.label}
-            </Link>
-          ))}
-          <Link to="/get-involved" style={styles.ctaButton}>
-            Contact Us
+  return (
+    <>
+      <nav
+        style={styles.nav}
+        className={isHomepageHidden ? 'nav-hidden-mobile' : ''}
+        data-show-nav={showNav.toString()}
+        data-pathname={location.pathname}
+      >
+        <div style={styles.container}>
+          <Link to="/" style={styles.logo}>
+            <img
+              src="/brewedat/brewedat-logo.png"
+              alt="BrewedAt Logo"
+              style={styles.logoImg}
+            />
           </Link>
+
+          {/* Desktop Navigation */}
+          <div className="nav-desktop-links" style={styles.desktopLinks}>
+            {navLinks.map((link) => (
+              <Link
+                key={link.path}
+                to={link.path}
+                style={{
+                  ...styles.navLink,
+                  ...(isActive(link.path) ? styles.navLinkActive : {})
+                }}
+              >
+                {link.label}
+              </Link>
+            ))}
+            <Link to="/get-involved" style={styles.ctaButton}>
+              Contact Us
+            </Link>
+          </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            className="nav-mobile-button"
+            style={styles.mobileMenuButton}
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle menu"
+          >
+            {mobileMenuOpen ? '✕' : '☰'}
+          </button>
         </div>
 
-        {/* Mobile Menu Button */}
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div style={styles.mobileMenu}>
+            {navLinks.map((link) => (
+              <Link
+                key={link.path}
+                to={link.path}
+                style={styles.mobileLink}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {link.label}
+              </Link>
+            ))}
+            <Link
+              to="/get-involved"
+              style={styles.mobileCtaButton}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Contact Us
+            </Link>
+          </div>
+        )}
+      </nav>
+
+      {/* Floating hamburger button for mobile homepage */}
+      {isHomepageHidden && (
         <button
-          className="nav-mobile-button"
-          style={styles.mobileMenuButton}
+          className="nav-mobile-button nav-floating-hamburger"
+          style={styles.floatingHamburger}
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           aria-label="Toggle menu"
         >
           {mobileMenuOpen ? '✕' : '☰'}
         </button>
-      </div>
-
-      {/* Mobile Menu */}
-      {mobileMenuOpen && (
-        <div style={styles.mobileMenu}>
-          {navLinks.map((link) => (
-            <Link
-              key={link.path}
-              to={link.path}
-              style={styles.mobileLink}
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              {link.label}
-            </Link>
-          ))}
-          <Link
-            to="/get-involved"
-            style={styles.mobileCtaButton}
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            Contact Us
-          </Link>
-        </div>
       )}
-    </nav>
+    </>
   );
 }
 
 const styles = {
   nav: {
-    backgroundColor: 'rgba(255, 255, 255, 0.85)',
+    backgroundColor: '#FEF5E7',
     backdropFilter: 'blur(12px)',
     WebkitBackdropFilter: 'blur(12px)',
     borderBottom: '1px solid rgba(0, 0, 0, 0.1)',
@@ -92,6 +135,7 @@ const styles = {
     top: 0,
     zIndex: 1000,
     boxShadow: '0 2px 12px rgba(0, 0, 0, 0.08)',
+    transition: 'all 0.3s ease',
   },
   container: {
     maxWidth: '1200px',
@@ -145,6 +189,19 @@ const styles = {
     color: '#1f3540',
     padding: '8px',
   },
+  floatingHamburger: {
+    position: 'fixed' as const,
+    top: '20px',
+    right: '20px',
+    zIndex: 1001,
+    backgroundColor: 'transparent',
+    border: 'none',
+    fontSize: '36px',
+    color: '#1f3540',
+    padding: '8px',
+    cursor: 'pointer',
+    display: 'none',
+  },
   mobileMenu: {
     display: 'flex',
     flexDirection: 'column' as const,
@@ -185,11 +242,53 @@ const mediaQueryStyles = `
     .nav-mobile-button {
       display: block !important;
     }
+
+    /* Mobile navbar is always fixed, never in document flow */
+    nav {
+      position: fixed !important;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      transition: transform 0.3s ease;
+    }
+
+    /* Hide navbar on mobile homepage when at top */
+    nav.nav-hidden-mobile {
+      transform: translateY(-100%);
+    }
+
+    /* Show navbar when scrolled */
+    nav:not(.nav-hidden-mobile) {
+      transform: translateY(0);
+    }
+
+    /* Show floating hamburger only when navbar is hidden */
+    .nav-floating-hamburger {
+      display: block !important;
+    }
   }
 
   @media (min-width: 769px) {
     .nav-mobile-button {
       display: none !important;
+    }
+    .nav-floating-hamburger {
+      display: none !important;
+    }
+
+    /* Always show navbar on desktop */
+    .nav-hidden-mobile {
+      background-color: #FEF5E7 !important;
+      backdrop-filter: blur(12px) !important;
+      -webkit-backdrop-filter: blur(12px) !important;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08) !important;
+    }
+
+    .nav-container-hidden-mobile {
+      opacity: 1 !important;
+      pointer-events: auto !important;
     }
   }
 `;
