@@ -21,41 +21,7 @@ export default function HomePage() {
   const [email, setEmail] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [formMessage, setFormMessage] = useState('');
-  const [activeSocial, setActiveSocial] = useState<'instagram' | 'tiktok'>('instagram');
   const [podcastCarouselIndex, setPodcastCarouselIndex] = useState(0);
-
-  // Reload social embeds when switching platforms
-  useEffect(() => {
-    if (activeSocial === 'instagram') {
-      // Process Instagram embeds - wait for DOM to update
-      const timer = setTimeout(() => {
-        if ((window as any).instgrm) {
-          // Process all Instagram blockquotes
-          const instagramBlockquotes = document.querySelectorAll('.instagram-media');
-          instagramBlockquotes.forEach((blockquote: any) => {
-            // Remove any existing iframes to force re-render
-            const existingIframe = blockquote.querySelector('iframe');
-            if (existingIframe) {
-              existingIframe.remove();
-            }
-          });
-          (window as any).instgrm.Embeds.process();
-        }
-      }, 500);
-
-      return () => clearTimeout(timer);
-    } else if (activeSocial === 'tiktok') {
-      // Reload TikTok script to process embeds
-      const timer = setTimeout(() => {
-        const script = document.createElement('script');
-        script.src = 'https://www.tiktok.com/embed.js';
-        script.async = true;
-        document.body.appendChild(script);
-      }, 300);
-
-      return () => clearTimeout(timer);
-    }
-  }, [activeSocial]);
 
   useEffect(() => {
     // loadSocialStats(); // Commented out - not using social stats API
@@ -674,109 +640,81 @@ export default function HomePage() {
 
             {/* Compact Social Buttons */}
             <div className="social-buttons-compact">
-              <button
-                onClick={() => setActiveSocial('instagram')}
-                className={`social-button-compact instagram ${activeSocial === 'instagram' ? 'active' : ''}`}
-                style={{
-                  border: 'none',
-                  cursor: 'pointer',
-                  opacity: activeSocial === 'instagram' ? 1 : 0.6,
-                  transition: 'opacity 0.3s'
-                }}
+              <a
+                href="https://www.instagram.com/brewedat/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="social-button-compact instagram"
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                   <rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" strokeWidth="2" fill="none"/>
                   <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="2" fill="none"/>
                   <circle cx="17.5" cy="6.5" r="1.5" fill="currentColor"/>
                 </svg>
-                Instagram
-              </button>
+                @brewedat
+              </a>
 
-              <button
-                onClick={() => setActiveSocial('tiktok')}
-                className={`social-button-compact tiktok ${activeSocial === 'tiktok' ? 'active' : ''}`}
-                style={{
-                  border: 'none',
-                  cursor: 'pointer',
-                  opacity: activeSocial === 'tiktok' ? 1 : 0.6,
-                  transition: 'opacity 0.3s'
-                }}
+              <a
+                href="https://www.tiktok.com/@brewedat"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="social-button-compact tiktok"
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
                 </svg>
-                TikTok
-              </button>
+                @brewedat
+              </a>
+
+              <a
+                href="https://www.instagram.com/thebrewedatpodcast/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="social-button-compact instagram"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" strokeWidth="2" fill="none"/>
+                  <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="2" fill="none"/>
+                  <circle cx="17.5" cy="6.5" r="1.5" fill="currentColor"/>
+                </svg>
+                @thebrewedatpodcast
+              </a>
             </div>
           </div>
 
-          {/* Social Content Grid */}
-          <div className="social-content-grid" key={activeSocial}>
-            {activeSocial === 'instagram' ? (
-              <>
-                <div className="social-feed-card" key="instagram-brewedat">
-                  <div className="social-feed-header instagram-theme">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                      <rect x="2" y="2" width="20" height="20" rx="5" stroke="white" strokeWidth="2" fill="none"/>
-                      <circle cx="12" cy="12" r="4" stroke="white" strokeWidth="2" fill="none"/>
-                      <circle cx="17.5" cy="6.5" r="1.5" fill="white"/>
-                    </svg>
-                    <span>@brewedat</span>
-                  </div>
-                  <div className="social-feed-embed">
-                    <blockquote className="instagram-media" data-instgrm-permalink="https://www.instagram.com/brewedat/" data-instgrm-version="14"></blockquote>
-                  </div>
-                </div>
+          {/* Social Content Grid - Static TikTok Feeds */}
+          <div className="social-content-grid">
+            <div className="social-feed-card">
+              <div className="social-feed-header tiktok-theme">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+                </svg>
+                <span>@brewedat</span>
+              </div>
+              <div className="social-feed-embed">
+                <blockquote className="tiktok-embed" cite="https://www.tiktok.com/@brewedat" data-unique-id="brewedat" data-embed-type="creator" style={{maxWidth: '780px', minWidth: '288px'}}>
+                  <section>
+                    <a target="_blank" href="https://www.tiktok.com/@brewedat?refer=creator_embed">@brewedat</a>
+                  </section>
+                </blockquote>
+              </div>
+            </div>
 
-                <div className="social-feed-card" key="instagram-podcast">
-                  <div className="social-feed-header instagram-theme">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                      <rect x="2" y="2" width="20" height="20" rx="5" stroke="white" strokeWidth="2" fill="none"/>
-                      <circle cx="12" cy="12" r="4" stroke="white" strokeWidth="2" fill="none"/>
-                      <circle cx="17.5" cy="6.5" r="1.5" fill="white"/>
-                    </svg>
-                    <span>@thebrewedatpodcast</span>
-                  </div>
-                  <div className="social-feed-embed">
-                    <blockquote className="instagram-media" data-instgrm-permalink="https://www.instagram.com/thebrewedatpodcast/" data-instgrm-version="14"></blockquote>
-                  </div>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="social-feed-card" key="tiktok-brewedat">
-                  <div className="social-feed-header tiktok-theme">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-                      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
-                    </svg>
-                    <span>@brewedat</span>
-                  </div>
-                  <div className="social-feed-embed">
-                    <blockquote className="tiktok-embed" cite="https://www.tiktok.com/@brewedat" data-unique-id="brewedat" data-embed-type="creator" style={{maxWidth: '780px', minWidth: '288px'}}>
-                      <section>
-                        <a target="_blank" href="https://www.tiktok.com/@brewedat?refer=creator_embed">@brewedat</a>
-                      </section>
-                    </blockquote>
-                  </div>
-                </div>
-
-                <div className="social-feed-card" key="tiktok-podcast">
-                  <div className="social-feed-header tiktok-theme">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-                      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
-                    </svg>
-                    <span>@thebrewedatpodcast</span>
-                  </div>
-                  <div className="social-feed-embed">
-                    <blockquote className="tiktok-embed" cite="https://www.tiktok.com/@thebrewedatpodcast" data-unique-id="thebrewedatpodcast" data-embed-type="creator" style={{maxWidth: '780px', minWidth: '288px'}}>
-                      <section>
-                        <a target="_blank" href="https://www.tiktok.com/@thebrewedatpodcast?refer=creator_embed">@thebrewedatpodcast</a>
-                      </section>
-                    </blockquote>
-                  </div>
-                </div>
-              </>
-            )}
+            <div className="social-feed-card">
+              <div className="social-feed-header tiktok-theme">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+                </svg>
+                <span>@thebrewedatpodcast</span>
+              </div>
+              <div className="social-feed-embed">
+                <blockquote className="tiktok-embed" cite="https://www.tiktok.com/@thebrewedatpodcast" data-unique-id="thebrewedatpodcast" data-embed-type="creator" style={{maxWidth: '780px', minWidth: '288px'}}>
+                  <section>
+                    <a target="_blank" href="https://www.tiktok.com/@thebrewedatpodcast?refer=creator_embed">@thebrewedatpodcast</a>
+                  </section>
+                </blockquote>
+              </div>
+            </div>
           </div>
         </div>
       </section>
