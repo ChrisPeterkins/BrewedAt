@@ -185,7 +185,7 @@ const styles = {
     display: 'none',
     backgroundColor: 'transparent',
     border: 'none',
-    fontSize: '24px',
+    fontSize: '36px',
     color: '#1f3540',
     padding: '8px',
   },
@@ -251,6 +251,14 @@ const mediaQueryStyles = `
       right: 0;
       z-index: 1000;
       transition: transform 0.3s ease;
+      background-color: rgba(255, 255, 255, 0.5) !important;
+      backdrop-filter: blur(12px) !important;
+      -webkit-backdrop-filter: blur(12px) !important;
+    }
+
+    /* Reduce navbar height on mobile */
+    nav > div {
+      padding: 8px 20px !important;
     }
 
     /* Hide navbar on mobile homepage when at top */

@@ -194,7 +194,7 @@ export default function HomePage() {
               alt="BrewedAt Logo"
               className="hero-logo"
             />
-            <h1>Tap into the Craft Beer & Beverage Scene</h1>
+            <h1>Tap into the Craft Beverage Scene</h1>
             <div className="hero-cta">
               <a href="#events" className="btn-large btn-primary">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -228,18 +228,14 @@ export default function HomePage() {
         <div className="container">
           <div className="content-split">
             <div className="content-text">
-              <h2>Stay connected to what's happening in your local craft beverage scene.</h2>
-              <p>From pop-ups to brewery crawls and festivals, discover fun new ways to explore the craft beverage scene in PA and NJ. Something is always brewing.</p>
+              <h2>Find Events Near You</h2>
+              <p>From pop-ups to brewery crawls and festivals, discover fun new ways to explore the craft beverage scene in PA and NJ.</p>
               <ul className="highlight-list">
                 <li>Unique Pop-ups</li>
                 <li>Brewery tours and crawls</li>
                 <li>Beer festivals and tastings</li>
                 <li>Community meetups</li>
               </ul>
-              <div className="button-group">
-                <a href="/brewedat/events" className="btn-large btn-primary">View All Events</a>
-                <a href="/brewedat/get-involved" className="btn-large btn-secondary">Submit an Event</a>
-              </div>
             </div>
             <div className="content-visual">
               <div className="events-visual-wrapper">
@@ -430,6 +426,10 @@ export default function HomePage() {
                   </div>
                 </div>
               </div>
+            </div>
+            <div className="button-group">
+              <a href="/brewedat/events" className="btn-large btn-primary">View All Events</a>
+              <a href="/brewedat/get-involved" className="btn-large btn-secondary">Submit an Event</a>
             </div>
           </div>
         </div>
