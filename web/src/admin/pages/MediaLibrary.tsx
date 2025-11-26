@@ -62,8 +62,8 @@ export default function MediaLibrary() {
         continue;
       }
 
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error('File too large', `${file.name} exceeds 5MB limit`);
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error('File too large', `${file.name} exceeds 10MB limit`);
         continue;
       }
 
@@ -149,7 +149,7 @@ export default function MediaLibrary() {
               <p className="upload-zone-text">
                 <strong>Click to upload</strong> or drag and drop
               </p>
-              <p className="upload-zone-hint">PNG, JPG, GIF up to 5MB</p>
+              <p className="upload-zone-hint">PNG, JPG, GIF up to 10MB</p>
             </>
           )}
         </div>

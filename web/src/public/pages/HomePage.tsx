@@ -17,6 +17,7 @@ export default function HomePage() {
   const [featuredEpisodes, setFeaturedEpisodes] = useState<PodcastEpisode[]>([]);
   const [currentEventSlide, setCurrentEventSlide] = useState(0);
   const [currentOtherEventSlide, setCurrentOtherEventSlide] = useState(0);
+  const [expandedEvent, setExpandedEvent] = useState<number | null>(null);
   const [totalFollowers, setTotalFollowers] = useState('15,000+');
   const [email, setEmail] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -27,6 +28,17 @@ export default function HomePage() {
     // loadSocialStats(); // Commented out - not using social stats API
     loadFeaturedEvents();
     loadFeaturedEpisodes();
+  }, []);
+
+  // Auto-rotate featured events carousel
+  useEffect(() => {
+    const imageCount = 9; // 9 images in carousel
+
+    const interval = setInterval(() => {
+      setCurrentEventSlide((prev) => (prev + 1) % imageCount);
+    }, 5000); // Rotate every 5 seconds
+
+    return () => clearInterval(interval);
   }, []);
 
   const loadSocialStats = async () => {
@@ -87,11 +99,13 @@ export default function HomePage() {
   };
 
   const nextEventSlide = () => {
-    setCurrentEventSlide((prev) => (prev + 1) % featuredEvents.length);
+    const imageCount = 3;
+    setCurrentEventSlide((prev) => (prev + 1) % imageCount);
   };
 
   const prevEventSlide = () => {
-    setCurrentEventSlide((prev) => (prev - 1 + featuredEvents.length) % featuredEvents.length);
+    const imageCount = 3;
+    setCurrentEventSlide((prev) => (prev - 1 + imageCount) % imageCount);
   };
 
   const goToEventSlide = (index: number) => {
@@ -156,11 +170,14 @@ export default function HomePage() {
         <div className="hero-content">
           <div className="hero-text">
             <img
-              src="/brewedat/brewedat-logo.png"
+              src="/brewedat/uploads/general/smaller logo-1764111844469-980589512.png"
               alt="BrewedAt Logo"
               className="hero-logo"
             />
-            <h1>Tap into the Craft Beverage Scene</h1>
+            <h1>
+              <span className="hero-title-mobile">Tap into the Craft Beverage Scene</span>
+              <span className="hero-title-desktop">Tap into the Local<br className="hero-title-break" />Craft Beverage Scene</span>
+            </h1>
             <div className="hero-cta">
               <a href="#events" className="btn-large btn-primary">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -192,73 +209,48 @@ export default function HomePage() {
       {/* Events Section */}
       <section id="events" className="events-highlight">
         <div className="container">
-          <div className="content-split">
-            <div className="content-text">
-              <h2>Find Events Near You</h2>
-              <p>From pop-ups to brewery crawls and festivals, discover fun new ways to explore the craft beverage scene in PA and NJ.</p>
-              <ul className="highlight-list">
-                <li>Unique Pop-ups</li>
-                <li>Brewery tours and crawls</li>
-                <li>Beer festivals and tastings</li>
-                <li>Community meetups</li>
-              </ul>
-            </div>
+          <div className="events-header">
+            <h2>Find Events Near You</h2>
+            <p>From pop-ups to brewery crawls and festivals, discover fun new ways to explore the craft beverage scene in PA and NJ.</p>
+          </div>
+
+          <div className="events-content">
             <div className="content-visual">
               <div className="events-visual-wrapper">
-                {featuredEvents.length > 0 ? (
-                  <div className="events-carousel">
-                    <div className="events-carousel-container">
-                    {featuredEvents.map((event, idx) => (
-                      <a
-                        key={event.id}
-                        href="/brewedat/events"
-                        className="featured-event-card"
-                        style={{
-                          display: idx === currentEventSlide ? 'flex' : 'none'
-                        }}
-                      >
-                        <div className="featured-event-date">
-                          <span className="month">{new Date(event.date).toLocaleDateString('en-US', { month: 'short' })}</span>
-                          <span className="day">{new Date(event.date).getDate()}</span>
+                <div className="events-carousel">
+                  <div className="events-carousel-container">
+                    <div className="events-carousel-track" style={{ transform: `translateX(-${currentEventSlide * (100 / 3)}%)` }}>
+                      {[
+                        { image: '/brewedat/uploads/general/passportevent.jpeg', title: 'Beer Passport Event', date: 'Dec 15, 2025', location: 'Center City, Philadelphia', description: 'Explore the best craft breweries in Philadelphia with our exclusive Beer Passport. Visit multiple locations and collect stamps for special prizes!' },
+                        { image: '/brewedat/uploads/general/testevent-1764112766587-547516293.png', title: 'Test Brewery Crawl', date: 'Dec 20, 2025', location: 'Fishtown, Philadelphia', description: 'Join us for an epic brewery crawl through Fishtown\'s finest craft beer spots. Sample unique brews and meet fellow beer enthusiasts.' },
+                        { image: '/brewedat/uploads/general/passportevent.jpeg', title: 'Beer Passport Event', date: 'Dec 22, 2025', location: 'Center City, Philadelphia', description: 'Explore the best craft breweries in Philadelphia with our exclusive Beer Passport. Visit multiple locations and collect stamps for special prizes!' },
+                        { image: '/brewedat/uploads/general/testevent-1764112766587-547516293.png', title: 'Test Brewery Crawl', date: 'Dec 28, 2025', location: 'Fishtown, Philadelphia', description: 'Join us for an epic brewery crawl through Fishtown\'s finest craft beer spots. Sample unique brews and meet fellow beer enthusiasts.' },
+                        { image: '/brewedat/uploads/general/passportevent.jpeg', title: 'Beer Passport Event', date: 'Jan 5, 2026', location: 'Center City, Philadelphia', description: 'Explore the best craft breweries in Philadelphia with our exclusive Beer Passport. Visit multiple locations and collect stamps for special prizes!' },
+                        { image: '/brewedat/uploads/general/testevent-1764112766587-547516293.png', title: 'Test Brewery Crawl', date: 'Jan 10, 2026', location: 'Fishtown, Philadelphia', description: 'Join us for an epic brewery crawl through Fishtown\'s finest craft beer spots. Sample unique brews and meet fellow beer enthusiasts.' },
+                        { image: '/brewedat/uploads/general/passportevent.jpeg', title: 'Beer Passport Event', date: 'Jan 15, 2026', location: 'Center City, Philadelphia', description: 'Explore the best craft breweries in Philadelphia with our exclusive Beer Passport. Visit multiple locations and collect stamps for special prizes!' },
+                        { image: '/brewedat/uploads/general/testevent-1764112766587-547516293.png', title: 'Test Brewery Crawl', date: 'Jan 20, 2026', location: 'Fishtown, Philadelphia', description: 'Join us for an epic brewery crawl through Fishtown\'s finest craft beer spots. Sample unique brews and meet fellow beer enthusiasts.' },
+                        { image: '/brewedat/uploads/general/passportevent.jpeg', title: 'Beer Passport Event', date: 'Jan 25, 2026', location: 'Center City, Philadelphia', description: 'Explore the best craft breweries in Philadelphia with our exclusive Beer Passport. Visit multiple locations and collect stamps for special prizes!' }
+                      ].map((event, idx) => (
+                        <div
+                          key={idx}
+                          className="featured-event-image"
+                          style={{
+                            backgroundImage: `url(${event.image})`,
+                            backgroundSize: 'contain',
+                            backgroundPosition: 'center',
+                            backgroundRepeat: 'no-repeat',
+                            backgroundColor: 'transparent',
+                            cursor: 'pointer'
+                          }}
+                          onClick={() => setExpandedEvent(expandedEvent === idx ? null : idx)}
+                        >
+                          <span className="featured-badge">Featured</span>
+                          <span className="date-badge">{event.date}</span>
                         </div>
-                        <div className="featured-event-info">
-                          <div className="featured-event-header">
-                            <h4>{event.title}</h4>
-                            {event.eventType && (
-                              <span className={`event-type-badge ${event.eventType}`}>
-                                {event.eventType === 'brewedat' ? 'BrewedAt Event' : 'Local Event'}
-                              </span>
-                            )}
-                          </div>
-                          {event.description && (
-                            <p className="featured-event-description">
-                              {event.description.length > 150 ? event.description.substring(0, 150) + '...' : event.description}
-                            </p>
-                          )}
-                          <div className="featured-event-details">
-                            <div className="event-meta">
-                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                                <circle cx="12" cy="10" r="3"/>
-                              </svg>
-                              <span>{event.location}</span>
-                            </div>
-                            {event.eventTime && (
-                              <div className="event-meta">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                  <circle cx="12" cy="12" r="10"/>
-                                  <path d="M12 6v6l4 2"/>
-                                </svg>
-                                <span>{event.eventTime}</span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </a>
-                    ))}
-                    {featuredEvents.length > 1 && (
-                      <>
-                        <button
+                      ))}
+                    </div>
+                    <>
+                      <button
                           className="events-carousel-button events-carousel-button-prev"
                           onClick={(e) => {
                             e.preventDefault();
@@ -283,7 +275,7 @@ export default function HomePage() {
                           </svg>
                         </button>
                         <div className="events-carousel-dots">
-                          {featuredEvents.map((_, idx) => (
+                          {[...Array(9)].map((_, idx) => (
                             <div
                               key={idx}
                               className={`carousel-dot ${idx === currentEventSlide ? 'active' : ''}`}
@@ -295,17 +287,84 @@ export default function HomePage() {
                           ))}
                         </div>
                       </>
-                    )}
                     </div>
                   </div>
-                ) : (
-                  <div className="visual-placeholder" style={{ background: 'linear-gradient(135deg, #fd5526 0%, #e04515 100%)' }}>
-                    <div className="placeholder-text">
-                      <h3>Upcoming Events</h3>
-                      <p>Check out what's happening this month</p>
+
+                  {/* Expanded Event Details */}
+                  {expandedEvent !== null && (
+                    <div className="expanded-event-details">
+                      <button
+                        className="close-expanded-event"
+                        onClick={() => setExpandedEvent(null)}
+                        aria-label="Close details"
+                      >
+                        ✕
+                      </button>
+                      <h3>{[
+                        { image: '/brewedat/uploads/general/passportevent.jpeg', title: 'Beer Passport Event', date: 'Dec 15, 2025', location: 'Center City, Philadelphia', description: 'Explore the best craft breweries in Philadelphia with our exclusive Beer Passport. Visit multiple locations and collect stamps for special prizes!' },
+                        { image: '/brewedat/uploads/general/testevent-1764112766587-547516293.png', title: 'Test Brewery Crawl', date: 'Dec 20, 2025', location: 'Fishtown, Philadelphia', description: 'Join us for an epic brewery crawl through Fishtown\'s finest craft beer spots. Sample unique brews and meet fellow beer enthusiasts.' },
+                        { image: '/brewedat/uploads/general/passportevent.jpeg', title: 'Beer Passport Event', date: 'Dec 22, 2025', location: 'Center City, Philadelphia', description: 'Explore the best craft breweries in Philadelphia with our exclusive Beer Passport. Visit multiple locations and collect stamps for special prizes!' },
+                        { image: '/brewedat/uploads/general/testevent-1764112766587-547516293.png', title: 'Test Brewery Crawl', date: 'Dec 28, 2025', location: 'Fishtown, Philadelphia', description: 'Join us for an epic brewery crawl through Fishtown\'s finest craft beer spots. Sample unique brews and meet fellow beer enthusiasts.' },
+                        { image: '/brewedat/uploads/general/passportevent.jpeg', title: 'Beer Passport Event', date: 'Jan 5, 2026', location: 'Center City, Philadelphia', description: 'Explore the best craft breweries in Philadelphia with our exclusive Beer Passport. Visit multiple locations and collect stamps for special prizes!' },
+                        { image: '/brewedat/uploads/general/testevent-1764112766587-547516293.png', title: 'Test Brewery Crawl', date: 'Jan 10, 2026', location: 'Fishtown, Philadelphia', description: 'Join us for an epic brewery crawl through Fishtown\'s finest craft beer spots. Sample unique brews and meet fellow beer enthusiasts.' },
+                        { image: '/brewedat/uploads/general/passportevent.jpeg', title: 'Beer Passport Event', date: 'Jan 15, 2026', location: 'Center City, Philadelphia', description: 'Explore the best craft breweries in Philadelphia with our exclusive Beer Passport. Visit multiple locations and collect stamps for special prizes!' },
+                        { image: '/brewedat/uploads/general/testevent-1764112766587-547516293.png', title: 'Test Brewery Crawl', date: 'Jan 20, 2026', location: 'Fishtown, Philadelphia', description: 'Join us for an epic brewery crawl through Fishtown\'s finest craft beer spots. Sample unique brews and meet fellow beer enthusiasts.' },
+                        { image: '/brewedat/uploads/general/passportevent.jpeg', title: 'Beer Passport Event', date: 'Jan 25, 2026', location: 'Center City, Philadelphia', description: 'Explore the best craft breweries in Philadelphia with our exclusive Beer Passport. Visit multiple locations and collect stamps for special prizes!' }
+                      ][expandedEvent].title}</h3>
+                      <div className="expanded-event-meta">
+                        <div className="expanded-event-date">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                            <line x1="16" y1="2" x2="16" y2="6"/>
+                            <line x1="8" y1="2" x2="8" y2="6"/>
+                            <line x1="3" y1="10" x2="21" y2="10"/>
+                          </svg>
+                          {[
+                            { image: '/brewedat/uploads/general/passportevent.jpeg', title: 'Beer Passport Event', date: 'Dec 15, 2025', location: 'Center City, Philadelphia', description: 'Explore the best craft breweries in Philadelphia with our exclusive Beer Passport. Visit multiple locations and collect stamps for special prizes!' },
+                            { image: '/brewedat/uploads/general/testevent-1764112766587-547516293.png', title: 'Test Brewery Crawl', date: 'Dec 20, 2025', location: 'Fishtown, Philadelphia', description: 'Join us for an epic brewery crawl through Fishtown\'s finest craft beer spots. Sample unique brews and meet fellow beer enthusiasts.' },
+                            { image: '/brewedat/uploads/general/passportevent.jpeg', title: 'Beer Passport Event', date: 'Dec 22, 2025', location: 'Center City, Philadelphia', description: 'Explore the best craft breweries in Philadelphia with our exclusive Beer Passport. Visit multiple locations and collect stamps for special prizes!' },
+                            { image: '/brewedat/uploads/general/testevent-1764112766587-547516293.png', title: 'Test Brewery Crawl', date: 'Dec 28, 2025', location: 'Fishtown, Philadelphia', description: 'Join us for an epic brewery crawl through Fishtown\'s finest craft beer spots. Sample unique brews and meet fellow beer enthusiasts.' },
+                            { image: '/brewedat/uploads/general/passportevent.jpeg', title: 'Beer Passport Event', date: 'Jan 5, 2026', location: 'Center City, Philadelphia', description: 'Explore the best craft breweries in Philadelphia with our exclusive Beer Passport. Visit multiple locations and collect stamps for special prizes!' },
+                            { image: '/brewedat/uploads/general/testevent-1764112766587-547516293.png', title: 'Test Brewery Crawl', date: 'Jan 10, 2026', location: 'Fishtown, Philadelphia', description: 'Join us for an epic brewery crawl through Fishtown\'s finest craft beer spots. Sample unique brews and meet fellow beer enthusiasts.' },
+                            { image: '/brewedat/uploads/general/passportevent.jpeg', title: 'Beer Passport Event', date: 'Jan 15, 2026', location: 'Center City, Philadelphia', description: 'Explore the best craft breweries in Philadelphia with our exclusive Beer Passport. Visit multiple locations and collect stamps for special prizes!' },
+                            { image: '/brewedat/uploads/general/testevent-1764112766587-547516293.png', title: 'Test Brewery Crawl', date: 'Jan 20, 2026', location: 'Fishtown, Philadelphia', description: 'Join us for an epic brewery crawl through Fishtown\'s finest craft beer spots. Sample unique brews and meet fellow beer enthusiasts.' },
+                            { image: '/brewedat/uploads/general/passportevent.jpeg', title: 'Beer Passport Event', date: 'Jan 25, 2026', location: 'Center City, Philadelphia', description: 'Explore the best craft breweries in Philadelphia with our exclusive Beer Passport. Visit multiple locations and collect stamps for special prizes!' }
+                          ][expandedEvent].date}
+                        </div>
+                        <div className="expanded-event-location">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                          </svg>
+                          {[
+                            { image: '/brewedat/uploads/general/passportevent.jpeg', title: 'Beer Passport Event', date: 'Dec 15, 2025', location: 'Center City, Philadelphia', description: 'Explore the best craft breweries in Philadelphia with our exclusive Beer Passport. Visit multiple locations and collect stamps for special prizes!' },
+                            { image: '/brewedat/uploads/general/testevent-1764112766587-547516293.png', title: 'Test Brewery Crawl', date: 'Dec 20, 2025', location: 'Fishtown, Philadelphia', description: 'Join us for an epic brewery crawl through Fishtown\'s finest craft beer spots. Sample unique brews and meet fellow beer enthusiasts.' },
+                            { image: '/brewedat/uploads/general/passportevent.jpeg', title: 'Beer Passport Event', date: 'Dec 22, 2025', location: 'Center City, Philadelphia', description: 'Explore the best craft breweries in Philadelphia with our exclusive Beer Passport. Visit multiple locations and collect stamps for special prizes!' },
+                            { image: '/brewedat/uploads/general/testevent-1764112766587-547516293.png', title: 'Test Brewery Crawl', date: 'Dec 28, 2025', location: 'Fishtown, Philadelphia', description: 'Join us for an epic brewery crawl through Fishtown\'s finest craft beer spots. Sample unique brews and meet fellow beer enthusiasts.' },
+                            { image: '/brewedat/uploads/general/passportevent.jpeg', title: 'Beer Passport Event', date: 'Jan 5, 2026', location: 'Center City, Philadelphia', description: 'Explore the best craft breweries in Philadelphia with our exclusive Beer Passport. Visit multiple locations and collect stamps for special prizes!' },
+                            { image: '/brewedat/uploads/general/testevent-1764112766587-547516293.png', title: 'Test Brewery Crawl', date: 'Jan 10, 2026', location: 'Fishtown, Philadelphia', description: 'Join us for an epic brewery crawl through Fishtown\'s finest craft beer spots. Sample unique brews and meet fellow beer enthusiasts.' },
+                            { image: '/brewedat/uploads/general/passportevent.jpeg', title: 'Beer Passport Event', date: 'Jan 15, 2026', location: 'Center City, Philadelphia', description: 'Explore the best craft breweries in Philadelphia with our exclusive Beer Passport. Visit multiple locations and collect stamps for special prizes!' },
+                            { image: '/brewedat/uploads/general/testevent-1764112766587-547516293.png', title: 'Test Brewery Crawl', date: 'Jan 20, 2026', location: 'Fishtown, Philadelphia', description: 'Join us for an epic brewery crawl through Fishtown\'s finest craft beer spots. Sample unique brews and meet fellow beer enthusiasts.' },
+                            { image: '/brewedat/uploads/general/passportevent.jpeg', title: 'Beer Passport Event', date: 'Jan 25, 2026', location: 'Center City, Philadelphia', description: 'Explore the best craft beveries in Philadelphia with our exclusive Beer Passport. Visit multiple locations and collect stamps for special prizes!' }
+                          ][expandedEvent].location}
+                        </div>
+                      </div>
+                      <p className="expanded-event-description">
+                        {[
+                          { image: '/brewedat/uploads/general/passportevent.jpeg', title: 'Beer Passport Event', date: 'Dec 15, 2025', location: 'Center City, Philadelphia', description: 'Explore the best craft breweries in Philadelphia with our exclusive Beer Passport. Visit multiple locations and collect stamps for special prizes!' },
+                          { image: '/brewedat/uploads/general/testevent-1764112766587-547516293.png', title: 'Test Brewery Crawl', date: 'Dec 20, 2025', location: 'Fishtown, Philadelphia', description: 'Join us for an epic brewery crawl through Fishtown\'s finest craft beer spots. Sample unique brews and meet fellow beer enthusiasts.' },
+                          { image: '/brewedat/uploads/general/passportevent.jpeg', title: 'Beer Passport Event', date: 'Dec 22, 2025', location: 'Center City, Philadelphia', description: 'Explore the best craft breweries in Philadelphia with our exclusive Beer Passport. Visit multiple locations and collect stamps for special prizes!' },
+                          { image: '/brewedat/uploads/general/testevent-1764112766587-547516293.png', title: 'Test Brewery Crawl', date: 'Dec 28, 2025', location: 'Fishtown, Philadelphia', description: 'Join us for an epic brewery crawl through Fishtown\'s finest craft beer spots. Sample unique brews and meet fellow beer enthusiasts.' },
+                          { image: '/brewedat/uploads/general/passportevent.jpeg', title: 'Beer Passport Event', date: 'Jan 5, 2026', location: 'Center City, Philadelphia', description: 'Explore the best craft breweries in Philadelphia with our exclusive Beer Passport. Visit multiple locations and collect stamps for special prizes!' },
+                          { image: '/brewedat/uploads/general/testevent-1764112766587-547516293.png', title: 'Test Brewery Crawl', date: 'Jan 10, 2026', location: 'Fishtown, Philadelphia', description: 'Join us for an epic brewery crawl through Fishtown\'s finest craft beer spots. Sample unique brews and meet fellow beer enthusiasts.' },
+                          { image: '/brewedat/uploads/general/passportevent.jpeg', title: 'Beer Passport Event', date: 'Jan 15, 2026', location: 'Center City, Philadelphia', description: 'Explore the best craft breweries in Philadelphia with our exclusive Beer Passport. Visit multiple locations and collect stamps for special prizes!' },
+                          { image: '/brewedat/uploads/general/testevent-1764112766587-547516293.png', title: 'Test Brewery Crawl', date: 'Jan 20, 2026', location: 'Fishtown, Philadelphia', description: 'Join us for an epic brewery crawl through Fishtown\'s finest craft beer spots. Sample unique brews and meet fellow beer enthusiasts.' },
+                          { image: '/brewedat/uploads/general/passportevent.jpeg', title: 'Beer Passport Event', date: 'Jan 25, 2026', location: 'Center City, Philadelphia', description: 'Explore the best craft breweries in Philadelphia with our exclusive Beer Passport. Visit multiple locations and collect stamps for special prizes!' }
+                        ][expandedEvent].description}
+                      </p>
+                      <a href="/brewedat/events" className="btn-large btn-primary">View Full Details</a>
                     </div>
-                  </div>
-                )}
+                  )}
 
                 {/* Other Events Carousel - Right Aligned */}
                 <div className="other-events-carousel-inline">
@@ -393,10 +452,11 @@ export default function HomePage() {
                 </div>
               </div>
             </div>
-            <div className="button-group">
-              <a href="/brewedat/events" className="btn-large btn-primary">View All Events</a>
-              <a href="/brewedat/get-involved" className="btn-large btn-secondary">Submit an Event</a>
-            </div>
+          </div>
+
+          <div className="events-button-group">
+            <a href="/brewedat/events" className="btn-large btn-primary">View All Events</a>
+            <a href="/brewedat/get-involved" className="btn-large btn-secondary">Submit an Event</a>
           </div>
         </div>
       </section>
@@ -412,8 +472,8 @@ export default function HomePage() {
       >
         <div className="container">
           <div className="podcast-header">
-            <h2>The BrewedAt Podcast</h2>
-            <p>An exploration of the movers and shakers in the Greater Philadelphia Area beer, bar and culture space. Join us as we sit down with brewery owners, bar operators, and community leaders for honest, in-depth conversations about what makes the local craft beer scene special.</p>
+            <h2>Listen to the Experts</h2>
+            <p>The BrewedAt Podcast explores Philly's craft beverage, bar, and culture scene through unfiltered conversations with the founders and leaders shaping it.</p>
           </div>
 
           {/* Featured Episodes - YouTube Embeds */}
@@ -676,6 +736,18 @@ export default function HomePage() {
                   <rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" strokeWidth="2" fill="none"/>
                   <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="2" fill="none"/>
                   <circle cx="17.5" cy="6.5" r="1.5" fill="currentColor"/>
+                </svg>
+                @thebrewedatpodcast
+              </a>
+
+              <a
+                href="https://www.tiktok.com/@thebrewedatpodcast"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="social-button-compact tiktok"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
                 </svg>
                 @thebrewedatpodcast
               </a>

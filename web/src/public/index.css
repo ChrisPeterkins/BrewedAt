@@ -215,12 +215,12 @@ p {
 /* Hero Section */
 .hero {
     padding: 102px 20px 68px;
-    min-height: 59.5vh;
+    min-height: 50.575vh;
     display: flex;
     align-items: center;
     position: relative;
-    background-image: url('/hero-background-optimized.jpg');
-    background-size: 150%;
+    background-image: url('/brewedat/uploads/general/hero-background-new.jpeg');
+    background-size: 100%;
     background-position: center;
     background-repeat: no-repeat;
 }
@@ -228,8 +228,8 @@ p {
 @media (max-width: 768px) {
     .hero {
         background-size: cover;
-        min-height: 50vh;
-        padding: 60px 20px 40px;
+        min-height: 42.5vh;
+        padding: 60px 20px 0;
     }
 }
 
@@ -248,7 +248,7 @@ p {
 
 .hero-content {
     max-width: 900px;
-    margin: 0 auto;
+    margin: -90px auto 0;
     text-align: center;
     position: relative;
     z-index: 2;
@@ -259,9 +259,9 @@ p {
 }
 
 .hero-logo {
-    height: 187px;
+    height: 225.6px;
     width: auto;
-    margin: 0 auto 2rem;
+    margin: 0 auto 0;
     display: block;
     filter: none;
 }
@@ -273,6 +273,28 @@ p {
     margin-bottom: 1.5rem;
     color: #1f3540;
     text-shadow: none;
+}
+
+.hero-title-mobile {
+    display: none;
+}
+
+.hero-title-desktop {
+    display: inline;
+}
+
+@media (max-width: 768px) {
+    .hero-title-mobile {
+        display: inline;
+    }
+
+    .hero-title-desktop {
+        display: none;
+    }
+
+    .hero-title-break {
+        display: none;
+    }
 }
 
 .hero-text-centered {
@@ -874,8 +896,8 @@ p {
     }
 
     .hero {
-        padding: 100px 20px 60px;
-        min-height: 70vh;
+        padding: 100px 20px 0;
+        min-height: 60.5vh;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -883,12 +905,13 @@ p {
 
     .hero-content {
         width: 100%;
+        padding-top: 20px;
     }
 
     .hero-logo {
-        height: 100px;
+        height: 120.32px;
         max-width: 90%;
-        margin: 0 auto 1rem;
+        margin: 0 auto 0;
     }
 
     .hero .btn-large {
@@ -930,6 +953,8 @@ p {
     .highlight-list {
         margin-top: 0;
         margin-bottom: 0.25rem;
+        text-align: center;
+        list-style-position: inside;
     }
 
     .highlight-list li {
@@ -953,6 +978,8 @@ p {
 
     .events-highlight .content-text {
         order: 1;
+        display: flex;
+        flex-direction: column;
     }
 
     .events-highlight .content-visual {
@@ -962,8 +989,12 @@ p {
         margin-bottom: -30%;
     }
 
-    .events-highlight .button-group {
+    .events-highlight .button-group-left {
         order: 3;
+    }
+
+    .events-highlight .button-group {
+        order: 4;
         flex-direction: row !important;
         align-items: center !important;
         justify-content: center !important;
@@ -2696,15 +2727,93 @@ html {
 .events-highlight {
     background: #fef5e7;
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.02);
+    padding: 40px 0;
+}
+
+.events-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.events-header h2 {
+    color: #1f3540;
+    margin-bottom: 0.75rem;
+}
+
+.events-header p {
+    color: #25303d;
+    margin-bottom: 0;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.events-content {
+    margin-bottom: 2rem;
+}
+
+.events-visual-wrapper {
+    background: linear-gradient(135deg, #fff8e7 0%, #fef5e7 100%);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(31, 53, 64, 0.08);
+    border: 1px solid rgba(253, 85, 38, 0.1);
+}
+
+.other-events-carousel-inline {
+    background: linear-gradient(135deg, #fff8e7 0%, #fef5e7 100%);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 2rem;
+    box-shadow: 0 4px 6px rgba(31, 53, 64, 0.08);
+    border: 1px solid rgba(253, 85, 38, 0.1);
+}
+
+.events-button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+    margin-top: 2rem;
+}
+
+.events-button-group .btn-large {
+    min-width: 250px;
+    text-align: center;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+}
+
+@media (min-width: 769px) {
+    .events-highlight {
+        padding: 60px 0;
+    }
+
+    .events-button-group {
+        flex-direction: row;
+        justify-content: center;
+        gap: 1.5rem;
+    }
 }
 
 .events-highlight .content-text h2 {
     color: #1f3540;
+    margin-bottom: 0.75rem;
 }
 
-.events-highlight .content-text p,
+.events-highlight .content-text p {
+    color: #25303d;
+    margin-bottom: 0.75rem;
+}
+
+.events-highlight .highlight-list {
+    margin: 0.5rem 0;
+}
+
 .events-highlight .highlight-list li {
     color: #25303d;
+    margin-bottom: 0.5rem;
 }
 
 .events-highlight .featured-event-card {
@@ -2827,7 +2936,7 @@ html {
 
 .visual-placeholder {
     width: 100%;
-    height: 500px;
+    height: 600px;
     border-radius: 20px;
     display: flex;
     align-items: center;
@@ -2872,10 +2981,151 @@ html {
 
 .events-carousel-container {
     position: relative;
-    aspect-ratio: 1 / 1;
+    height: 480px;
     padding-bottom: 50px;
+    overflow: hidden;
+}
+
+.events-carousel-track {
+    display: flex;
+    gap: 1.5rem;
+    transition: transform 0.6s ease-in-out;
+    height: 100%;
+}
+
+.featured-event-image {
+    min-width: 100%;
+    width: 100%;
+    height: 480px;
+    flex-shrink: 0;
+    position: relative;
+    border: 2px solid rgba(31, 53, 64, 0.3);
+    border-radius: 8px;
+}
+
+.featured-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: linear-gradient(135deg, #fd5526 0%, #ff6b3d 100%);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 12px rgba(253, 85, 38, 0.3);
+    z-index: 10;
+}
+
+.date-badge {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: linear-gradient(135deg, #1f3540 0%, #25303d 100%);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(31, 53, 64, 0.3);
+    z-index: 10;
+}
+
+.expanded-event-details {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    margin-top: 2rem;
+    box-shadow: 0 4px 12px rgba(31, 53, 64, 0.15);
+    position: relative;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.close-expanded-event {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(31, 53, 64, 0.1);
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.25rem;
+    color: #1f3540;
+    transition: all 0.2s ease;
+}
+
+.close-expanded-event:hover {
+    background: rgba(31, 53, 64, 0.2);
+    transform: rotate(90deg);
+}
+
+.expanded-event-details h3 {
+    color: #1f3540;
+    margin-bottom: 1rem;
+    font-size: 1.75rem;
+}
+
+.expanded-event-meta {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.expanded-event-date,
+.expanded-event-location {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #25303d;
+    font-size: 1rem;
+}
+
+.expanded-event-date svg,
+.expanded-event-location svg {
+    color: #fd5526;
+}
+
+.expanded-event-description {
+    color: #25303d;
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+    font-size: 1.125rem;
+}
+
+.expanded-event-details .btn-large {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@media (min-width: 769px) {
+    .events-carousel-track {
+        gap: 2rem;
+    }
+
+    .featured-event-image {
+        min-width: calc(33.333% - 1.33rem);
+        width: calc(33.333% - 1.33rem);
+    }
 }
 
 .featured-event-card {
@@ -3052,7 +3302,35 @@ html {
     font-weight: 600;
     color: #1f3540;
     margin: 0 0 1rem 0;
-    text-align: left;
+    text-align: center;
+}
+
+.button-group-left {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    order: 3;
+    width: 100%;
+}
+
+.button-group-left .btn-large {
+    text-align: center;
+    justify-content: center;
+    width: 100%;
+}
+
+@media (min-width: 769px) {
+    .button-group-left {
+        margin-top: 1.5rem;
+        order: initial;
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .button-group-left .btn-large {
+        width: 100%;
+    }
 }
 
 .other-events-container {
@@ -3725,23 +4003,28 @@ html {
     white-space: nowrap;
 }
 
-/* First button (Instagram) - top left */
+/* First button (Instagram @brewedat) - top left */
 .social-button-compact:nth-child(1) {
     grid-column: 1;
     grid-row: 1;
 }
 
-/* Second button (TikTok) - top right */
+/* Second button (TikTok @brewedat) - top right */
 .social-button-compact:nth-child(2) {
     grid-column: 2;
     grid-row: 1;
 }
 
-/* Third button (Podcast Instagram) - bottom center */
+/* Third button (Instagram @thebrewedatpodcast) - bottom left */
 .social-button-compact:nth-child(3) {
-    grid-column: 1 / -1;
+    grid-column: 1;
     grid-row: 2;
-    justify-self: center;
+}
+
+/* Fourth button (TikTok @thebrewedatpodcast) - bottom right */
+.social-button-compact:nth-child(4) {
+    grid-column: 2;
+    grid-row: 2;
 }
 
 .social-button-compact:hover {
@@ -3985,24 +4268,25 @@ html {
     }
 
     .social-buttons-compact {
-        gap: 0.75rem;
-        row-gap: 0.75rem;
-        column-gap: 0.75rem;
-        max-width: 400px;
+        gap: 0.5rem;
+        row-gap: 0.5rem;
+        column-gap: 0.5rem;
+        max-width: 100%;
+        padding: 0 1rem;
     }
 
     .social-button-compact {
         justify-content: center;
-        padding: 0.5rem 1rem;
-        font-size: 0.8125rem;
-        height: 40px;
-        min-height: 40px;
-        gap: 0.375rem;
+        padding: 0.375rem 0.75rem;
+        font-size: 0.75rem;
+        height: 36px;
+        min-height: 36px;
+        gap: 0.25rem;
     }
 
     .social-button-compact svg {
-        width: 16px;
-        height: 16px;
+        width: 14px;
+        height: 14px;
     }
 
     .social-content-grid {
