@@ -10,6 +10,8 @@ DROP TABLE IF EXISTS contact_submissions;
 DROP TABLE IF EXISTS site_config;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS podcast_episodes;
+DROP TABLE IF EXISTS event_tags;
+DROP TABLE IF EXISTS tags;
 DROP TABLE IF EXISTS events;
 
 -- ============================================================================
@@ -38,6 +40,39 @@ CREATE INDEX idx_events_date ON events(date);
 CREATE INDEX idx_events_featured ON events(featured);
 CREATE INDEX idx_events_brewery ON events(brewery);
 CREATE INDEX idx_events_type ON events(eventType);
+
+-- ============================================================================
+-- TAGS TABLE
+-- ============================================================================
+-- Stores predefined tags organized by category
+CREATE TABLE tags (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,                       -- Display name (e.g., "Live Music")
+  category TEXT NOT NULL,                   -- Category grouping (e.g., "entertainment", "beverages")
+  color TEXT,                               -- Optional hex color for UI display
+  createdAt TEXT NOT NULL                   -- ISO 8601 datetime
+);
+
+-- Indexes for efficient querying
+CREATE INDEX idx_tags_category ON tags(category);
+CREATE UNIQUE INDEX idx_tags_name_category ON tags(name, category);
+
+-- ============================================================================
+-- EVENT_TAGS JUNCTION TABLE
+-- ============================================================================
+-- Links events to their tags (many-to-many relationship)
+CREATE TABLE event_tags (
+  eventId TEXT NOT NULL,
+  tagId TEXT NOT NULL,
+  createdAt TEXT NOT NULL,                  -- ISO 8601 datetime
+  PRIMARY KEY (eventId, tagId),
+  FOREIGN KEY (eventId) REFERENCES events(id) ON DELETE CASCADE,
+  FOREIGN KEY (tagId) REFERENCES tags(id) ON DELETE CASCADE
+);
+
+-- Indexes for efficient querying
+CREATE INDEX idx_event_tags_eventId ON event_tags(eventId);
+CREATE INDEX idx_event_tags_tagId ON event_tags(tagId);
 
 -- ============================================================================
 -- PODCAST EPISODES TABLE

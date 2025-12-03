@@ -12,6 +12,7 @@ import podcastRouter from './routes/podcast';
 import rafflesRouter from './routes/raffles';
 import contactRouter from './routes/contact';
 import configRouter from './routes/config';
+import tagsRouter from './routes/tags';
 
 // Import middleware
 import { authenticateToken, requireAdmin, login } from './middleware/auth';
@@ -46,6 +47,9 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
   next();
 });
+
+// Serve uploaded files statically
+app.use('/api/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // ============================================================================
 // AUTHENTICATION ROUTES
@@ -119,6 +123,9 @@ app.use('/api/contact', contactRouter);
 
 // Config (public can read)
 app.use('/api/config', configRouter);
+
+// Tags (public can read)
+app.use('/api/tags', tagsRouter);
 
 // ============================================================================
 // IMAGE UPLOAD ROUTES (admin only)
@@ -399,8 +406,8 @@ app.post('/api/users',
       const newUser = usersDb.create({
         id: uuidv4(),
         email,
-        displayName: displayName || null,
-        photoUrl: null,
+        displayName: displayName || undefined,
+        photoUrl: undefined,
         role: role || 'admin',
         passwordHash
       });

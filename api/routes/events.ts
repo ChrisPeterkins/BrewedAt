@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { eventsDb } from '../db';
+import { eventsDb, eventTagsDb, tagsDb } from '../db';
 import { v4 as uuidv4 } from 'uuid';
 
 const router = Router();
@@ -115,6 +115,105 @@ router.delete('/:id', (req: Request, res: Response) => {
   } catch (error: any) {
     console.error('Error deleting event:', error);
     res.status(500).json({ success: false, error: 'Failed to delete event' });
+  }
+});
+
+// ============================================================================
+// EVENT TAGS ROUTES
+// ============================================================================
+
+// GET /api/events/:id/tags - Get tags for an event
+router.get('/:id/tags', (req: Request, res: Response) => {
+  try {
+    const event = eventsDb.getById(req.params.id);
+
+    if (!event) {
+      return res.status(404).json({ success: false, error: 'Event not found' });
+    }
+
+    const tags = eventTagsDb.getTagsForEvent(req.params.id);
+    res.json({ success: true, data: tags });
+  } catch (error: any) {
+    console.error('Error fetching event tags:', error);
+    res.status(500).json({ success: false, error: 'Failed to fetch event tags' });
+  }
+});
+
+// PUT /api/events/:id/tags - Set tags for an event (replaces existing tags)
+router.put('/:id/tags', (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { tagIds } = req.body;
+
+    const event = eventsDb.getById(id);
+    if (!event) {
+      return res.status(404).json({ success: false, error: 'Event not found' });
+    }
+
+    if (!Array.isArray(tagIds)) {
+      return res.status(400).json({ success: false, error: 'tagIds must be an array' });
+    }
+
+    // Verify all tags exist
+    if (tagIds.length > 0) {
+      const existingTags = tagsDb.getByIds(tagIds);
+      if (existingTags.length !== tagIds.length) {
+        return res.status(400).json({ success: false, error: 'One or more tags not found' });
+      }
+    }
+
+    eventTagsDb.setTagsForEvent(id, tagIds);
+    const tags = eventTagsDb.getTagsForEvent(id);
+
+    res.json({ success: true, data: tags });
+  } catch (error: any) {
+    console.error('Error setting event tags:', error);
+    res.status(500).json({ success: false, error: 'Failed to set event tags' });
+  }
+});
+
+// POST /api/events/:id/tags/:tagId - Add a single tag to an event
+router.post('/:id/tags/:tagId', (req: Request, res: Response) => {
+  try {
+    const { id, tagId } = req.params;
+
+    const event = eventsDb.getById(id);
+    if (!event) {
+      return res.status(404).json({ success: false, error: 'Event not found' });
+    }
+
+    const tag = tagsDb.getById(tagId);
+    if (!tag) {
+      return res.status(404).json({ success: false, error: 'Tag not found' });
+    }
+
+    eventTagsDb.addTagToEvent(id, tagId);
+    const tags = eventTagsDb.getTagsForEvent(id);
+
+    res.json({ success: true, data: tags });
+  } catch (error: any) {
+    console.error('Error adding tag to event:', error);
+    res.status(500).json({ success: false, error: 'Failed to add tag to event' });
+  }
+});
+
+// DELETE /api/events/:id/tags/:tagId - Remove a single tag from an event
+router.delete('/:id/tags/:tagId', (req: Request, res: Response) => {
+  try {
+    const { id, tagId } = req.params;
+
+    const event = eventsDb.getById(id);
+    if (!event) {
+      return res.status(404).json({ success: false, error: 'Event not found' });
+    }
+
+    eventTagsDb.removeTagFromEvent(id, tagId);
+    const tags = eventTagsDb.getTagsForEvent(id);
+
+    res.json({ success: true, data: tags });
+  } catch (error: any) {
+    console.error('Error removing tag from event:', error);
+    res.status(500).json({ success: false, error: 'Failed to remove tag from event' });
   }
 });
 

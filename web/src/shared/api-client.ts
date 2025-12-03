@@ -6,6 +6,14 @@ const API_BASE_URL = '/brewedat/api';
 // TYPES
 // ============================================================================
 
+export interface Tag {
+  id: string;
+  name: string;
+  category: string;
+  color?: string;
+  createdAt: string;
+}
+
 export interface Event {
   id: string;
   title: string;
@@ -21,6 +29,7 @@ export interface Event {
   featured: number;
   createdAt: string;
   updatedAt: string;
+  tags?: Tag[];
 }
 
 export interface PodcastEpisode {
@@ -238,6 +247,45 @@ class ApiClient {
         error: error.message || 'Upload failed',
       };
     }
+  }
+
+  // ============================================================================
+  // EVENT TAGS
+  // ============================================================================
+
+  async getTags(category?: string): Promise<ApiResponse<Tag[]>> {
+    const queryParams = new URLSearchParams();
+    if (category) queryParams.set('category', category);
+    const query = queryParams.toString();
+    return this.request<Tag[]>(`/tags${query ? `?${query}` : ''}`);
+  }
+
+  async getTagCategories(): Promise<ApiResponse<{ category: string }[]>> {
+    return this.request<{ category: string }[]>('/tags/categories');
+  }
+
+  async getEventTags(eventId: string): Promise<ApiResponse<Tag[]>> {
+    return this.request<Tag[]>(`/events/${eventId}/tags`);
+  }
+
+  async setEventTags(eventId: string, tagIds: string[]): Promise<ApiResponse<Tag[]>> {
+    return this.request<Tag[]>(`/events/${eventId}/tags`, {
+      method: 'PUT',
+      body: JSON.stringify({ tagIds }),
+    });
+  }
+
+  async createTag(tag: { name: string; category: string; color?: string }): Promise<ApiResponse<Tag>> {
+    return this.request<Tag>('/tags', {
+      method: 'POST',
+      body: JSON.stringify(tag),
+    });
+  }
+
+  async deleteTag(id: string): Promise<ApiResponse<void>> {
+    return this.request<void>(`/tags/${id}`, {
+      method: 'DELETE',
+    });
   }
 
   // ============================================================================

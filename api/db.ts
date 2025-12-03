@@ -30,7 +30,155 @@ export interface Event {
   featured: number;
   createdAt: string;
   updatedAt: string;
+  tags?: Tag[];  // Populated when fetching events with tags
 }
+
+// ============================================================================
+// TAGS
+// ============================================================================
+
+export interface Tag {
+  id: string;
+  name: string;
+  category: string;
+  color?: string;
+  createdAt: string;
+}
+
+export interface EventTag {
+  eventId: string;
+  tagId: string;
+  createdAt: string;
+}
+
+export const tagsDb = {
+  getAll: (category?: string) => {
+    let query = 'SELECT * FROM tags';
+    const params: any[] = [];
+
+    if (category) {
+      query += ' WHERE category = ?';
+      params.push(category);
+    }
+
+    query += ' ORDER BY category, name';
+    return db.prepare(query).all(...params) as Tag[];
+  },
+
+  getById: (id: string) => {
+    return db.prepare('SELECT * FROM tags WHERE id = ?').get(id) as Tag | undefined;
+  },
+
+  getByIds: (ids: string[]) => {
+    if (ids.length === 0) return [];
+    const placeholders = ids.map(() => '?').join(',');
+    return db.prepare(`SELECT * FROM tags WHERE id IN (${placeholders})`).all(...ids) as Tag[];
+  },
+
+  create: (tag: Omit<Tag, 'createdAt'>) => {
+    const now = new Date().toISOString();
+    const stmt = db.prepare(`
+      INSERT INTO tags (id, name, category, color, createdAt)
+      VALUES (?, ?, ?, ?, ?)
+    `);
+
+    stmt.run(tag.id, tag.name, tag.category, tag.color || null, now);
+    return { ...tag, createdAt: now };
+  },
+
+  update: (id: string, tag: Partial<Omit<Tag, 'id' | 'createdAt'>>) => {
+    const fields: string[] = [];
+    const values: any[] = [];
+
+    Object.entries(tag).forEach(([key, value]) => {
+      fields.push(`${key} = ?`);
+      values.push(value);
+    });
+
+    values.push(id);
+    const stmt = db.prepare(`UPDATE tags SET ${fields.join(', ')} WHERE id = ?`);
+    const result = stmt.run(...values);
+    return result.changes > 0;
+  },
+
+  delete: (id: string) => {
+    const stmt = db.prepare('DELETE FROM tags WHERE id = ?');
+    const result = stmt.run(id);
+    return result.changes > 0;
+  },
+
+  getCategories: () => {
+    return db.prepare('SELECT DISTINCT category FROM tags ORDER BY category').all() as { category: string }[];
+  }
+};
+
+export const eventTagsDb = {
+  getTagsForEvent: (eventId: string) => {
+    return db.prepare(`
+      SELECT t.* FROM tags t
+      JOIN event_tags et ON t.id = et.tagId
+      WHERE et.eventId = ?
+      ORDER BY t.category, t.name
+    `).all(eventId) as Tag[];
+  },
+
+  getEventsForTag: (tagId: string) => {
+    return db.prepare(`
+      SELECT e.* FROM events e
+      JOIN event_tags et ON e.id = et.eventId
+      WHERE et.tagId = ?
+      ORDER BY e.date DESC
+    `).all(tagId) as Event[];
+  },
+
+  addTagToEvent: (eventId: string, tagId: string) => {
+    const now = new Date().toISOString();
+    try {
+      const stmt = db.prepare(`
+        INSERT INTO event_tags (eventId, tagId, createdAt)
+        VALUES (?, ?, ?)
+      `);
+      stmt.run(eventId, tagId, now);
+      return true;
+    } catch (error: any) {
+      // Ignore duplicate entries
+      if (error.code === 'SQLITE_CONSTRAINT_PRIMARYKEY') {
+        return true;
+      }
+      throw error;
+    }
+  },
+
+  removeTagFromEvent: (eventId: string, tagId: string) => {
+    const stmt = db.prepare('DELETE FROM event_tags WHERE eventId = ? AND tagId = ?');
+    const result = stmt.run(eventId, tagId);
+    return result.changes > 0;
+  },
+
+  setTagsForEvent: (eventId: string, tagIds: string[]) => {
+    const now = new Date().toISOString();
+
+    // Use a transaction for atomicity
+    const deleteStmt = db.prepare('DELETE FROM event_tags WHERE eventId = ?');
+    const insertStmt = db.prepare('INSERT INTO event_tags (eventId, tagId, createdAt) VALUES (?, ?, ?)');
+
+    const transaction = db.transaction(() => {
+      deleteStmt.run(eventId);
+      for (const tagId of tagIds) {
+        insertStmt.run(eventId, tagId, now);
+      }
+    });
+
+    transaction();
+    return true;
+  },
+
+  removeAllTagsFromEvent: (eventId: string) => {
+    const stmt = db.prepare('DELETE FROM event_tags WHERE eventId = ?');
+    const result = stmt.run(eventId);
+    return result.changes > 0;
+  }
+};
 
 export const eventsDb = {
   getAll: (featured?: boolean, limit?: number, offset?: number) => {

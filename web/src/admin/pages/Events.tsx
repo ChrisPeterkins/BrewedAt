@@ -1,6 +1,16 @@
 import { useState, useEffect } from 'react';
 import { apiClient } from '@shared/api-client';
-import type { Event } from '@shared/api-client';
+import type { Event, Tag } from '@shared/api-client';
+
+// Tag category display names and colors
+const TAG_CATEGORIES: Record<string, { label: string; color: string }> = {
+  'entertainment': { label: 'Entertainment', color: '#9333EA' },
+  'video-games': { label: 'Video Games', color: '#EF4444' },
+  'beverages': { label: 'Beverages', color: '#F59E0B' },
+  'event-focus': { label: 'Event Focus', color: '#3B82F6' },
+  'activity': { label: 'Activity', color: '#14B8A6' },
+  'sports': { label: 'Sports', color: '#F97316' },
+};
 
 interface EventFormData {
   name: string;
@@ -47,6 +57,11 @@ export default function Events() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
 
+  // Tags state
+  const [allTags, setAllTags] = useState<Tag[]>([]);
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
+  const [eventTags, setEventTags] = useState<Record<string, Tag[]>>({});  // Cache of tags per event
+
   // Filtering and sorting state
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'approved' | 'pending'>('all');
@@ -54,10 +69,35 @@ export default function Events() {
   const [sortField, setSortField] = useState<'name' | 'eventDate' | 'location'>('eventDate');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
 
-  // Load events
+  // Load events and tags
   useEffect(() => {
     loadEvents();
+    loadTags();
   }, []);
+
+  const loadTags = async () => {
+    try {
+      const response = await apiClient.getTags();
+      if (response.success && response.data) {
+        setAllTags(response.data);
+      }
+    } catch (error) {
+      console.error('Error loading tags:', error);
+    }
+  };
+
+  const loadEventTags = async (eventId: string) => {
+    try {
+      const response = await apiClient.getEventTags(eventId);
+      if (response.success && response.data) {
+        setEventTags(prev => ({ ...prev, [eventId]: response.data! }));
+        return response.data;
+      }
+    } catch (error) {
+      console.error('Error loading event tags:', error);
+    }
+    return [];
+  };
 
   const loadEvents = async () => {
     try {
@@ -152,11 +192,17 @@ export default function Events() {
         await uploadImage(eventId);
       }
 
+      // Save tags if we have an event ID
+      if (eventId) {
+        await apiClient.setEventTags(eventId, selectedTagIds);
+      }
+
       // Reset form and reload
       setFormData(INITIAL_FORM_DATA);
       setEditingEvent(null);
       setShowForm(false);
       setImageFile(null);
+      setSelectedTagIds([]);
       loadEvents();
     } catch (error) {
       console.error('Error saving event:', error);
@@ -166,7 +212,7 @@ export default function Events() {
     }
   };
 
-  const handleEdit = (event: Event) => {
+  const handleEdit = async (event: Event) => {
     setEditingEvent(event);
     setFormData({
       name: event.title,
@@ -185,6 +231,11 @@ export default function Events() {
       approved: true,
       featured: event.featured,
     });
+
+    // Load existing tags for this event
+    const tags = await loadEventTags(event.id);
+    setSelectedTagIds(tags.map(t => t.id));
+
     setShowForm(true);
   };
 
@@ -250,6 +301,23 @@ export default function Events() {
     }
   };
 
+  const toggleTag = (tagId: string) => {
+    setSelectedTagIds(prev =>
+      prev.includes(tagId)
+        ? prev.filter(id => id !== tagId)
+        : [...prev, tagId]
+    );
+  };
+
+  // Group tags by category
+  const tagsByCategory = allTags.reduce((acc, tag) => {
+    if (!acc[tag.category]) {
+      acc[tag.category] = [];
+    }
+    acc[tag.category].push(tag);
+    return acc;
+  }, {} as Record<string, Tag[]>);
+
   return (
     <div style={{ padding: '24px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
@@ -265,6 +333,7 @@ export default function Events() {
             setEditingEvent(null);
             setFormData(INITIAL_FORM_DATA);
             setImageFile(null);
+            setSelectedTagIds([]);
           }}
           style={{
             padding: '12px 24px',
@@ -599,6 +668,105 @@ export default function Events() {
                   <span style={{ fontWeight: '500', color: '#654321' }}>Featured Event</span>
                 </label>
               </div>
+
+              {/* Tags Section */}
+              <div style={{ gridColumn: '1 / -1', marginTop: '16px' }}>
+                <label style={{ display: 'block', marginBottom: '12px', fontWeight: '500', color: '#654321' }}>
+                  Event Tags
+                </label>
+                <p style={{ fontSize: '13px', color: '#666', marginBottom: '16px', marginTop: 0 }}>
+                  Select tags to categorize this event. Tags help users find events based on activities, beverages, and more.
+                </p>
+
+                {Object.entries(tagsByCategory).map(([category, tags]) => (
+                  <div key={category} style={{ marginBottom: '16px' }}>
+                    <h4 style={{
+                      margin: '0 0 8px 0',
+                      fontSize: '13px',
+                      fontWeight: '600',
+                      color: TAG_CATEGORIES[category]?.color || '#666',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px',
+                    }}>
+                      {TAG_CATEGORIES[category]?.label || category}
+                    </h4>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                      {tags.map(tag => {
+                        const isSelected = selectedTagIds.includes(tag.id);
+                        const tagColor = tag.color || TAG_CATEGORIES[category]?.color || '#666';
+                        return (
+                          <button
+                            key={tag.id}
+                            type="button"
+                            onClick={() => toggleTag(tag.id)}
+                            style={{
+                              padding: '6px 12px',
+                              borderRadius: '16px',
+                              border: `2px solid ${tagColor}`,
+                              backgroundColor: isSelected ? tagColor : 'transparent',
+                              color: isSelected ? 'white' : tagColor,
+                              fontSize: '13px',
+                              fontWeight: '500',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s ease',
+                            }}
+                          >
+                            {tag.name}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+
+                {selectedTagIds.length > 0 && (
+                  <div style={{
+                    marginTop: '16px',
+                    padding: '12px',
+                    backgroundColor: '#f5f5f5',
+                    borderRadius: '8px',
+                  }}>
+                    <strong style={{ fontSize: '13px', color: '#654321' }}>
+                      Selected Tags ({selectedTagIds.length}):
+                    </strong>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '8px' }}>
+                      {selectedTagIds.map(tagId => {
+                        const tag = allTags.find(t => t.id === tagId);
+                        if (!tag) return null;
+                        const tagColor = tag.color || TAG_CATEGORIES[tag.category]?.color || '#666';
+                        return (
+                          <span
+                            key={tag.id}
+                            style={{
+                              padding: '4px 10px',
+                              borderRadius: '12px',
+                              backgroundColor: tagColor,
+                              color: 'white',
+                              fontSize: '12px',
+                              fontWeight: '500',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '6px',
+                            }}
+                          >
+                            {tag.name}
+                            <span
+                              onClick={() => toggleTag(tag.id)}
+                              style={{
+                                cursor: 'pointer',
+                                opacity: 0.8,
+                                fontWeight: 'bold',
+                              }}
+                            >
+                              ×
+                            </span>
+                          </span>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div style={{ marginTop: '24px', display: 'flex', gap: '12px' }}>
@@ -625,6 +793,7 @@ export default function Events() {
                   setEditingEvent(null);
                   setFormData(INITIAL_FORM_DATA);
                   setImageFile(null);
+                  setSelectedTagIds([]);
                 }}
                 style={{
                   padding: '12px 32px',

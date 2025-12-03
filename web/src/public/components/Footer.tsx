@@ -29,7 +29,7 @@ export default function Footer() {
         <div style={styles.content}>
           <div style={styles.logoSection}>
             <img
-              src="/brewedat/brewedat-logo.png"
+              src="/brewedat/uploads/general/smaller logo-1764111844469-980589512.png"
               alt="BrewedAt Logo"
               style={styles.logo}
             />
@@ -131,6 +131,8 @@ const styles = {
   logo: {
     height: '50px',
     width: 'auto',
+    objectFit: 'contain' as const,
+    maxWidth: '200px',
   },
   tagline: {
     color: '#25303d',

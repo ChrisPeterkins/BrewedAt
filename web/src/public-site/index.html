@@ -171,7 +171,7 @@
                     <a href="/events.html" class="btn-large btn-primary">View All Events</a>
                 </div>
                 <div class="content-visual">
-                    <div class="visual-placeholder" style="background: linear-gradient(135deg, #D4922A 0%, #8B4513 100%);">
+                    <div class="visual-placeholder" style="background-image: url('/brewedat/uploads/general/passportevent.jpeg'); background-size: cover; background-position: center;">
                         <div class="placeholder-text">
                             <h3>Upcoming Events</h3>
                             <p>Check out what's happening this month</p>
@@ -184,6 +184,22 @@
 
     <!-- Podcast Section -->
     <section id="podcast" class="podcast-highlight">
+        <!-- Background Selector (Remove after choosing) -->
+        <div style="position: sticky; top: 0; z-index: 1000; background: rgba(0,0,0,0.9); padding: 15px; text-align: center; border-bottom: 2px solid #D4922A;">
+            <div style="max-width: 1200px; margin: 0 auto;">
+                <h4 style="color: #fff; margin: 0 0 10px 0; font-size: 14px;">Background Preview Tool (Designer Demo)</h4>
+                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                    <button onclick="changePodcastBg('option1')" style="padding: 8px 16px; background: #D4922A; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">Option 1</button>
+                    <button onclick="changePodcastBg('option2')" style="padding: 8px 16px; background: #D4922A; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">Option 2</button>
+                    <button onclick="changePodcastBg('option3')" style="padding: 8px 16px; background: #D4922A; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">Option 3</button>
+                    <button onclick="changePodcastBg('option4')" style="padding: 8px 16px; background: #D4922A; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">Option 4</button>
+                    <button onclick="changePodcastBg('option5')" style="padding: 8px 16px; background: #D4922A; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">Option 5</button>
+                    <button onclick="changePodcastBg('default')" style="padding: 8px 16px; background: #666; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">Default</button>
+                </div>
+                <p style="color: #999; font-size: 12px; margin: 10px 0 0 0;">Click buttons to preview different backgrounds. Update URLs in console or code.</p>
+            </div>
+        </div>
+
         <div class="container">
             <div class="content-split reverse">
                 <div class="content-visual">
@@ -328,7 +344,7 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-logo">
-                    <img src="/brewedat-logo.png" alt="BrewedAt Logo" class="footer-logo-img">
+                    <img src="/brewedat/uploads/general/smaller logo-1764111844469-980589512.png" alt="BrewedAt Logo" class="footer-logo-img">
                 </div>
                 <div class="footer-links">
                     <a href="/events.html">Events</a>
@@ -364,5 +380,39 @@
     </footer>
 
     <script src="script.js"></script>
+
+    <script>
+    // Background Preview Tool for Podcast Section
+    function changePodcastBg(option) {
+        const podcastSection = document.getElementById('podcast');
+
+        // Your 5 uploaded podcast background images
+        const backgrounds = {
+            'option1': '/brewedat/uploads/general/PodcastBackground1-1762980833090-871029288.jpeg',
+            'option2': '/brewedat/uploads/general/PodcastBackground2-1762980833203-514936744.jpeg',
+            'option3': '/brewedat/uploads/general/PodcastBackground3-1762980832782-435997819.jpeg',
+            'option4': '/brewedat/uploads/general/PodcastBackground4-1762980832892-747187565.jpeg',
+            'option5': '/brewedat/uploads/general/PodcastBackground5-1762980832972-131694191.jpeg',
+            'default': '' // No background image (original color)
+        };
+
+        if (option === 'default') {
+            podcastSection.style.backgroundImage = '';
+            podcastSection.style.backgroundColor = 'var(--secondary-bg)';
+            podcastSection.style.position = '';
+        } else {
+            podcastSection.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('${backgrounds[option]}')`;
+            podcastSection.style.backgroundSize = 'cover';
+            podcastSection.style.backgroundPosition = 'center';
+            podcastSection.style.backgroundRepeat = 'no-repeat';
+            podcastSection.style.position = 'relative';
+        }
+
+        console.log(`Applied background: ${option}`, backgrounds[option]);
+    }
+
+    // You can also set the URLs dynamically from console:
+    // Just run: changePodcastBg.backgrounds = { option1: 'URL1', option2: 'URL2', ... }
+    </script>
 </body>
 </html>
