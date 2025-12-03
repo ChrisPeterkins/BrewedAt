@@ -2778,13 +2778,13 @@ html {
 
 .events-coverflow-wrapper {
     width: 100%;
-    padding: 2rem 0 3rem;
+    padding: 2rem 0 0;
     overflow: visible;
 }
 
 .events-coverflow-swiper {
     width: 100%;
-    padding: 3rem 0 4rem;
+    padding: 3rem 0 0;
     overflow: visible !important;
 }
 
@@ -2803,70 +2803,143 @@ html {
     z-index: 10;
 }
 
-.coverflow-card {
-    background: #ffffff;
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 8px 32px rgba(31, 53, 64, 0.15);
-    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+/* ============================================================================
+   BEER CAN CARD STYLES
+   ============================================================================ */
+
+.beer-can {
+    width: 260px;
     cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     transform-origin: center center;
+    filter: drop-shadow(0 8px 24px rgba(31, 53, 64, 0.25));
 }
 
-.coverflow-card:hover {
-    box-shadow: 0 12px 48px rgba(31, 53, 64, 0.25);
+.beer-can:hover {
+    filter: drop-shadow(0 12px 36px rgba(31, 53, 64, 0.35));
 }
 
-.swiper-slide-active .coverflow-card {
-    box-shadow: 0 20px 60px rgba(253, 85, 38, 0.3);
+.swiper-slide-active .beer-can {
+    filter: drop-shadow(0 16px 48px rgba(253, 85, 38, 0.4));
     transform: scale(1.15);
 }
 
-.coverflow-card-image {
+/* Can Top Rim */
+.can-top {
     width: 100%;
-    height: 320px;
+    height: 22px;
+    background: linear-gradient(180deg,
+        #e8e8e8 0%,
+        #c0c0c0 30%,
+        #a8a8a8 50%,
+        #c0c0c0 70%,
+        #d0d0d0 100%
+    );
+    border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+    position: relative;
+    z-index: 2;
+}
+
+.can-top-inner {
+    position: absolute;
+    top: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70%;
+    height: 12px;
+    background: linear-gradient(180deg,
+        #b0b0b0 0%,
+        #909090 50%,
+        #a0a0a0 100%
+    );
+    border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+}
+
+/* Can Body */
+.can-body {
+    width: 100%;
+    min-height: 440px;
+    background: linear-gradient(90deg,
+        #d4d4d4 0%,
+        #e8e8e8 15%,
+        #f5f5f5 30%,
+        #ffffff 50%,
+        #f5f5f5 70%,
+        #e8e8e8 85%,
+        #d4d4d4 100%
+    );
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Metallic curved highlight - subtle */
+.can-highlight {
+    position: absolute;
+    top: 0;
+    left: 35%;
+    width: 30%;
+    height: 100%;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.15) 30%,
+        rgba(255, 255, 255, 0.2) 50%,
+        rgba(255, 255, 255, 0.15) 70%,
+        transparent 100%
+    );
+    pointer-events: none;
+    z-index: 3;
+}
+
+/* Event Image Label */
+.can-label {
+    width: 92%;
+    height: 280px;
+    margin: 15px auto 0;
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
-    background-color: #f8f9fa;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
     position: relative;
+    z-index: 2;
+    box-shadow:
+        inset 0 0 20px rgba(0, 0, 0, 0.05),
+        0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.coverflow-featured-badge {
+.can-featured-badge {
     position: absolute;
-    top: 12px;
-    left: 12px;
+    top: 8px;
+    left: 8px;
     background: linear-gradient(135deg, #fd5526 0%, #e04a20 100%);
     color: white;
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 0.75rem;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.65rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    box-shadow: 0 2px 8px rgba(253, 85, 38, 0.4);
+    box-shadow: 0 2px 6px rgba(253, 85, 38, 0.4);
+    z-index: 4;
 }
 
-.coverflow-date-badge {
-    position: absolute;
-    bottom: 12px;
-    right: 12px;
-    background: rgba(31, 53, 64, 0.9);
-    color: white;
-    padding: 8px 14px;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    backdrop-filter: blur(4px);
+/* Event Info Section */
+.can-info {
+    padding: 12px 15px 15px;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
 }
 
-.coverflow-card-content {
-    padding: 1rem 1.25rem 1.25rem;
-}
-
-.coverflow-card-title {
-    margin: 0 0 0.5rem 0;
-    font-size: 1.1rem;
+.can-title {
+    margin: 0 0 6px 0;
+    font-size: 0.95rem;
     font-weight: 700;
     color: #1f3540;
     line-height: 1.3;
@@ -2876,13 +2949,118 @@ html {
     overflow: hidden;
 }
 
-.coverflow-card-location {
+.can-date {
+    margin: 0 0 4px 0;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #fd5526;
+}
+
+.can-location {
     margin: 0;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     color: #6b7280;
-    display: flex;
-    align-items: center;
-    gap: 0.35rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Can Bottom Rim */
+.can-bottom {
+    width: 100%;
+    height: 18px;
+    background: linear-gradient(180deg,
+        #d0d0d0 0%,
+        #c0c0c0 30%,
+        #a8a8a8 50%,
+        #909090 80%,
+        #808080 100%
+    );
+    border-radius: 0 0 50% 50% / 0 0 100% 100%;
+    position: relative;
+    z-index: 2;
+}
+
+.can-bottom-inner {
+    position: absolute;
+    bottom: 3px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 85%;
+    height: 10px;
+    background: linear-gradient(180deg,
+        #a0a0a0 0%,
+        #888888 100%
+    );
+    border-radius: 0 0 50% 50% / 0 0 100% 100%;
+}
+
+/* Active can glow effect */
+.swiper-slide-active .can-body {
+    background: linear-gradient(90deg,
+        #e0d4c8 0%,
+        #f0e8e0 15%,
+        #faf5f0 30%,
+        #ffffff 50%,
+        #faf5f0 70%,
+        #f0e8e0 85%,
+        #e0d4c8 100%
+    );
+}
+
+/* Responsive adjustments for beer cans */
+@media (max-width: 768px) {
+    .beer-can {
+        width: 180px;
+    }
+
+    .can-body {
+        min-height: 320px;
+    }
+
+    .can-label {
+        height: 190px;
+    }
+
+    .can-title {
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .beer-can {
+        width: 150px;
+    }
+
+    .can-body {
+        min-height: 280px;
+    }
+
+    .can-label {
+        height: 160px;
+    }
+
+    .can-top {
+        height: 18px;
+    }
+
+    .can-bottom {
+        height: 14px;
+    }
+
+    .can-info {
+        padding: 8px 10px 12px;
+    }
+
+    .can-title {
+        font-size: 0.8rem;
+    }
+
+    .can-date,
+    .can-location {
+        font-size: 0.7rem;
+    }
 }
 
 /* Swiper Navigation Arrows */

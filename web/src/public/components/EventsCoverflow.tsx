@@ -107,19 +107,38 @@ export default function EventsCoverflow({
             className="events-coverflow-slide"
           >
             <div
-              className={`coverflow-card ${index === activeIndex ? 'active' : ''}`}
+              className={`beer-can ${index === activeIndex ? 'active' : ''}`}
               onClick={() => handleSlideClick(index)}
             >
-              <div
-                className="coverflow-card-image"
-                style={{ backgroundImage: `url(${event.image})` }}
-              >
-                <span className="coverflow-featured-badge">Featured</span>
-                <span className="coverflow-date-badge">{event.date}</span>
+              {/* Can Top Rim */}
+              <div className="can-top">
+                <div className="can-top-inner"></div>
               </div>
-              <div className="coverflow-card-content">
-                <h4 className="coverflow-card-title">{event.title}</h4>
-                <p className="coverflow-card-location">{event.location}</p>
+
+              {/* Can Body */}
+              <div className="can-body">
+                {/* Metallic highlight overlay */}
+                <div className="can-highlight"></div>
+
+                {/* Event Image as Label */}
+                <div
+                  className="can-label"
+                  style={{ backgroundImage: `url(${event.image})` }}
+                >
+                  <span className="can-featured-badge">Featured</span>
+                </div>
+
+                {/* Event Info */}
+                <div className="can-info">
+                  <h4 className="can-title">{event.title}</h4>
+                  <p className="can-date">{event.date}</p>
+                  <p className="can-location">{event.location}</p>
+                </div>
+              </div>
+
+              {/* Can Bottom Rim */}
+              <div className="can-bottom">
+                <div className="can-bottom-inner"></div>
               </div>
             </div>
           </SwiperSlide>
