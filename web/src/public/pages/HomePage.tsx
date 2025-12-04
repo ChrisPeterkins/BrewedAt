@@ -17,7 +17,11 @@ const PLACEHOLDER_EVENTS: EventItem[] = [
       { name: 'Brewery Crawl', color: '#14B8A6', category: 'activity' },
       { name: 'Craft Beer', color: '#F59E0B', category: 'beverages' },
       { name: 'Dog Friendly', color: '#16A34A', category: 'activity' },
-    ]
+    ],
+    canColor: '#1f3540',
+    accentColor: '#fd5526',
+    breweryName: 'BrewedAt',
+    beerStyle: 'PASSPORT'
   },
   {
     id: 'event-2',
@@ -30,7 +34,11 @@ const PLACEHOLDER_EVENTS: EventItem[] = [
       { name: 'Live Music', color: '#9333EA', category: 'entertainment' },
       { name: 'IPA', color: '#FBBF24', category: 'beverages' },
       { name: 'Food Truck', color: '#022C22', category: 'activity' },
-    ]
+    ],
+    canColor: '#2d4a3e',
+    accentColor: '#fbbf24',
+    breweryName: 'Fishtown',
+    beerStyle: 'CRAWL'
   },
   {
     id: 'event-3',
@@ -43,7 +51,11 @@ const PLACEHOLDER_EVENTS: EventItem[] = [
       { name: 'Tasting', color: '#3B82F6', category: 'event-focus' },
       { name: 'Stout', color: '#D97706', category: 'beverages' },
       { name: 'Meet the Brewer', color: '#312E81', category: 'event-focus' },
-    ]
+    ],
+    canColor: '#3d2a1f',
+    accentColor: '#d97706',
+    breweryName: 'BrewedAt',
+    beerStyle: 'STOUT'
   },
   {
     id: 'event-4',
@@ -56,7 +68,11 @@ const PLACEHOLDER_EVENTS: EventItem[] = [
       { name: 'Trivia', color: '#7C3AED', category: 'entertainment' },
       { name: 'Sour', color: '#92400E', category: 'beverages' },
       { name: 'Family Friendly', color: '#22C55E', category: 'activity' },
-    ]
+    ],
+    canColor: '#3b2d5a',
+    accentColor: '#7c3aed',
+    breweryName: 'Fishtown',
+    beerStyle: 'SOUR'
   },
   {
     id: 'event-5',
@@ -69,7 +85,11 @@ const PLACEHOLDER_EVENTS: EventItem[] = [
       { name: 'Release Party', color: '#2563EB', category: 'event-focus' },
       { name: 'Lager', color: '#B45309', category: 'beverages' },
       { name: 'Outdoor', color: '#15803D', category: 'activity' },
-    ]
+    ],
+    canColor: '#1e3a5f',
+    accentColor: '#2563eb',
+    breweryName: 'BrewedAt',
+    beerStyle: 'LAGER'
   },
   {
     id: 'event-6',
@@ -82,7 +102,11 @@ const PLACEHOLDER_EVENTS: EventItem[] = [
       { name: 'Mario Kart', color: '#EF4444', category: 'video-games' },
       { name: 'Craft Beer', color: '#F59E0B', category: 'beverages' },
       { name: 'DJ', color: '#A855F7', category: 'entertainment' },
-    ]
+    ],
+    canColor: '#4a1f1f',
+    accentColor: '#ef4444',
+    breweryName: 'Fishtown',
+    beerStyle: 'GAMING'
   },
   {
     id: 'event-7',
@@ -95,7 +119,11 @@ const PLACEHOLDER_EVENTS: EventItem[] = [
       { name: 'Watch Party', color: '#F97316', category: 'sports' },
       { name: 'Eagles', color: '#065F46', category: 'sports' },
       { name: 'Cocktails', color: '#10B981', category: 'beverages' },
-    ]
+    ],
+    canColor: '#004c54',
+    accentColor: '#a5acaf',
+    breweryName: 'BrewedAt',
+    beerStyle: 'EAGLES'
   },
   {
     id: 'event-8',
@@ -108,7 +136,11 @@ const PLACEHOLDER_EVENTS: EventItem[] = [
       { name: 'Karaoke', color: '#8B5CF6', category: 'entertainment' },
       { name: 'Cider', color: '#78350F', category: 'beverages' },
       { name: 'Bingo', color: '#134E4A', category: 'activity' },
-    ]
+    ],
+    canColor: '#4a3728',
+    accentColor: '#8b5cf6',
+    breweryName: 'Fishtown',
+    beerStyle: 'CIDER'
   },
   {
     id: 'event-9',
@@ -121,7 +153,11 @@ const PLACEHOLDER_EVENTS: EventItem[] = [
       { name: 'Charity Event', color: '#EC4899', category: 'event-focus' },
       { name: 'Non-Alcoholic', color: '#6B7280', category: 'beverages' },
       { name: 'Yoga', color: '#0F766E', category: 'activity' },
-    ]
+    ],
+    canColor: '#4a2d4a',
+    accentColor: '#ec4899',
+    breweryName: 'BrewedAt',
+    beerStyle: 'WELLNESS'
   },
 ];
 
