@@ -44,7 +44,6 @@ export default function Footer() {
               <Link to="/events" style={styles.link}>Events</Link>
               <Link to="/podcast" style={styles.link}>Podcast</Link>
               <Link to="/press" style={styles.link}>Press</Link>
-              <Link to="/hall-of-champions" style={styles.link}>Hall of Champions</Link>
             </div>
 
             <div style={styles.linkColumn}>
