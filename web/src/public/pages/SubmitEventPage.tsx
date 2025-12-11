@@ -19,16 +19,224 @@ const STEPS = [
   { id: 4, title: 'Contact', icon: '👤' },
 ];
 
-const BeerMugIcon = () => (
-  <svg width="48" height="48" viewBox="0 0 32 32" fill="none">
-    <path d="M6 10C6 8.89543 6.89543 8 8 8H20C21.1046 8 22 8.89543 22 10V26C22 27.1046 21.1046 28 20 28H8C6.89543 28 6 27.1046 6 26V10Z" fill="#D4A03E"/>
-    <path d="M8 12H20V24C20 25.1046 19.1046 26 18 26H10C8.89543 26 8 25.1046 8 24V12Z" fill="#F5B041"/>
-    <ellipse cx="10" cy="11" rx="2.5" ry="2" fill="#FFF8E7"/>
-    <ellipse cx="14" cy="10" rx="3" ry="2.5" fill="#FFF8E7"/>
-    <ellipse cx="18" cy="11" rx="2.5" ry="2" fill="#FFF8E7"/>
-    <path d="M22 12H24C25.6569 12 27 13.3431 27 15V19C27 20.6569 25.6569 22 24 22H22" stroke="#D4A03E" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
-  </svg>
-);
+// Beer Pour Celebration Animation Component
+const BeerPourCelebration = () => {
+  const [stage, setStage] = useState(0);
+
+  useEffect(() => {
+    const timers = [
+      setTimeout(() => setStage(1), 100),    // Start pour
+      setTimeout(() => setStage(2), 1200),   // Beer filled
+      setTimeout(() => setStage(3), 1600),   // Foam appears
+      setTimeout(() => setStage(4), 2000),   // Celebration
+    ];
+    return () => timers.forEach(clearTimeout);
+  }, []);
+
+  return (
+    <div style={celebrationStyles.container}>
+      {/* Background bubbles */}
+      <div style={celebrationStyles.bubblesContainer}>
+        {[...Array(12)].map((_, i) => (
+          <div
+            key={i}
+            style={{
+              ...celebrationStyles.bgBubble,
+              left: `${10 + (i * 7)}%`,
+              animationDelay: `${i * 0.3}s`,
+              width: 8 + (i % 3) * 4,
+              height: 8 + (i % 3) * 4,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Confetti */}
+      {stage >= 4 && (
+        <div style={celebrationStyles.confettiContainer}>
+          {[...Array(20)].map((_, i) => (
+            <div
+              key={i}
+              style={{
+                ...celebrationStyles.confetti,
+                left: `${5 + (i * 4.5)}%`,
+                backgroundColor: ['#fd5526', '#F5B041', '#D4A03E', '#10B981', '#3B82F6'][i % 5],
+                animationDelay: `${i * 0.1}s`,
+                transform: `rotate(${i * 30}deg)`,
+              }}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Beer Glass */}
+      <div style={celebrationStyles.glassWrapper}>
+        <svg width="170" height="195" viewBox="0 0 170 195" fill="none">
+          {/* Glass outline */}
+          <defs>
+            <clipPath id="glassClip">
+              <path d="M25 35 L30 165 C30 172 40 175 70 175 C100 175 110 172 110 165 L115 35 Z" />
+            </clipPath>
+            <linearGradient id="beerGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#F5B041" />
+              <stop offset="100%" stopColor="#D4A03E" />
+            </linearGradient>
+            <linearGradient id="foamGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#FFFDF5" />
+              <stop offset="100%" stopColor="#FFF8E7" />
+            </linearGradient>
+          </defs>
+
+          {/* Glass background (empty) */}
+          <path
+            d="M25 35 L30 165 C30 172 40 175 70 175 C100 175 110 172 110 165 L115 35 Z"
+            fill="rgba(255,255,255,0.1)"
+            stroke="rgba(255,255,255,0.3)"
+            strokeWidth="2"
+          />
+
+          {/* Beer fill */}
+          <g clipPath="url(#glassClip)">
+            <rect
+              x="20"
+              y={stage >= 1 ? 40 : 180}
+              width="100"
+              height="150"
+              fill="url(#beerGradient)"
+              style={{
+                transition: 'y 1s cubic-bezier(0.4, 0, 0.2, 1)',
+              }}
+            />
+
+            {/* Bubbles inside beer */}
+            {stage >= 2 && [...Array(8)].map((_, i) => (
+              <circle
+                key={i}
+                cx={40 + (i * 10)}
+                cy={100 + (i % 3) * 20}
+                r={2 + (i % 2)}
+                fill="rgba(255,255,255,0.4)"
+                style={{
+                  animation: `riseBubble ${1.5 + (i % 3) * 0.5}s ease-in-out infinite`,
+                  animationDelay: `${i * 0.2}s`,
+                }}
+              />
+            ))}
+          </g>
+
+          {/* Foam */}
+          {stage >= 3 && (
+            <g style={{ animation: 'foamAppear 0.5s ease-out forwards' }}>
+              <ellipse cx="70" cy="42" rx="42" ry="12" fill="url(#foamGradient)" />
+              <ellipse cx="45" cy="38" rx="18" ry="10" fill="#FFFDF5" />
+              <ellipse cx="70" cy="35" rx="22" ry="12" fill="#FFFDF5" />
+              <ellipse cx="95" cy="38" rx="18" ry="10" fill="#FFFDF5" />
+              <ellipse cx="55" cy="32" rx="12" ry="8" fill="#FFFFFF" />
+              <ellipse cx="82" cy="32" rx="14" ry="9" fill="#FFFFFF" />
+            </g>
+          )}
+
+          {/* Glass highlight */}
+          <path
+            d="M35 45 L38 155"
+            stroke="rgba(255,255,255,0.4)"
+            strokeWidth="3"
+            strokeLinecap="round"
+          />
+
+          {/* Handle */}
+          <path
+            d="M115 55 C140 55 145 70 145 90 C145 110 140 125 115 125"
+            stroke="#D4A03E"
+            strokeWidth="8"
+            strokeLinecap="round"
+            fill="none"
+          />
+          <path
+            d="M115 55 C140 55 145 70 145 90 C145 110 140 125 115 125"
+            stroke="#F5B041"
+            strokeWidth="4"
+            strokeLinecap="round"
+            fill="none"
+          />
+        </svg>
+
+        {/* Sparkles */}
+        {stage >= 4 && (
+          <>
+            <div style={{ ...celebrationStyles.sparkle, top: '10%', left: '10%', animationDelay: '0s' }}>✦</div>
+            <div style={{ ...celebrationStyles.sparkle, top: '20%', right: '5%', animationDelay: '0.2s' }}>✦</div>
+            <div style={{ ...celebrationStyles.sparkle, top: '5%', right: '20%', animationDelay: '0.4s' }}>✦</div>
+            <div style={{ ...celebrationStyles.sparkle, bottom: '30%', left: '5%', animationDelay: '0.3s' }}>✦</div>
+            <div style={{ ...celebrationStyles.sparkle, bottom: '40%', right: '0%', animationDelay: '0.5s' }}>✦</div>
+          </>
+        )}
+      </div>
+
+      {/* Cheers text */}
+      {stage >= 4 && (
+        <div style={celebrationStyles.cheersText}>Cheers! 🎉</div>
+      )}
+    </div>
+  );
+};
+
+const celebrationStyles: Record<string, React.CSSProperties> = {
+  container: {
+    position: 'relative',
+    width: '100%',
+    height: 300,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  glassWrapper: {
+    position: 'relative',
+    animation: 'glassAppear 0.6s ease-out',
+  },
+  bubblesContainer: {
+    position: 'absolute',
+    inset: 0,
+    overflow: 'hidden',
+    pointerEvents: 'none',
+  },
+  bgBubble: {
+    position: 'absolute',
+    bottom: -20,
+    borderRadius: '50%',
+    backgroundColor: 'rgba(212, 160, 62, 0.3)',
+    animation: 'floatUp 4s ease-in-out infinite',
+  },
+  confettiContainer: {
+    position: 'absolute',
+    inset: 0,
+    overflow: 'hidden',
+    pointerEvents: 'none',
+  },
+  confetti: {
+    position: 'absolute',
+    top: -10,
+    width: 10,
+    height: 10,
+    borderRadius: 2,
+    animation: 'confettiFall 3s ease-out forwards',
+  },
+  sparkle: {
+    position: 'absolute',
+    fontSize: 20,
+    color: '#F5B041',
+    animation: 'sparkle 1s ease-in-out infinite',
+  },
+  cheersText: {
+    position: 'absolute',
+    bottom: 10,
+    fontSize: 18,
+    fontWeight: 700,
+    color: '#D4A03E',
+    animation: 'popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+  },
+};
 
 const CheckIcon = () => (
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -311,10 +519,49 @@ export default function SubmitEventPage() {
           100% { transform: scale(1); }
         }
 
+        /* Beer celebration animations */
+        @keyframes glassAppear {
+          from { opacity: 0; transform: scale(0.8) translateY(20px); }
+          to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        @keyframes floatUp {
+          0%, 100% { transform: translateY(0) scale(1); opacity: 0.3; }
+          50% { transform: translateY(-100px) scale(0.8); opacity: 0.6; }
+          100% { transform: translateY(-200px) scale(0.5); opacity: 0; }
+        }
+        @keyframes riseBubble {
+          0% { transform: translateY(0); opacity: 0.4; }
+          100% { transform: translateY(-60px); opacity: 0; }
+        }
+        @keyframes foamAppear {
+          from { opacity: 0; transform: translateY(10px) scaleY(0.5); }
+          to { opacity: 1; transform: translateY(0) scaleY(1); }
+        }
+        @keyframes confettiFall {
+          0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+          100% { transform: translateY(350px) rotate(720deg); opacity: 0; }
+        }
+        @keyframes sparkle {
+          0%, 100% { opacity: 0; transform: scale(0.5); }
+          50% { opacity: 1; transform: scale(1.2); }
+        }
+        @keyframes popIn {
+          from { opacity: 0; transform: scale(0.5); }
+          to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes textReveal {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
         .slide-in-right { animation: slideInRight 0.35s ease-out; }
         .slide-in-left { animation: slideInLeft 0.35s ease-out; }
         .fade-in { animation: fadeIn 0.4s ease-out; }
         .scale-in { animation: scaleIn 0.4s ease-out; }
+        .text-reveal { animation: textReveal 0.5s ease-out forwards; }
+        .text-reveal-delay-1 { animation: textReveal 0.5s ease-out 0.3s forwards; opacity: 0; }
+        .text-reveal-delay-2 { animation: textReveal 0.5s ease-out 0.5s forwards; opacity: 0; }
+        .text-reveal-delay-3 { animation: textReveal 0.5s ease-out 2.2s forwards; opacity: 0; }
       `}</style>
 
       <div style={styles.container}>
@@ -325,11 +572,20 @@ export default function SubmitEventPage() {
 
         <div style={styles.formContainer}>
           {submitted ? (
-            <div style={styles.success} className="scale-in">
-              <div style={styles.successIcon}><BeerMugIcon /></div>
-              <h2 style={styles.successTitle}>Event Submitted!</h2>
-              <p style={styles.successText}>Thanks for sharing. Our team will review it and get back to you soon.</p>
-              <button onClick={resetForm} className="btn-primary" style={{ ...styles.primaryButton, margin: '0 auto' }}>
+            <div style={styles.success}>
+              <BeerPourCelebration />
+
+              <h2 className="text-reveal-delay-3" style={styles.successTitle}>
+                Event Submitted!
+              </h2>
+              <p className="text-reveal-delay-3" style={styles.successText}>
+                Thanks for sharing your event. Our team will review it and get back to you soon.
+              </p>
+              <button
+                onClick={resetForm}
+                className="btn-primary text-reveal-delay-3"
+                style={{ ...styles.primaryButton, opacity: 0, animation: 'textReveal 0.5s ease-out 2.4s forwards', margin: '0 auto' }}
+              >
                 Submit Another Event
               </button>
             </div>
@@ -1100,18 +1356,14 @@ const styles: Record<string, React.CSSProperties> = {
   // Success
   success: {
     textAlign: 'center',
-    padding: '48px 24px',
-  },
-  successIcon: {
-    marginBottom: 20,
-    display: 'inline-block',
+    padding: '32px 24px',
   },
   successTitle: {
     fontSize: 26,
     fontWeight: 700,
     color: '#1f3540',
     marginBottom: 12,
-    marginTop: 0,
+    marginTop: 16,
   },
   successText: {
     fontSize: 15,
