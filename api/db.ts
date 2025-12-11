@@ -212,8 +212,10 @@ export const eventsDb = {
     const now = new Date().toISOString();
     const stmt = db.prepare(`
       INSERT INTO events (id, title, description, date, time, location, brewery,
-        breweryLogo, eventType, imageUrl, externalUrl, featured, createdAt, updatedAt)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        breweryLogo, eventType, imageUrl, externalUrl, featured,
+        organizerName, organizerEmail, organizerPhone, websiteUrl, ticketUrl, approved,
+        createdAt, updatedAt)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
     stmt.run(
@@ -228,12 +230,47 @@ export const eventsDb = {
       event.eventType || null,
       event.imageUrl || null,
       event.externalUrl || null,
-      event.featured,
+      event.featured ?? 0,
+      (event as any).organizerName || null,
+      (event as any).organizerEmail || null,
+      (event as any).organizerPhone || null,
+      (event as any).websiteUrl || null,
+      (event as any).ticketUrl || null,
+      (event as any).approved ?? 1,
       now,
       now
     );
 
     return { ...event, createdAt: now, updatedAt: now };
+  },
+
+  // Get only approved events (for public API)
+  getApproved: (featured?: boolean, limit?: number, offset?: number) => {
+    let query = 'SELECT * FROM events WHERE approved = 1';
+    const params: any[] = [];
+
+    if (featured !== undefined) {
+      query += ' AND featured = ?';
+      params.push(featured ? 1 : 0);
+    }
+
+    query += ' ORDER BY date DESC';
+
+    if (limit) {
+      query += ' LIMIT ?';
+      params.push(limit);
+      if (offset) {
+        query += ' OFFSET ?';
+        params.push(offset);
+      }
+    }
+
+    return db.prepare(query).all(...params) as Event[];
+  },
+
+  // Get pending (unapproved) events for admin review
+  getPending: () => {
+    return db.prepare('SELECT * FROM events WHERE approved = 0 ORDER BY createdAt DESC').all() as Event[];
   },
 
   update: (id: string, event: Partial<Omit<Event, 'id' | 'createdAt' | 'updatedAt'>>) => {

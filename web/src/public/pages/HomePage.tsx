@@ -656,7 +656,7 @@ export default function HomePage() {
           <div className="events-button-group">
             <a href="/brewedat/events" className="btn-large btn-primary">View All Events</a>
             <p className="submit-event-link">
-              Have an event to share? <a href="/brewedat/get-involved">Submit it here</a>
+              Have an event to share? <a href="/brewedat/submit-event">Submit it here</a>
             </p>
           </div>
         </div>

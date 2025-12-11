@@ -7,7 +7,7 @@ import EventsPage from './pages/EventsPage';
 import PodcastPage from './pages/PodcastPage';
 import PressPage from './pages/PressPage';
 import ForBusinessPage from './pages/ForBusinessPage';
-// import GetInvolvedPage from './pages/GetInvolvedPage';
+import SubmitEventPage from './pages/SubmitEventPage';
 import HallOfChampionsPage from './pages/HallOfChampionsPage';
 
 function App() {
@@ -22,8 +22,7 @@ function App() {
               <Route path="/podcast" element={<PodcastPage />} />
               <Route path="/press" element={<PressPage />} />
               <Route path="/for-business" element={<ForBusinessPage />} />
-              {/* <Route path="/get-involved" element={<GetInvolvedPage />} /> */}
-              {/* <Route path="/submit-event" element={<GetInvolvedPage />} /> */}
+              <Route path="/submit-event" element={<SubmitEventPage />} />
               <Route path="/hall-of-champions" element={<HallOfChampionsPage />} />
             </Routes>
           </Layout>

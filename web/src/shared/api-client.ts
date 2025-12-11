@@ -211,6 +211,28 @@ class ApiClient {
     });
   }
 
+  // Public event submission (no auth required)
+  async submitEvent(eventData: {
+    title: string;
+    description?: string;
+    date: string;
+    time?: string;
+    location: string;
+    address?: string;
+    eventType?: string;
+    organizerName: string;
+    organizerEmail: string;
+    organizerPhone?: string;
+    websiteUrl?: string;
+    ticketUrl?: string;
+    tagIds?: string[];
+  }): Promise<ApiResponse<{ id: string }>> {
+    return this.request<{ id: string }>('/events/submit', {
+      method: 'POST',
+      body: JSON.stringify(eventData),
+    });
+  }
+
   async updateEvent(id: string, event: Partial<Event>): Promise<ApiResponse<Event>> {
     return this.request<Event>(`/events/${id}`, {
       method: 'PUT',

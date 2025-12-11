@@ -4,6 +4,28 @@ import { v4 as uuidv4 } from 'uuid';
 
 const router = Router();
 
+// Rate limiting for public submissions
+const submissionRateLimit: Map<string, { count: number; firstSubmission: number }> = new Map();
+const RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hour
+const RATE_LIMIT_MAX = 3; // 3 submissions per hour per IP
+
+const checkSubmissionRateLimit = (ip: string): boolean => {
+  const now = Date.now();
+  const record = submissionRateLimit.get(ip);
+
+  if (!record || (now - record.firstSubmission) > RATE_LIMIT_WINDOW) {
+    submissionRateLimit.set(ip, { count: 1, firstSubmission: now });
+    return true;
+  }
+
+  if (record.count >= RATE_LIMIT_MAX) {
+    return false;
+  }
+
+  record.count++;
+  return true;
+};
+
 // GET /api/events - List all events
 router.get('/', (req: Request, res: Response) => {
   try {
@@ -67,6 +89,94 @@ router.post('/', (req: Request, res: Response) => {
   }
 });
 
+// POST /api/events/submit - Public event submission (no auth required)
+router.post('/submit', (req: Request, res: Response) => {
+  try {
+    // Rate limiting
+    const ip = req.ip || req.socket.remoteAddress || 'unknown';
+    if (!checkSubmissionRateLimit(ip)) {
+      return res.status(429).json({
+        success: false,
+        error: 'Too many submissions. Please try again later.'
+      });
+    }
+
+    const {
+      title, description, date, time, location, address,
+      eventType, organizerName, organizerEmail, organizerPhone,
+      websiteUrl, ticketUrl, tagIds
+    } = req.body;
+
+    // Validation
+    if (!title || !date || !location || !organizerName || !organizerEmail) {
+      return res.status(400).json({
+        success: false,
+        error: 'Event name, date, location, organizer name, and email are required'
+      });
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(organizerEmail)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Please provide a valid email address'
+      });
+    }
+
+    const event = eventsDb.create({
+      id: uuidv4(),
+      title,
+      description: description || null,
+      date,
+      time: time || null,
+      location: address || null, // address goes to location field (full address)
+      brewery: location, // venue name goes to brewery field
+      breweryLogo: null,
+      eventType: eventType || 'local',
+      imageUrl: null,
+      externalUrl: websiteUrl || ticketUrl || null,
+      featured: 0,
+      organizerName,
+      organizerEmail,
+      organizerPhone: organizerPhone || null,
+      websiteUrl: websiteUrl || null,
+      ticketUrl: ticketUrl || null,
+      approved: 0 // Submissions require approval
+    } as any);
+
+    // Set event tags if provided
+    if (tagIds && Array.isArray(tagIds) && tagIds.length > 0) {
+      try {
+        eventTagsDb.setTagsForEvent(event.id, tagIds);
+      } catch (tagError) {
+        console.error('Error setting event tags:', tagError);
+        // Don't fail the submission if tags fail to save
+      }
+    }
+
+    res.status(201).json({
+      success: true,
+      message: 'Event submitted successfully! It will be reviewed and published soon.',
+      data: { id: event.id }
+    });
+  } catch (error: any) {
+    console.error('Error submitting event:', error);
+    res.status(500).json({ success: false, error: 'Failed to submit event' });
+  }
+});
+
+// GET /api/events/pending - Get pending submissions (admin only)
+router.get('/pending', (req: Request, res: Response) => {
+  try {
+    const events = eventsDb.getPending();
+    res.json({ success: true, data: events });
+  } catch (error: any) {
+    console.error('Error fetching pending events:', error);
+    res.status(500).json({ success: false, error: 'Failed to fetch pending events' });
+  }
+});
+
 // PUT /api/events/:id - Update event (admin only)
 router.put('/:id', (req: Request, res: Response) => {
   try {
@@ -75,7 +185,8 @@ router.put('/:id', (req: Request, res: Response) => {
 
     // Only include fields that were provided
     const allowedFields = ['title', 'description', 'date', 'time', 'location', 'brewery',
-                          'breweryLogo', 'eventType', 'imageUrl', 'externalUrl', 'featured'];
+                          'breweryLogo', 'eventType', 'imageUrl', 'externalUrl', 'featured',
+                          'organizerName', 'organizerEmail', 'organizerPhone', 'websiteUrl', 'ticketUrl', 'approved'];
 
     allowedFields.forEach(field => {
       if (req.body[field] !== undefined) {
@@ -83,9 +194,12 @@ router.put('/:id', (req: Request, res: Response) => {
       }
     });
 
-    // Convert featured to integer if present
+    // Convert boolean fields to integers
     if (updateData.featured !== undefined) {
       updateData.featured = updateData.featured ? 1 : 0;
+    }
+    if (updateData.approved !== undefined) {
+      updateData.approved = updateData.approved ? 1 : 0;
     }
 
     const success = eventsDb.update(id, updateData);
