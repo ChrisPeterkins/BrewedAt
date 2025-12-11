@@ -4,6 +4,170 @@ import { apiClient } from '@shared/api-client';
 import type { Event, PodcastEpisode } from '@shared/api-client';
 import EventsCoverflow, { type EventItem } from '../components/EventsCoverflow';
 
+// Fun on-brand success messages
+const successMessages = [
+  "Cheers! You're on the list",
+  "Great pour decision.",
+  "Welcome to the crew — first round's on us (metaphorically)",
+  "You're in. No ID required.",
+  "Tapped in and ready to go.",
+  "Consider yourself a regular now.",
+  "The best email we've gotten all day.",
+];
+
+const errorMessages = [
+  "Whoa, something spilled. Try again?",
+  "That didn't pour right. One more shot?",
+  "Hmm, hit a snag. Give it another go.",
+];
+
+// Toast notification components
+const BeerMugIcon = () => (
+  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+    <path
+      d="M6 10C6 8.89543 6.89543 8 8 8H20C21.1046 8 22 8.89543 22 10V26C22 27.1046 21.1046 28 20 28H8C6.89543 28 6 27.1046 6 26V10Z"
+      fill="#D4A03E"
+    />
+    <path
+      d="M8 12H20V24C20 25.1046 19.1046 26 18 26H10C8.89543 26 8 25.1046 8 24V12Z"
+      fill="#F5B041"
+    />
+    <ellipse cx="10" cy="11" rx="2.5" ry="2" fill="#FFF8E7"/>
+    <ellipse cx="14" cy="10" rx="3" ry="2.5" fill="#FFF8E7"/>
+    <ellipse cx="18" cy="11" rx="2.5" ry="2" fill="#FFF8E7"/>
+    <ellipse cx="12" cy="9" rx="2" ry="1.5" fill="#FFFDF5"/>
+    <ellipse cx="16" cy="9" rx="2" ry="1.5" fill="#FFFDF5"/>
+    <path
+      d="M22 12H24C25.6569 12 27 13.3431 27 15V19C27 20.6569 25.6569 22 24 22H22"
+      stroke="#D4A03E"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      fill="none"
+    />
+  </svg>
+);
+
+const ErrorIcon = () => (
+  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+    <g transform="rotate(-20 16 20)">
+      <path
+        d="M8 14C8 12.8954 8.89543 12 10 12H22C23.1046 12 24 12.8954 24 14V26C24 27.1046 23.1046 28 22 28H10C8.89543 28 8 27.1046 8 26V14Z"
+        fill="#D4A03E"
+      />
+    </g>
+    <circle cx="7" cy="24" r="2" fill="#F5B041" opacity="0.8"/>
+    <circle cx="10" cy="27" r="1.5" fill="#F5B041" opacity="0.6"/>
+    <circle cx="5" cy="28" r="1" fill="#F5B041" opacity="0.4"/>
+  </svg>
+);
+
+const Bubble = ({ delay, left, size }: { delay: number; left: number; size: number }) => (
+  <div
+    style={{
+      position: 'absolute',
+      bottom: -10,
+      left: `${left}%`,
+      width: size,
+      height: size,
+      background: 'rgba(212, 160, 62, 0.6)',
+      borderRadius: '50%',
+      animation: `bubbleRise 2s ease-out ${delay}s forwards`,
+    }}
+  />
+);
+
+interface ToastProps {
+  message: string;
+  type: 'success' | 'error';
+  isVisible: boolean;
+  onClose: () => void;
+}
+
+const Toast = ({ message, type, isVisible, onClose }: ToastProps) => {
+  const [bubbleKey, setBubbleKey] = useState(0);
+
+  useEffect(() => {
+    if (isVisible) {
+      setBubbleKey(prev => prev + 1);
+      const timer = setTimeout(onClose, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [isVisible, onClose]);
+
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        bottom: 24,
+        right: 24,
+        minWidth: 320,
+        maxWidth: 420,
+        borderRadius: 12,
+        overflow: 'hidden',
+        boxShadow: '0 4px 24px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1)',
+        background: type === 'success'
+          ? 'linear-gradient(135deg, #1a2f1a 0%, #0d1f0d 100%)'
+          : 'linear-gradient(135deg, #2f1a1a 0%, #1f0d0d 100%)',
+        borderLeft: `4px solid ${type === 'success' ? '#D4A03E' : '#fd5526'}`,
+        transform: isVisible ? 'translateX(0)' : 'translateX(120%)',
+        opacity: isVisible ? 1 : 0,
+        transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease',
+        zIndex: 9999,
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', position: 'relative' }}>
+        <div style={{
+          flexShrink: 0,
+          animation: isVisible ? 'iconPop 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both' : 'none',
+        }}>
+          {type === 'success' ? <BeerMugIcon /> : <ErrorIcon />}
+        </div>
+        <p style={{
+          flex: 1,
+          margin: 0,
+          color: '#fff',
+          fontSize: '0.95rem',
+          fontWeight: 500,
+          lineHeight: 1.4,
+          animation: isVisible ? 'messageSlide 0.4s ease 0.1s both' : 'none',
+        }}>
+          {message}
+        </p>
+        <button
+          onClick={onClose}
+          style={{
+            flexShrink: 0,
+            background: 'none',
+            border: 'none',
+            color: 'rgba(255,255,255,0.5)',
+            cursor: 'pointer',
+            padding: 4,
+            borderRadius: 4,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16">
+            <path d="M12.2 3.8L3.8 12.2M3.8 3.8L12.2 12.2" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      {type === 'success' && isVisible && (
+        <div key={bubbleKey} style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '100%', pointerEvents: 'none', overflow: 'hidden' }}>
+          <Bubble delay={0} left={10} size={6} />
+          <Bubble delay={0.2} left={25} size={4} />
+          <Bubble delay={0.4} left={40} size={8} />
+          <Bubble delay={0.1} left={60} size={5} />
+          <Bubble delay={0.3} left={75} size={6} />
+          <Bubble delay={0.5} left={90} size={4} />
+        </div>
+      )}
+    </div>
+  );
+};
+
 // Placeholder event data with tags
 const PLACEHOLDER_EVENTS: EventItem[] = [
   {
@@ -186,8 +350,16 @@ export default function HomePage() {
   const [totalFollowers, setTotalFollowers] = useState('15,000+');
   const [email, setEmail] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [formMessage, setFormMessage] = useState('');
+  const [toast, setToast] = useState<{ isVisible: boolean; type: 'success' | 'error'; message: string }>({ isVisible: false, type: 'success', message: '' });
   const [podcastCarouselIndex, setPodcastCarouselIndex] = useState(0);
+
+  const showToast = (type: 'success' | 'error', customMessage?: string) => {
+    const messages = type === 'success' ? successMessages : errorMessages;
+    const message = customMessage || messages[Math.floor(Math.random() * messages.length)];
+    setToast({ isVisible: true, type, message });
+  };
+
+  const hideToast = () => setToast(prev => ({ ...prev, isVisible: false }));
 
   useEffect(() => {
     // loadSocialStats(); // Commented out - not using social stats API
@@ -261,26 +433,22 @@ export default function HomePage() {
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setFormMessage('Please enter a valid email address');
+      showToast('error', "That email doesn't look quite right. Try again?");
       return;
     }
     setSubmitting(true);
-    setFormMessage('');
 
     try {
       const response = await apiClient.subscribe(email);
 
       if (response.success) {
-        setFormMessage(response.message || 'Thanks for signing up! We\'ll keep you updated.');
+        showToast('success');
         setEmail('');
-        setTimeout(() => setFormMessage(''), 5000);
       } else {
-        setFormMessage(response.error || 'Something went wrong. Please try again.');
-        setTimeout(() => setFormMessage(''), 5000);
+        showToast('error', response.error || undefined);
       }
     } catch (error) {
-      setFormMessage('Something went wrong. Please try again.');
-      setTimeout(() => setFormMessage(''), 5000);
+      showToast('error');
     } finally {
       setSubmitting(false);
     }
@@ -842,13 +1010,20 @@ export default function HomePage() {
                   {submitting ? 'Signing Up...' : 'Sign Up'}
                 </button>
               </div>
-              {formMessage && <p className={`form-message ${formMessage.includes('Thanks') ? 'success' : 'error'}`}>{formMessage}</p>}
             </form>
             <p className="privacy-note">We respect your privacy. Unsubscribe anytime.</p>
           </div>
         </div>
       </section>
       </div>
+
+      {/* Toast Notification */}
+      <Toast
+        type={toast.type}
+        message={toast.message}
+        isVisible={toast.isVisible}
+        onClose={hideToast}
+      />
     </>
   );
 }
