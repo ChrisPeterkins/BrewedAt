@@ -686,4 +686,91 @@ export const usersDb = {
   }
 };
 
+// ============================================================================
+// EMAIL SUBSCRIBERS
+// ============================================================================
+
+export interface EmailSubscriber {
+  id: string;
+  email: string;
+  source: string;
+  ipAddress?: string;
+  subscribedAt: string;
+  unsubscribedAt?: string;
+}
+
+export const subscribersDb = {
+  getAll: (limit?: number, offset?: number) => {
+    let query = 'SELECT * FROM email_subscribers ORDER BY subscribedAt DESC';
+    const params: any[] = [];
+
+    if (limit) {
+      query += ' LIMIT ?';
+      params.push(limit);
+      if (offset) {
+        query += ' OFFSET ?';
+        params.push(offset);
+      }
+    }
+
+    return db.prepare(query).all(...params) as EmailSubscriber[];
+  },
+
+  getById: (id: string) => {
+    return db.prepare('SELECT * FROM email_subscribers WHERE id = ?').get(id) as EmailSubscriber | undefined;
+  },
+
+  getByEmail: (email: string) => {
+    return db.prepare('SELECT * FROM email_subscribers WHERE email = ?').get(email) as EmailSubscriber | undefined;
+  },
+
+  getCount: () => {
+    const result = db.prepare('SELECT COUNT(*) as count FROM email_subscribers WHERE unsubscribedAt IS NULL').get() as { count: number };
+    return result.count;
+  },
+
+  create: (subscriber: Omit<EmailSubscriber, 'subscribedAt' | 'unsubscribedAt'>) => {
+    const now = new Date().toISOString();
+    const stmt = db.prepare(`
+      INSERT INTO email_subscribers (id, email, source, ipAddress, subscribedAt)
+      VALUES (?, ?, ?, ?, ?)
+    `);
+
+    try {
+      stmt.run(
+        subscriber.id,
+        subscriber.email.toLowerCase().trim(),
+        subscriber.source || 'website',
+        subscriber.ipAddress || null,
+        now
+      );
+      return { ...subscriber, email: subscriber.email.toLowerCase().trim(), subscribedAt: now };
+    } catch (error: any) {
+      if (error.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+        throw new Error('Email already subscribed');
+      }
+      throw error;
+    }
+  },
+
+  unsubscribe: (email: string) => {
+    const now = new Date().toISOString();
+    const stmt = db.prepare('UPDATE email_subscribers SET unsubscribedAt = ? WHERE email = ? AND unsubscribedAt IS NULL');
+    const result = stmt.run(now, email.toLowerCase().trim());
+    return result.changes > 0;
+  },
+
+  resubscribe: (email: string) => {
+    const stmt = db.prepare('UPDATE email_subscribers SET unsubscribedAt = NULL WHERE email = ?');
+    const result = stmt.run(email.toLowerCase().trim());
+    return result.changes > 0;
+  },
+
+  delete: (id: string) => {
+    const stmt = db.prepare('DELETE FROM email_subscribers WHERE id = ?');
+    const result = stmt.run(id);
+    return result.changes > 0;
+  }
+};
+
 export default db;

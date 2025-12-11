@@ -10,10 +10,11 @@ import UserManagement from './UserManagement';
 import Settings from './Settings';
 import EmailLogs from './EmailLogs';
 import Documents from './Documents';
+import Subscribers from './Subscribers';
 import ChangePasswordModal from '../components/ChangePasswordModal';
 // import ContactSubmissions from './ContactSubmissions';
 
-type TabType = 'events' | 'podcast' | 'analytics' | 'breweries' | 'raffles' | 'settings' | 'contact' | 'media' | 'users' | 'emails' | 'documents';
+type TabType = 'events' | 'podcast' | 'analytics' | 'breweries' | 'raffles' | 'settings' | 'contact' | 'media' | 'users' | 'emails' | 'documents' | 'subscribers';
 
 interface DashboardProps {
   user: any;
@@ -191,6 +192,21 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
         <button
           style={{
             ...styles.navButton,
+            ...(activeTab === 'subscribers' ? styles.navButtonActive : {})
+          }}
+          onClick={() => setActiveTab('subscribers')}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          Subscribers
+        </button>
+        <button
+          style={{
+            ...styles.navButton,
             ...(activeTab === 'settings' ? styles.navButtonActive : {})
           }}
           onClick={() => setActiveTab('settings')}
@@ -214,6 +230,7 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
         {activeTab === 'documents' && <Documents />}
         {activeTab === 'users' && <UserManagement />}
         {activeTab === 'emails' && <EmailLogs />}
+        {activeTab === 'subscribers' && <Subscribers />}
         {activeTab === 'settings' && <Settings />}
       </main>
     </div>

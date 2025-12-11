@@ -556,6 +556,43 @@ class ApiClient {
       method: 'DELETE',
     });
   }
+
+  // ============================================================================
+  // EMAIL SUBSCRIBERS
+  // ============================================================================
+
+  async subscribe(email: string): Promise<ApiResponse<{ message: string }>> {
+    return this.request<{ message: string }>('/subscribers', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
+  }
+
+  async unsubscribe(email: string): Promise<ApiResponse<{ message: string }>> {
+    return this.request<{ message: string }>('/subscribers/unsubscribe', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
+  }
+
+  async getSubscribers(params?: { limit?: number; offset?: number }): Promise<ApiResponse<EmailSubscriber[]>> {
+    const queryParams = new URLSearchParams();
+    if (params?.limit) queryParams.set('limit', params.limit.toString());
+    if (params?.offset) queryParams.set('offset', params.offset.toString());
+
+    const query = queryParams.toString();
+    return this.request<EmailSubscriber[]>(`/subscribers${query ? `?${query}` : ''}`);
+  }
+
+  async getSubscriberCount(): Promise<ApiResponse<{ count: number }>> {
+    return this.request<{ count: number }>('/subscribers/count');
+  }
+
+  async deleteSubscriber(id: string): Promise<ApiResponse<void>> {
+    return this.request<void>(`/subscribers/${id}`, {
+      method: 'DELETE',
+    });
+  }
 }
 
 export interface EmailLog {
@@ -568,6 +605,15 @@ export interface EmailLog {
   sent_at: string;
   delivered_at?: string;
   created_at: string;
+}
+
+export interface EmailSubscriber {
+  id: string;
+  email: string;
+  source: string;
+  ipAddress?: string;
+  subscribedAt: string;
+  unsubscribedAt?: string;
 }
 
 export interface Document {

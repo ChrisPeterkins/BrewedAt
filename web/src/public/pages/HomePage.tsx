@@ -35,6 +35,7 @@ const PLACEHOLDER_EVENTS: EventItem[] = [
       { name: 'IPA', color: '#FBBF24', category: 'beverages' },
       { name: 'Food Truck', color: '#022C22', category: 'activity' },
     ],
+    canImage: '/brewedat/uploads/general/IMG_5279-1765478448365-728673072.jpeg',
     canColor: '#2d4a3e',
     accentColor: '#fbbf24',
     breweryName: 'Fishtown',
@@ -52,6 +53,7 @@ const PLACEHOLDER_EVENTS: EventItem[] = [
       { name: 'Stout', color: '#D97706', category: 'beverages' },
       { name: 'Meet the Brewer', color: '#312E81', category: 'event-focus' },
     ],
+    canImage: '/brewedat/uploads/general/IMG_5281-1765478448531-767674974.jpeg',
     canColor: '#3d2a1f',
     accentColor: '#d97706',
     breweryName: 'BrewedAt',
@@ -69,6 +71,7 @@ const PLACEHOLDER_EVENTS: EventItem[] = [
       { name: 'Sour', color: '#92400E', category: 'beverages' },
       { name: 'Family Friendly', color: '#22C55E', category: 'activity' },
     ],
+    canImage: '/brewedat/uploads/general/IMG_5280-1765478450052-862386541.jpeg',
     canColor: '#3b2d5a',
     accentColor: '#7c3aed',
     breweryName: 'Fishtown',
@@ -86,6 +89,7 @@ const PLACEHOLDER_EVENTS: EventItem[] = [
       { name: 'Lager', color: '#B45309', category: 'beverages' },
       { name: 'Outdoor', color: '#15803D', category: 'activity' },
     ],
+    canImage: '/brewedat/uploads/general/testevent-1765417106825-549704247.png',
     canColor: '#1e3a5f',
     accentColor: '#2563eb',
     breweryName: 'BrewedAt',
@@ -103,6 +107,7 @@ const PLACEHOLDER_EVENTS: EventItem[] = [
       { name: 'Craft Beer', color: '#F59E0B', category: 'beverages' },
       { name: 'DJ', color: '#A855F7', category: 'entertainment' },
     ],
+    canImage: '/brewedat/uploads/general/IMG_5279-1765478448365-728673072.jpeg',
     canColor: '#4a1f1f',
     accentColor: '#ef4444',
     breweryName: 'Fishtown',
@@ -120,6 +125,7 @@ const PLACEHOLDER_EVENTS: EventItem[] = [
       { name: 'Eagles', color: '#065F46', category: 'sports' },
       { name: 'Cocktails', color: '#10B981', category: 'beverages' },
     ],
+    canImage: '/brewedat/uploads/general/IMG_5281-1765478448531-767674974.jpeg',
     canColor: '#004c54',
     accentColor: '#a5acaf',
     breweryName: 'BrewedAt',
@@ -137,6 +143,7 @@ const PLACEHOLDER_EVENTS: EventItem[] = [
       { name: 'Cider', color: '#78350F', category: 'beverages' },
       { name: 'Bingo', color: '#134E4A', category: 'activity' },
     ],
+    canImage: '/brewedat/uploads/general/IMG_5280-1765478450052-862386541.jpeg',
     canColor: '#4a3728',
     accentColor: '#8b5cf6',
     breweryName: 'Fishtown',
@@ -154,6 +161,7 @@ const PLACEHOLDER_EVENTS: EventItem[] = [
       { name: 'Non-Alcoholic', color: '#6B7280', category: 'beverages' },
       { name: 'Yoga', color: '#0F766E', category: 'activity' },
     ],
+    canImage: '/brewedat/uploads/general/testevent-1765417106825-549704247.png',
     canColor: '#4a2d4a',
     accentColor: '#ec4899',
     breweryName: 'BrewedAt',
@@ -252,18 +260,30 @@ export default function HomePage() {
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email ||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setFormMessage('Please enter a valid email address');
       return;
     }
     setSubmitting(true);
     setFormMessage('');
-    setTimeout(() => {
-      setFormMessage('Thanks for signing up! We\'ll keep you updated.');
-      setEmail('');
+
+    try {
+      const response = await apiClient.subscribe(email);
+
+      if (response.success) {
+        setFormMessage(response.message || 'Thanks for signing up! We\'ll keep you updated.');
+        setEmail('');
+        setTimeout(() => setFormMessage(''), 5000);
+      } else {
+        setFormMessage(response.error || 'Something went wrong. Please try again.');
+        setTimeout(() => setFormMessage(''), 5000);
+      }
+    } catch (error) {
+      setFormMessage('Something went wrong. Please try again.');
+      setTimeout(() => setFormMessage(''), 5000);
+    } finally {
       setSubmitting(false);
-      setTimeout(() => setFormMessage(''), 3000);
-    }, 1000);
+    }
   };
 
   return (
@@ -466,6 +486,9 @@ export default function HomePage() {
 
           <div className="events-button-group">
             <a href="/brewedat/events" className="btn-large btn-primary">View All Events</a>
+            <p className="submit-event-link">
+              Have an event to share? <a href="/brewedat/get-involved">Submit it here</a>
+            </p>
           </div>
         </div>
       </section>
@@ -800,70 +823,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Submit Event CTA */}
-      <section style={{
-        padding: '80px 0',
-        background: 'white'
-      }}>
-        <div className="container">
-          <div style={{
-            background: 'linear-gradient(135deg, #1f3540 0%, #25303d 100%)',
-            padding: '60px 40px',
-            borderRadius: '20px',
-            textAlign: 'center',
-            maxWidth: '900px',
-            margin: '0 auto'
-          }}>
-            <h2 style={{
-              fontSize: 'clamp(2rem, 4vw, 2.75rem)',
-              fontWeight: '800',
-              color: '#ffffff',
-              marginBottom: '1rem'
-            }}>
-              Have an Event to Share?
-            </h2>
-            <p style={{
-              fontSize: '1.125rem',
-              color: '#b8c5d0',
-              marginBottom: '2rem',
-              lineHeight: '1.8',
-              maxWidth: '700px',
-              marginLeft: 'auto',
-              marginRight: 'auto'
-            }}>
-              Whether you're hosting a tap takeover, brewery tour, beer festival, or any craft beverage event, we'd love to help spread the word to our community.
-            </p>
-            <a
-              href="/brewedat/get-involved"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '16px 32px',
-                background: '#fd5526',
-                color: 'white',
-                borderRadius: '8px',
-                fontSize: '1.125rem',
-                fontWeight: '600',
-                textDecoration: 'none',
-                transition: 'all 0.3s ease'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(253, 85, 38, 0.3)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = 'none';
-              }}
-            >
-              Submit an Event
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* Email Signup */}
+      {/* Email Signup Section */}
       <section id="signup" className="email-signup">
         <div className="container">
           <div className="signup-content">
@@ -871,14 +831,20 @@ export default function HomePage() {
             <p>Get updates about upcoming events, community news, and the latest from the craft beer scene.</p>
             <form className="signup-form" onSubmit={handleEmailSubmit}>
               <div className="form-group">
-                <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Enter your email address" required />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  required
+                />
                 <button type="submit" className="btn-primary" disabled={submitting}>
                   {submitting ? 'Signing Up...' : 'Sign Up'}
                 </button>
               </div>
               {formMessage && <p className={`form-message ${formMessage.includes('Thanks') ? 'success' : 'error'}`}>{formMessage}</p>}
             </form>
-            <p className="privacy-note">We respect your privacy. Unsubscribe at any time.</p>
+            <p className="privacy-note">We respect your privacy. Unsubscribe anytime.</p>
           </div>
         </div>
       </section>

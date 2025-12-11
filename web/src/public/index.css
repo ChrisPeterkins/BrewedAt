@@ -624,7 +624,7 @@ p {
 /* Email Signup */
 .email-signup {
     padding: 80px 0;
-    background: var(--color-background);
+    background: #1f3540;
 }
 
 .email-signup h2 {
@@ -632,7 +632,7 @@ p {
 }
 
 .email-signup p {
-    color: #b8c5d0;
+    color: rgba(255, 255, 255, 0.8);
 }
 
 .signup-content {
@@ -645,43 +645,61 @@ p {
     margin: 40px 0 20px;
 }
 
+.email-signup .form-group input[type="email"] {
+    flex: 1;
+    min-width: 280px;
+    padding: 16px 20px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+.email-signup .form-group input[type="email"]:focus {
+    outline: none;
+    border-color: #fd5526;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.email-signup .form-group input[type="email"]::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.email-signup .privacy-note {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Submit Event Link in Events Section */
+.submit-event-link {
+    width: 100%;
+    flex-basis: 100%;
+    margin-top: 8px;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    text-align: center;
+}
+
+.submit-event-link a {
+    color: #fd5526;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.submit-event-link a:hover {
+    color: #e64a1a;
+    text-decoration: underline;
+}
+
+/* Legacy form styles for other sections */
 .form-group {
     display: flex;
     gap: 12px;
     flex-wrap: wrap;
     justify-content: center;
-}
-
-.form-group input[type="email"] {
-    flex: 1;
-    min-width: 280px;
-    padding: 16px 20px;
-    border: 2px solid var(--border-color);
-    border-radius: 8px;
-    font-size: 1rem;
-    font-family: 'Inter', sans-serif;
-    transition: all 0.3s ease;
-    background: white;
-}
-
-.form-group input[type="email"]:focus {
-    outline: none;
-    border-color: var(--accent-color);
-    box-shadow: 0 0 0 3px rgba(212, 146, 42, 0.1);
-}
-
-.form-group button {
-    padding: 16px 32px;
-    min-width: 120px;
-}
-
-.btn-loading svg {
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
 }
 
 .form-message {
@@ -704,25 +722,6 @@ p {
     font-size: 0.875rem;
     color: var(--text-muted);
     margin-top: 16px;
-}
-
-.email-signup .privacy-note {
-    color: #b8c5d0;
-}
-
-.email-signup .form-group input[type="email"] {
-    background: rgba(255, 255, 255, 0.1);
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    color: #ffffff;
-}
-
-.email-signup .form-group input[type="email"]:focus {
-    border-color: #fd5526;
-    background: rgba(255, 255, 255, 0.15);
-}
-
-.email-signup .form-group input[type="email"]::placeholder {
-    color: rgba(255, 255, 255, 0.6);
 }
 
 /* Download CTA */
@@ -1363,27 +1362,6 @@ html {
     font-size: 0.875rem;
 }
 
-/* Submit Event CTA */
-.submit-event-cta {
-    background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
-    padding: 60px;
-    border-radius: 20px;
-    text-align: center;
-    margin-top: 40px;
-}
-
-.submit-event-cta h2 {
-    color: var(--text-primary);
-    margin-bottom: 16px;
-}
-
-.submit-event-cta p {
-    color: var(--text-secondary);
-    margin-bottom: 30px;
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
-}
 
 /* Champions Section */
 .champions-header {
@@ -1554,7 +1532,7 @@ html {
         padding: 120px 20px 40px;
     }
 
-    .submit-event-cta,
+    .email-signup,
     .join-tournament-cta {
         padding: 40px 20px;
     }
@@ -3668,6 +3646,7 @@ html {
 
     .events-button-group {
         flex-direction: row;
+        flex-wrap: wrap;
         justify-content: center;
         gap: 1.5rem;
     }

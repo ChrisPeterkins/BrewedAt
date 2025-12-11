@@ -13,6 +13,7 @@ import rafflesRouter from './routes/raffles';
 import contactRouter from './routes/contact';
 import configRouter from './routes/config';
 import tagsRouter from './routes/tags';
+import subscribersRouter from './routes/subscribers';
 
 // Import middleware
 import { authenticateToken, requireAdmin, login } from './middleware/auth';
@@ -126,6 +127,9 @@ app.use('/api/config', configRouter);
 
 // Tags (public can read)
 app.use('/api/tags', tagsRouter);
+
+// Subscribers (public can subscribe, admin can view)
+app.use('/api/subscribers', subscribersRouter);
 
 // ============================================================================
 // IMAGE UPLOAD ROUTES (admin only)
