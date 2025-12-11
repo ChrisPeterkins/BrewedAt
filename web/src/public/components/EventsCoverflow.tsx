@@ -25,6 +25,7 @@ export interface EventItem {
   tags: EventTag[];
   // Optional styling properties
   canColor?: string;
+  canImage?: string; // Background image for the can (replaces canColor if provided)
   accentColor?: string;
   breweryName?: string;
   beerStyle?: string;
@@ -34,6 +35,7 @@ interface EventsCoverflowProps {
   events: EventItem[];
   onEventChange?: (event: EventItem, index: number) => void;
   autoplayDelay?: number;
+  externalPagination?: boolean;
 }
 
 // Default colors using brand palette
@@ -48,13 +50,26 @@ interface BeerCanProps {
 
 function BeerCan({ event, isActive, onClick }: BeerCanProps) {
   const canColor = event.canColor || defaultCanColor;
+  const canImage = event.canImage;
   const accentColor = event.accentColor || defaultAccentColor;
   const breweryName = event.breweryName || 'BrewedAt';
   const beerStyle = event.beerStyle || 'CRAFT';
 
-  const canWidth = 180;
+  const canWidth = 210;
   const canHeight = 340;
   const topHeight = 28;
+
+  // Always use canColor for can background
+  const canBackgroundStyle: React.CSSProperties = {
+    background: canColor
+  };
+
+  // Hide label text when using an image background
+  const showLabel = !canImage;
+
+  // Image dimensions for 4:5 aspect ratio that fits nicely in the can
+  const imageWidth = canWidth - 24; // 12px margin on each side
+  const imageHeight = imageWidth * (5 / 4); // 4:5 aspect ratio
 
   return (
     <div
@@ -132,7 +147,7 @@ function BeerCan({ event, isActive, onClick }: BeerCanProps) {
           transform: 'translateX(-50%)',
           width: `${canWidth}px`,
           height: `${canHeight}px`,
-          background: canColor,
+          ...canBackgroundStyle,
           borderRadius: '4px 4px 6px 6px',
           overflow: 'hidden'
         }}>
@@ -157,107 +172,148 @@ function BeerCan({ event, isActive, onClick }: BeerCanProps) {
             background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.08) 50%, transparent 100%)'
           }} />
 
-          {/* Label Area */}
-          <div style={{
-            position: 'absolute',
-            top: '35px',
-            left: '16px',
-            right: '16px',
-            bottom: '28px',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '20px 10px'
-          }}>
-
-            {/* Beer Style */}
+          {/* Label Area - only show when not using image background */}
+          {showLabel && (
             <div style={{
-              color: accentColor,
-              fontSize: '12px',
-              fontFamily: 'system-ui, -apple-system, sans-serif',
-              fontWeight: '600',
-              letterSpacing: '2.5px',
-              textTransform: 'uppercase',
-              opacity: 0.9
+              position: 'absolute',
+              top: '35px',
+              left: '16px',
+              right: '16px',
+              bottom: '28px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '20px 10px'
             }}>
-              {beerStyle}
-            </div>
 
-            {/* Brewery Name */}
-            <div style={{
-              color: '#fff',
-              fontSize: '24px',
-              fontFamily: 'Georgia, "Times New Roman", serif',
-              fontWeight: '400',
-              textAlign: 'center',
-              lineHeight: '1.2',
-              letterSpacing: '0.5px'
-            }}>
-              {breweryName}
-            </div>
+              {/* Beer Style */}
+              <div style={{
+                color: accentColor,
+                fontSize: '12px',
+                fontFamily: 'system-ui, -apple-system, sans-serif',
+                fontWeight: '600',
+                letterSpacing: '2.5px',
+                textTransform: 'uppercase',
+                opacity: 0.9
+              }}>
+                {beerStyle}
+              </div>
 
-            {/* Simple Divider */}
+              {/* Brewery Name */}
+              <div style={{
+                color: '#fff',
+                fontSize: '24px',
+                fontFamily: 'Georgia, "Times New Roman", serif',
+                fontWeight: '400',
+                textAlign: 'center',
+                lineHeight: '1.2',
+                letterSpacing: '0.5px'
+              }}>
+                {breweryName}
+              </div>
+
+              {/* Simple Divider */}
+              <div style={{
+                width: '55px',
+                height: '2px',
+                background: accentColor,
+                opacity: 0.5
+              }} />
+
+              {/* Event Name */}
+              <div style={{
+                color: accentColor,
+                fontSize: '14px',
+                fontFamily: 'system-ui, -apple-system, sans-serif',
+                fontWeight: '500',
+                textAlign: 'center',
+                lineHeight: '1.3'
+              }}>
+                {event.title}
+              </div>
+
+              {/* Date */}
+              <div style={{
+                color: 'rgba(255,255,255,0.85)',
+                fontSize: '16px',
+                fontFamily: 'system-ui, -apple-system, sans-serif',
+                fontWeight: '600'
+              }}>
+                {event.date}
+              </div>
+
+              {/* Location */}
+              <div style={{
+                color: 'rgba(255,255,255,0.6)',
+                fontSize: '11px',
+                fontFamily: 'system-ui, -apple-system, sans-serif',
+                fontWeight: '400',
+                letterSpacing: '0.3px'
+              }}>
+                {event.location}
+              </div>
+
+              {/* Simple decorative element */}
+              <div style={{
+                width: '42px',
+                height: '42px',
+                border: `1px solid ${accentColor}`,
+                borderRadius: '50%',
+                opacity: 0.3
+              }} />
+            </div>
+          )}
+
+          {/* Bottom accent stripe - only show when not using image background */}
+          {showLabel && (
             <div style={{
-              width: '55px',
-              height: '2px',
+              position: 'absolute',
+              bottom: '0',
+              left: '0',
+              right: '0',
+              height: '16px',
               background: accentColor,
-              opacity: 0.5
+              opacity: 0.4
             }} />
+          )}
 
-            {/* Event Name */}
+          {/* Image layout - show when canImage is provided */}
+          {canImage && (
             <div style={{
-              color: accentColor,
-              fontSize: '14px',
-              fontFamily: 'system-ui, -apple-system, sans-serif',
-              fontWeight: '500',
-              textAlign: 'center',
-              lineHeight: '1.3'
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '20px 12px'
             }}>
-              {event.title}
+              {/* Image frame */}
+              <div style={{
+                width: `${imageWidth}px`,
+                height: `${imageHeight}px`,
+                borderRadius: '4px',
+                overflow: 'hidden',
+                border: `2px solid ${accentColor}`,
+                boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                flexShrink: 0
+              }}>
+                <img
+                  src={canImage}
+                  alt={event.title}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover'
+                  }}
+                />
+              </div>
             </div>
-
-            {/* Date */}
-            <div style={{
-              color: 'rgba(255,255,255,0.85)',
-              fontSize: '16px',
-              fontFamily: 'system-ui, -apple-system, sans-serif',
-              fontWeight: '600'
-            }}>
-              {event.date}
-            </div>
-
-            {/* Location */}
-            <div style={{
-              color: 'rgba(255,255,255,0.6)',
-              fontSize: '11px',
-              fontFamily: 'system-ui, -apple-system, sans-serif',
-              fontWeight: '400',
-              letterSpacing: '0.3px'
-            }}>
-              {event.location}
-            </div>
-
-            {/* Simple decorative element */}
-            <div style={{
-              width: '42px',
-              height: '42px',
-              border: `1px solid ${accentColor}`,
-              borderRadius: '50%',
-              opacity: 0.3
-            }} />
-          </div>
-
-          {/* Bottom accent stripe */}
-          <div style={{
-            position: 'absolute',
-            bottom: '0',
-            left: '0',
-            right: '0',
-            height: '16px',
-            background: accentColor,
-            opacity: 0.4
-          }} />
+          )}
         </div>
 
         {/* Can Bottom - matches body width */}
@@ -280,7 +336,8 @@ function BeerCan({ event, isActive, onClick }: BeerCanProps) {
 export default function EventsCoverflow({
   events,
   onEventChange,
-  autoplayDelay = 8000
+  autoplayDelay = 8000,
+  externalPagination = false
 }: EventsCoverflowProps) {
   const swiperRef = useRef<SwiperType | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -323,8 +380,8 @@ export default function EventsCoverflow({
         coverflowEffect={{
           rotate: 0,
           stretch: 0,
-          depth: 200,
-          modifier: 2.5,
+          depth: 150,
+          modifier: 1.5,
           slideShadows: false,
         }}
         autoplay={{
@@ -332,7 +389,7 @@ export default function EventsCoverflow({
           disableOnInteraction: false,
           pauseOnMouseEnter: true,
         }}
-        pagination={{
+        pagination={externalPagination ? false : {
           clickable: true,
           dynamicBullets: events.length > 10,
           dynamicMainBullets: 5,

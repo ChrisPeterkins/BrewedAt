@@ -18,7 +18,7 @@ const PLACEHOLDER_EVENTS: EventItem[] = [
       { name: 'Craft Beer', color: '#F59E0B', category: 'beverages' },
       { name: 'Dog Friendly', color: '#16A34A', category: 'activity' },
     ],
-    canColor: '#1f3540',
+    canImage: '/brewedat/uploads/general/testevent-1765417106825-549704247.png',
     accentColor: '#fd5526',
     breweryName: 'BrewedAt',
     beerStyle: 'PASSPORT'
@@ -174,6 +174,7 @@ export default function HomePage() {
   const [otherEvents, setOtherEvents] = useState<Event[]>([]);
   const [featuredEpisodes, setFeaturedEpisodes] = useState<PodcastEpisode[]>([]);
   const [currentEvent, setCurrentEvent] = useState<EventItem>(PLACEHOLDER_EVENTS[0]);
+  const [currentEventIndex, setCurrentEventIndex] = useState(0);
   const [totalFollowers, setTotalFollowers] = useState('15,000+');
   const [email, setEmail] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -187,8 +188,9 @@ export default function HomePage() {
   }, []);
 
   // Handler for when coverflow carousel changes
-  const handleEventChange = (event: EventItem) => {
+  const handleEventChange = (event: EventItem, index: number) => {
     setCurrentEvent(event);
+    setCurrentEventIndex(index);
   };
 
   const loadSocialStats = async () => {
@@ -341,70 +343,104 @@ export default function HomePage() {
             <p>From pop-ups to brewery crawls and festivals, discover fun new ways to explore the craft beverage scene in PA and NJ.</p>
           </div>
 
-          <div className="events-content">
-            <div className="content-visual">
-              <div className="events-visual-wrapper">
-                {/* 3D Coverflow Carousel */}
-                <EventsCoverflow
-                  events={PLACEHOLDER_EVENTS}
-                  onEventChange={handleEventChange}
-                  autoplayDelay={8000}
-                />
+          {/* Side-by-side layout: Carousel left, Details right */}
+          <div className="events-split-layout">
+            {/* Left side - Carousel */}
+            <div className="events-carousel-side">
+              <EventsCoverflow
+                events={PLACEHOLDER_EVENTS}
+                onEventChange={handleEventChange}
+                autoplayDelay={8000}
+                externalPagination={true}
+              />
+            </div>
 
-                {/* Current Event Details - Shows info for the centered carousel item */}
-                <div className="current-event-details-section">
-                  <div className="current-event-details-card">
-                    <div className="current-event-header">
-                      <h3 className="current-event-title">{currentEvent.title}</h3>
-                      <div className="current-event-meta">
-                        <div className="current-event-date">
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                            <line x1="16" y1="2" x2="16" y2="6"/>
-                            <line x1="8" y1="2" x2="8" y2="6"/>
-                            <line x1="3" y1="10" x2="21" y2="10"/>
-                          </svg>
-                          <span>{currentEvent.date}</span>
-                        </div>
-                        <div className="current-event-location">
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                            <circle cx="12" cy="10" r="3"/>
-                          </svg>
-                          <span>{currentEvent.location}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <p className="current-event-description">
-                      {currentEvent.description}
-                    </p>
-
-                    {/* Event Tags */}
-                    <div className="current-event-tags">
-                      <span className="tags-label">Tags:</span>
-                      <div className="tags-list">
-                        {currentEvent.tags.map((tag, idx) => (
-                          <span
-                            key={idx}
-                            className="event-tag"
-                            style={{ backgroundColor: tag.color }}
-                          >
-                            {tag.name}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    <a href="/brewedat/events" className="current-event-link">
-                      View Event Details
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M5 12h14M12 5l7 7-7 7"/>
+            {/* Right side - Event Details */}
+            <div className="events-details-side">
+              <a
+                href="/brewedat/events"
+                className="current-event-details-card"
+                style={{
+                  backgroundColor: currentEvent.canColor || '#1f3540',
+                  transition: 'background-color 0.4s ease',
+                  textDecoration: 'none',
+                  display: 'block'
+                }}
+              >
+                <div
+                  className="featured-banner"
+                  style={{ backgroundColor: currentEvent.accentColor || '#fd5526' }}
+                >
+                  Featured Event
+                </div>
+                <div className="current-event-header">
+                  <h3 className="current-event-title">{currentEvent.title}</h3>
+                  {/* Event Tags - moved to top */}
+                  <div className="current-event-tags">
+                    {currentEvent.tags.map((tag, idx) => (
+                      <span
+                        key={idx}
+                        className="event-tag"
+                        style={{ backgroundColor: tag.color }}
+                      >
+                        {tag.name}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="current-event-meta">
+                    <div className="current-event-date">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                        <line x1="16" y1="2" x2="16" y2="6"/>
+                        <line x1="8" y1="2" x2="8" y2="6"/>
+                        <line x1="3" y1="10" x2="21" y2="10"/>
                       </svg>
-                    </a>
+                      <span>{currentEvent.date}</span>
+                    </div>
+                    <div className="current-event-location">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                        <circle cx="12" cy="10" r="3"/>
+                      </svg>
+                      <span>{currentEvent.location}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
+
+                <p className="current-event-description">
+                  {currentEvent.description}
+                </p>
+
+                {/* Location Map */}
+                <div className="current-event-map">
+                  <div className="map-container">
+                    <iframe
+                      src={`https://www.google.com/maps?q=${encodeURIComponent(currentEvent.location)}&output=embed&z=14`}
+                      width="100%"
+                      height="180"
+                      style={{ border: 0, borderRadius: '8px' }}
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      title={`Map of ${currentEvent.location}`}
+                    />
+                  </div>
+                </div>
+              </a>
+            </div>
+
+            {/* External Pagination Dots */}
+            <div className="events-pagination">
+              {PLACEHOLDER_EVENTS.map((_, index) => (
+                <span
+                  key={index}
+                  className={`pagination-dot ${index === currentEventIndex ? 'active' : ''}`}
+                  style={{
+                    backgroundColor: index === currentEventIndex
+                      ? '#fd5526'
+                      : 'rgba(253, 85, 38, 0.3)'
+                  }}
+                />
+              ))}
             </div>
           </div>
 

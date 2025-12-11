@@ -53,7 +53,7 @@ export default function Podcast() {
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
 
     if (type === 'checkbox') {
@@ -346,6 +346,31 @@ export default function Podcast() {
                       fontSize: '14px',
                     }}
                   />
+                </label>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500', color: '#654321' }}>
+                  Video Type *
+                  <select
+                    name="videoType"
+                    value={formData.videoType}
+                    onChange={handleInputChange}
+                    required
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      marginTop: '4px',
+                      border: '1px solid #ddd',
+                      borderRadius: '6px',
+                      fontSize: '14px',
+                      backgroundColor: 'white',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <option value="episode">Episode</option>
+                    <option value="short">Short</option>
+                  </select>
                 </label>
               </div>
 

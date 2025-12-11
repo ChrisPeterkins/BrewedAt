@@ -2817,11 +2817,81 @@ html {
     .events-coverflow-swiper .swiper-slide {
         width: 180px;
     }
+
+    /* Make events section edge-to-edge on mobile */
+    .events-highlight {
+        padding: 30px 0;
+    }
+
+    .events-highlight .container {
+        padding: 0 10px;
+    }
+
+    .events-visual-wrapper {
+        border-radius: 0;
+        padding: 1.5rem 0.5rem;
+        margin-left: -10px;
+        margin-right: -10px;
+        border-left: none;
+        border-right: none;
+    }
+
+    .events-coverflow-wrapper {
+        padding: 1rem 0 0;
+    }
+
+    .events-coverflow-swiper {
+        padding: 2rem 0 0;
+    }
+
+    .current-event-details-section {
+        margin-top: 1.5rem;
+        padding: 0 0.5rem;
+    }
 }
 
 @media (max-width: 480px) {
     .events-coverflow-swiper .swiper-slide {
         width: 160px;
+    }
+
+    .events-highlight {
+        padding: 20px 0;
+    }
+
+    .events-highlight .container {
+        padding: 0 8px;
+    }
+
+    .events-header {
+        padding: 0 12px;
+        margin-bottom: 1.5rem;
+    }
+
+    .events-header h2 {
+        font-size: 1.5rem;
+    }
+
+    .events-header p {
+        font-size: 0.95rem;
+    }
+
+    .events-visual-wrapper {
+        padding: 1rem 0;
+        margin-left: -8px;
+        margin-right: -8px;
+    }
+
+    .current-event-details-section {
+        padding: 0 0.75rem;
+    }
+
+    .current-event-details-card {
+        border-radius: 12px;
+    }
+
+    .events-button-group {
+        padding: 0 1rem;
     }
 }
 
@@ -2918,11 +2988,32 @@ html {
 }
 
 .current-event-details-card {
-    background: #ffffff;
+    background: #1f3540;
     border-radius: 16px;
     padding: 1.75rem;
-    box-shadow: 0 4px 16px rgba(31, 53, 64, 0.15);
-    border: 1px solid rgba(31, 53, 64, 0.08);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.current-event-details-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.featured-banner {
+    background: #fd5526;
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 0.5rem 1rem;
+    margin: -1.75rem -1.75rem 1.25rem -1.75rem;
+    text-align: center;
 }
 
 .current-event-header {
@@ -2932,8 +3023,8 @@ html {
 .current-event-title {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #1f3540;
-    margin: 0 0 0.75rem 0;
+    color: #ffffff;
+    margin: 0;
     line-height: 1.3;
 }
 
@@ -2949,7 +3040,7 @@ html {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    color: #25303d;
+    color: rgba(255, 255, 255, 0.9);
     font-size: 0.95rem;
 }
 
@@ -2960,7 +3051,7 @@ html {
 }
 
 .current-event-description {
-    color: #4a5568;
+    color: rgba(255, 255, 255, 0.8);
     line-height: 1.6;
     margin: 1rem 0;
     font-size: 0.95rem;
@@ -2969,18 +3060,8 @@ html {
 .current-event-tags {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
-    gap: 0.5rem;
-    margin: 1.25rem 0;
-    padding-top: 1rem;
-    border-top: 1px solid rgba(31, 53, 64, 0.1);
-}
-
-.tags-label {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #1f3540;
-    margin-right: 0.25rem;
+    gap: 0.3rem;
+    margin: 0;
 }
 
 .tags-list {
@@ -3004,6 +3085,18 @@ html {
 .event-tag:hover {
     transform: translateY(-2px);
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+.current-event-map {
+    margin: 1rem 0;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.current-event-map .map-container {
+    width: 100%;
+    background: #e5e7eb;
 }
 
 .current-event-link {
@@ -3062,6 +3155,188 @@ html {
     .event-tag {
         font-size: 0.75rem;
         padding: 0.3rem 0.6rem;
+    }
+}
+
+/* Events Split Layout - Carousel left, Details right */
+.events-split-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    align-items: center;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.events-carousel-side {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.events-details-side {
+    width: 100%;
+}
+
+.events-details-side .current-event-details-card {
+    animation: fadeInSlide 0.4s ease-out;
+}
+
+/* External pagination - mobile default (hidden, use swiper's) */
+.events-pagination {
+    display: none;
+}
+
+@keyframes fadeInSlide {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Desktop: Side-by-side layout */
+@media (min-width: 1024px) {
+    .events-split-layout {
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 2rem;
+        flex-wrap: nowrap;
+        position: relative;
+        padding-bottom: 3rem;
+    }
+
+    .events-carousel-side {
+        flex: 0 0 65%;
+        min-width: 0;
+        justify-content: center;
+        max-width: 700px;
+    }
+
+    /* Hide pagination in carousel, we'll show it at bottom of split layout */
+    .events-carousel-side .swiper-pagination {
+        display: none;
+    }
+
+    .events-details-side {
+        flex: 0 0 320px;
+        min-width: 0;
+        position: sticky;
+        top: 20px;
+        margin-top: -20px;
+    }
+
+    .events-details-side .current-event-details-card {
+        display: flex;
+        flex-direction: column;
+        padding: 1rem;
+        height: 383px;
+        overflow: hidden;
+    }
+
+    .events-details-side .current-event-map {
+        flex: 1;
+        margin: 0.5rem 0 0.5rem 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .events-details-side .current-event-map .map-container {
+        flex: 1;
+        min-height: 0;
+    }
+
+    .events-details-side .current-event-map iframe {
+        height: 100% !important;
+        min-height: 120px;
+    }
+
+    /* External pagination dots centered at bottom */
+    .events-split-layout .events-pagination {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        padding: 1rem 0;
+        width: 100%;
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+    }
+
+    .events-split-layout .pagination-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .events-split-layout .pagination-dot.active {
+        transform: scale(1.3);
+    }
+
+    .events-details-side .current-event-details-card .featured-banner {
+        margin: -1rem -1rem 0.75rem -1rem;
+        padding: 0.35rem 0.75rem;
+        font-size: 0.65rem;
+    }
+
+    .events-details-side .current-event-header {
+        margin-bottom: 0.5rem;
+    }
+
+    .events-details-side .current-event-title {
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .events-details-side .current-event-meta {
+        gap: 0.75rem;
+    }
+
+    .events-details-side .current-event-description {
+        font-size: 0.8rem;
+        line-height: 1.4;
+        margin: 0.5rem 0;
+    }
+
+    .events-details-side .current-event-tags {
+        margin: 0.75rem 0;
+        padding-top: 0.75rem;
+        gap: 0.4rem;
+    }
+
+    .events-details-side .tags-label {
+        font-size: 0.75rem;
+    }
+
+    .events-details-side .event-tag {
+        font-size: 0.7rem;
+        padding: 0.25rem 0.5rem;
+    }
+
+    .events-details-side .current-event-date,
+    .events-details-side .current-event-location {
+        font-size: 0.8rem;
+    }
+
+    .events-details-side .current-event-map {
+        margin: 0.5rem 0;
+    }
+
+    .events-details-side .current-event-map iframe {
+        height: 100px;
+    }
+
+    .events-details-side .current-event-link {
+        padding: 0.5rem 0.85rem;
+        font-size: 0.8rem;
+        margin-top: 0.5rem;
     }
 }
 
