@@ -357,75 +357,86 @@ export default function HomePage() {
 
             {/* Right side - Event Details */}
             <div className="events-details-side">
-              <a
-                href="/brewedat/events"
-                className="current-event-details-card"
-                style={{
-                  backgroundColor: currentEvent.canColor || '#1f3540',
-                  transition: 'background-color 0.4s ease',
-                  textDecoration: 'none',
-                  display: 'block'
-                }}
-              >
-                <div
-                  className="featured-banner"
-                  style={{ backgroundColor: currentEvent.accentColor || '#fd5526' }}
-                >
-                  Featured Event
-                </div>
-                <div className="current-event-header">
-                  <h3 className="current-event-title">{currentEvent.title}</h3>
-                  {/* Event Tags - moved to top */}
-                  <div className="current-event-tags">
-                    {currentEvent.tags.map((tag, idx) => (
-                      <span
-                        key={idx}
-                        className="event-tag"
-                        style={{ backgroundColor: tag.color }}
-                      >
-                        {tag.name}
-                      </span>
-                    ))}
-                  </div>
-                  <div className="current-event-meta">
-                    <div className="current-event-date">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                        <line x1="16" y1="2" x2="16" y2="6"/>
-                        <line x1="8" y1="2" x2="8" y2="6"/>
-                        <line x1="3" y1="10" x2="21" y2="10"/>
-                      </svg>
-                      <span>{currentEvent.date}</span>
-                    </div>
-                    <div className="current-event-location">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                        <circle cx="12" cy="10" r="3"/>
-                      </svg>
-                      <span>{currentEvent.location}</span>
-                    </div>
-                  </div>
+              <div className="event-details-card-new">
+                {/* Top Section */}
+                <div className="event-details-top">
+                  {/* Beer Style Tag */}
+                  {currentEvent.beerStyle && (
+                    <span
+                      className="event-style-tag"
+                      style={{
+                        background: `${currentEvent.canColor || '#1f3540'}20`,
+                        color: currentEvent.canColor || '#1f3540'
+                      }}
+                    >
+                      {currentEvent.beerStyle}
+                    </span>
+                  )}
+
+                  {/* Event Name */}
+                  <h3 className="event-details-title">{currentEvent.title}</h3>
+
+                  {/* Brewery Name */}
+                  {currentEvent.breweryName && (
+                    <p className="event-details-brewery">{currentEvent.breweryName}</p>
+                  )}
                 </div>
 
-                <p className="current-event-description">
+                {/* Description */}
+                <p className="event-details-description">
                   {currentEvent.description}
                 </p>
 
-                {/* Location Map */}
-                <div className="current-event-map">
-                  <div className="map-container">
-                    <iframe
-                      src={`https://www.google.com/maps?q=${encodeURIComponent(currentEvent.location)}&output=embed&z=14`}
-                      width="100%"
-                      height="180"
-                      style={{ border: 0, borderRadius: '8px' }}
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                      title={`Map of ${currentEvent.location}`}
-                    />
+                {/* Highlights/Tags */}
+                <div className="event-details-highlights">
+                  {currentEvent.tags.map((tag, idx) => (
+                    <span
+                      key={idx}
+                      className="event-highlight-tag"
+                      style={{ backgroundColor: tag.color }}
+                    >
+                      {tag.name}
+                    </span>
+                  ))}
+                </div>
+
+                {/* Divider */}
+                <div className="event-details-divider" />
+
+                {/* Details Grid */}
+                <div className="event-details-grid">
+                  {/* Date & Time */}
+                  <div className="event-detail-item">
+                    <p className="event-detail-label">Date & Time</p>
+                    <p className="event-detail-value">{currentEvent.date}</p>
+                    <p className="event-detail-subvalue">Time TBA</p>
+                  </div>
+
+                  {/* Location */}
+                  <div className="event-detail-item">
+                    <p className="event-detail-label">Location</p>
+                    <p className="event-detail-value">{currentEvent.location}</p>
+                    <p className="event-detail-subvalue">View on map</p>
                   </div>
                 </div>
-              </a>
+
+                {/* Bottom CTA Section */}
+                <div className="event-details-cta">
+                  {/* Price & Availability */}
+                  <div className="event-price-info">
+                    <p className="event-price">
+                      Free
+                      <span className="event-price-note">to attend</span>
+                    </p>
+                    <p className="event-availability">Open to all</p>
+                  </div>
+
+                  {/* CTA Button */}
+                  <a href="/brewedat/events" className="event-cta-button">
+                    View Details
+                  </a>
+                </div>
+              </div>
             </div>
 
             {/* External Pagination Dots */}
