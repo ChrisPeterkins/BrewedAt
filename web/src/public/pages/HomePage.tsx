@@ -345,18 +345,19 @@ export default function HomePage() {
 
           {/* Side-by-side layout: Carousel left, Details right */}
           <div className="events-split-layout">
-            {/* Left side - Carousel */}
-            <div className="events-carousel-side">
-              <EventsCoverflow
-                events={PLACEHOLDER_EVENTS}
-                onEventChange={handleEventChange}
-                autoplayDelay={8000}
-                externalPagination={true}
-              />
-            </div>
+            <div className="events-unified-container">
+              {/* Left side - Carousel */}
+              <div className="events-carousel-side">
+                <EventsCoverflow
+                  events={PLACEHOLDER_EVENTS}
+                  onEventChange={handleEventChange}
+                  autoplayDelay={8000}
+                  externalPagination={true}
+                />
+              </div>
 
-            {/* Right side - Event Details */}
-            <div className="events-details-side">
+              {/* Right side - Event Details */}
+              <div className="events-details-side">
               <div className="event-details-card-new">
                 {/* Top Section */}
                 <div className="event-details-top">
@@ -416,7 +417,14 @@ export default function HomePage() {
                   <div className="event-detail-item">
                     <p className="event-detail-label">Location</p>
                     <p className="event-detail-value">{currentEvent.location}</p>
-                    <p className="event-detail-subvalue">View on map</p>
+                    <a
+                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(currentEvent.location)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="event-detail-link"
+                    >
+                      View on map
+                    </a>
                   </div>
                 </div>
 
@@ -438,6 +446,7 @@ export default function HomePage() {
                 </div>
               </div>
             </div>
+            </div>
 
             {/* External Pagination Dots */}
             <div className="events-pagination">
@@ -457,7 +466,6 @@ export default function HomePage() {
 
           <div className="events-button-group">
             <a href="/brewedat/events" className="btn-large btn-primary">View All Events</a>
-            <a href="/brewedat/get-involved" className="btn-large btn-secondary">Submit an Event</a>
           </div>
         </div>
       </section>
@@ -792,7 +800,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Business CTA */}
+      {/* Submit Event CTA */}
       <section style={{
         padding: '80px 0',
         background: 'white'
@@ -812,7 +820,7 @@ export default function HomePage() {
               color: '#ffffff',
               marginBottom: '1rem'
             }}>
-              Partner with BrewedAt
+              Have an Event to Share?
             </h2>
             <p style={{
               fontSize: '1.125rem',
@@ -823,67 +831,34 @@ export default function HomePage() {
               marginLeft: 'auto',
               marginRight: 'auto'
             }}>
-              Reach 10,000+ craft beer enthusiasts and 765+ brewery decision-makers through our podcast, social media, and event network. Flexible retainer packages starting at $1,000/month.
+              Whether you're hosting a tap takeover, brewery tour, beer festival, or any craft beverage event, we'd love to help spread the word to our community.
             </p>
-            <div className="business-cta-buttons" style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <a
-                href="/brewedat/for-business#packages"
-                className="business-cta-btn"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: '16px 32px',
-                  background: '#fd5526',
-                  color: 'white',
-                  borderRadius: '8px',
-                  fontSize: '1.125rem',
-                  fontWeight: '600',
-                  textDecoration: 'none',
-                  transition: 'all 0.3s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(253, 85, 38, 0.3)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = 'none';
-                }}
-              >
-                View Retainer Packages
-              </a>
-              <a
-                href="mailto:info@brewedat.com"
-                className="business-cta-btn"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: '16px 32px',
-                  background: 'transparent',
-                  color: 'white',
-                  border: '2px solid white',
-                  borderRadius: '8px',
-                  fontSize: '1.125rem',
-                  fontWeight: '600',
-                  textDecoration: 'none',
-                  transition: 'all 0.3s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'white';
-                  e.currentTarget.style.color = '#1f3540';
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'transparent';
-                  e.currentTarget.style.color = 'white';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                }}
-              >
-                Contact Us
-              </a>
-            </div>
+            <a
+              href="/brewedat/get-involved"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '16px 32px',
+                background: '#fd5526',
+                color: 'white',
+                borderRadius: '8px',
+                fontSize: '1.125rem',
+                fontWeight: '600',
+                textDecoration: 'none',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(253, 85, 38, 0.3)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
+            >
+              Submit an Event
+            </a>
           </div>
         </div>
       </section>
