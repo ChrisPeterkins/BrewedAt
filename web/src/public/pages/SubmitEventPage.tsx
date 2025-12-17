@@ -25,158 +25,340 @@ const BeerPourCelebration = () => {
 
   useEffect(() => {
     const timers = [
-      setTimeout(() => setStage(1), 100),    // Start pour
-      setTimeout(() => setStage(2), 1200),   // Beer filled
-      setTimeout(() => setStage(3), 1600),   // Foam appears
-      setTimeout(() => setStage(4), 2000),   // Celebration
+      setTimeout(() => setStage(1), 300),    // Tap handle pulls, pour starts
+      setTimeout(() => setStage(2), 1800),   // Beer filled
+      setTimeout(() => setStage(3), 2200),   // Foam overflows
+      setTimeout(() => setStage(4), 2800),   // Celebration
     ];
     return () => timers.forEach(clearTimeout);
   }, []);
 
   return (
     <div style={celebrationStyles.container}>
-      {/* Background bubbles */}
-      <div style={celebrationStyles.bubblesContainer}>
-        {[...Array(12)].map((_, i) => (
+      {/* Gradient overlay for depth */}
+      <div style={celebrationStyles.gradientOverlay} />
+
+      {/* Animated glow rings */}
+      <div style={celebrationStyles.glowRings}>
+        {[...Array(3)].map((_, i) => (
           <div
             key={i}
+            className="glow-ring"
             style={{
-              ...celebrationStyles.bgBubble,
-              left: `${10 + (i * 7)}%`,
+              position: 'absolute',
+              left: '50%',
+              top: '45%',
+              transform: 'translate(-50%, -50%)',
+              width: 150 + i * 80,
+              height: 150 + i * 80,
+              borderRadius: '50%',
+              border: `2px solid rgba(253, 85, 38, ${0.3 - i * 0.08})`,
+              animation: `pulseRing ${2 + i * 0.5}s ease-out infinite`,
               animationDelay: `${i * 0.3}s`,
-              width: 8 + (i % 3) * 4,
-              height: 8 + (i % 3) * 4,
             }}
           />
         ))}
       </div>
 
-      {/* Confetti */}
+      {/* Floating particles - orange/teal mix */}
+      <div style={celebrationStyles.bubblesContainer}>
+        {[...Array(16)].map((_, i) => (
+          <div
+            key={i}
+            style={{
+              ...celebrationStyles.bgBubble,
+              left: `${5 + (i * 6)}%`,
+              animationDelay: `${i * 0.25}s`,
+              width: 4 + (i % 4) * 3,
+              height: 4 + (i % 4) * 3,
+              opacity: 0.4 + (i % 3) * 0.15,
+              backgroundColor: i % 3 === 0 ? '#fd5526' : i % 3 === 1 ? '#ff7a4d' : 'rgba(255,255,255,0.5)',
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Confetti - BrewedAt colors */}
       {stage >= 4 && (
         <div style={celebrationStyles.confettiContainer}>
-          {[...Array(20)].map((_, i) => (
+          {[...Array(24)].map((_, i) => (
             <div
               key={i}
               style={{
                 ...celebrationStyles.confetti,
-                left: `${5 + (i * 4.5)}%`,
-                backgroundColor: ['#fd5526', '#F5B041', '#D4A03E', '#10B981', '#3B82F6'][i % 5],
-                animationDelay: `${i * 0.1}s`,
-                transform: `rotate(${i * 30}deg)`,
+                left: `${3 + (i * 4)}%`,
+                backgroundColor: ['#fd5526', '#ff7a4d', '#1f3540', '#25303d', '#ffffff', '#ffaa8a'][i % 6],
+                animationDelay: `${i * 0.08}s`,
+                transform: `rotate(${i * 25}deg)`,
+                width: 8 + (i % 3) * 4,
+                height: 8 + (i % 3) * 4,
               }}
             />
           ))}
         </div>
       )}
 
-      {/* Beer Glass */}
-      <div style={celebrationStyles.glassWrapper}>
-        <svg width="170" height="195" viewBox="0 0 170 195" fill="none">
-          {/* Glass outline */}
+      {/* Beer Tap */}
+      <div style={celebrationStyles.tapWrapper}>
+        <svg width="80" height="70" viewBox="0 0 80 70" style={{ position: 'relative', zIndex: 2 }}>
           <defs>
-            <clipPath id="glassClip">
-              <path d="M25 35 L30 165 C30 172 40 175 70 175 C100 175 110 172 110 165 L115 35 Z" />
-            </clipPath>
-            <linearGradient id="beerGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#F5B041" />
-              <stop offset="100%" stopColor="#D4A03E" />
+            <linearGradient id="tapGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#1a1a1a" />
+              <stop offset="50%" stopColor="#3d3d3d" />
+              <stop offset="100%" stopColor="#1a1a1a" />
             </linearGradient>
-            <linearGradient id="foamGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#FFFDF5" />
-              <stop offset="100%" stopColor="#FFF8E7" />
+            <linearGradient id="tapHandleGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#8B4513" />
+              <stop offset="30%" stopColor="#CD853F" />
+              <stop offset="70%" stopColor="#CD853F" />
+              <stop offset="100%" stopColor="#8B4513" />
+            </linearGradient>
+            <linearGradient id="brassGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#D4A03E" />
+              <stop offset="50%" stopColor="#F5D998" />
+              <stop offset="100%" stopColor="#D4A03E" />
             </linearGradient>
           </defs>
 
-          {/* Glass background (empty) */}
+          {/* Tap base/mount */}
+          <rect x="25" y="0" width="30" height="12" rx="2" fill="url(#tapGradient)" />
+          <rect x="30" y="10" width="20" height="25" rx="1" fill="url(#tapGradient)" />
+
+          {/* Brass faucet */}
+          <ellipse cx="40" cy="38" rx="8" ry="4" fill="url(#brassGradient)" />
+          <rect x="35" y="35" width="10" height="15" fill="url(#brassGradient)" />
+          <ellipse cx="40" cy="50" rx="6" ry="3" fill="#D4A03E" />
+          <circle cx="40" cy="53" r="4" fill="#2a2a2a" />
+
+          {/* Tap handle */}
+          <g style={{
+            transformOrigin: '40px 20px',
+            transform: stage >= 1 ? 'rotate(-35deg)' : 'rotate(0deg)',
+            transition: 'transform 0.4s ease-out',
+          }}>
+            <rect x="36" y="5" width="8" height="8" rx="1" fill="url(#brassGradient)" />
+            <rect x="34" y="-25" width="12" height="32" rx="4" fill="url(#tapHandleGradient)" />
+            <ellipse cx="40" cy="-25" rx="8" ry="5" fill="#CD853F" />
+            {/* Handle highlight */}
+            <rect x="36" y="-20" width="3" height="25" rx="1" fill="rgba(255,255,255,0.2)" />
+          </g>
+        </svg>
+
+        {/* Pour stream */}
+        {stage >= 1 && stage < 3 && (
+          <div style={celebrationStyles.pourStream}>
+            <div style={celebrationStyles.pourStreamInner} />
+            {/* Pour splash particles */}
+            {[...Array(6)].map((_, i) => (
+              <div
+                key={i}
+                style={{
+                  position: 'absolute',
+                  bottom: -5,
+                  left: `${40 + (i - 3) * 8}%`,
+                  width: 4,
+                  height: 4,
+                  borderRadius: '50%',
+                  backgroundColor: '#F5B041',
+                  animation: `pourSplash 0.4s ease-out infinite`,
+                  animationDelay: `${i * 0.1}s`,
+                  opacity: 0.7,
+                }}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Beer Glass */}
+      <div style={celebrationStyles.glassWrapper}>
+        <svg width="180" height="200" viewBox="0 0 180 200" fill="none">
+          <defs>
+            {/* Glass clip path - interior */}
+            <clipPath id="glassClip">
+              <path d="M32 42 L38 168 C38 176 50 180 80 180 C110 180 122 176 122 168 L128 42 Z" />
+            </clipPath>
+
+            {/* Beer gradient - richer amber */}
+            <linearGradient id="beerGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#F5A623" />
+              <stop offset="40%" stopColor="#E8930C" />
+              <stop offset="100%" stopColor="#C67C00" />
+            </linearGradient>
+
+            {/* Glass gradient for 3D effect */}
+            <linearGradient id="glassGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="rgba(255,255,255,0.1)" />
+              <stop offset="15%" stopColor="rgba(255,255,255,0.25)" />
+              <stop offset="50%" stopColor="rgba(255,255,255,0.05)" />
+              <stop offset="85%" stopColor="rgba(255,255,255,0.2)" />
+              <stop offset="100%" stopColor="rgba(255,255,255,0.1)" />
+            </linearGradient>
+
+            {/* Foam gradient */}
+            <linearGradient id="foamGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#FFFFFF" />
+              <stop offset="100%" stopColor="#FFF8E7" />
+            </linearGradient>
+
+            {/* Condensation gradient */}
+            <radialGradient id="dropletGradient">
+              <stop offset="0%" stopColor="rgba(255,255,255,0.8)" />
+              <stop offset="100%" stopColor="rgba(255,255,255,0.3)" />
+            </radialGradient>
+          </defs>
+
+          {/* Glass outer shape - thick glass wall */}
           <path
-            d="M25 35 L30 165 C30 172 40 175 70 175 C100 175 110 172 110 165 L115 35 Z"
-            fill="rgba(255,255,255,0.1)"
-            stroke="rgba(255,255,255,0.3)"
-            strokeWidth="2"
+            d="M25 38 L32 172 C32 182 48 186 80 186 C112 186 128 182 128 172 L135 38 C135 34 130 32 80 32 C30 32 25 34 25 38 Z"
+            fill="url(#glassGradient)"
+            stroke="rgba(255,255,255,0.4)"
+            strokeWidth="1"
           />
+
+          {/* Glass rim - thick top edge */}
+          <ellipse cx="80" cy="35" rx="55" ry="8" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
+          <ellipse cx="80" cy="35" rx="50" ry="6" fill="rgba(255,255,255,0.1)" />
 
           {/* Beer fill */}
           <g clipPath="url(#glassClip)">
             <rect
-              x="20"
-              y={stage >= 1 ? 40 : 180}
+              x="30"
+              y={stage >= 1 ? 45 : 200}
               width="100"
-              height="150"
+              height="160"
               fill="url(#beerGradient)"
               style={{
-                transition: 'y 1s cubic-bezier(0.4, 0, 0.2, 1)',
+                transition: 'y 1.4s cubic-bezier(0.4, 0, 0.2, 1)',
               }}
             />
 
-            {/* Bubbles inside beer */}
-            {stage >= 2 && [...Array(8)].map((_, i) => (
+            {/* Beer surface wave effect */}
+            {stage >= 2 && (
+              <ellipse
+                cx="80"
+                cy="48"
+                rx="45"
+                ry="4"
+                fill="#F5C04A"
+                style={{ animation: 'beerWave 2s ease-in-out infinite' }}
+              />
+            )}
+
+            {/* Bubbles inside beer - more varied */}
+            {stage >= 1 && [...Array(16)].map((_, i) => (
               <circle
                 key={i}
-                cx={40 + (i * 10)}
-                cy={100 + (i % 3) * 20}
-                r={2 + (i % 2)}
-                fill="rgba(255,255,255,0.4)"
+                cx={45 + (i % 8) * 10 + (i % 3) * 2}
+                cy={80 + (i % 5) * 20}
+                r={1.5 + (i % 3)}
+                fill="rgba(255,255,255,0.5)"
                 style={{
-                  animation: `riseBubble ${1.5 + (i % 3) * 0.5}s ease-in-out infinite`,
-                  animationDelay: `${i * 0.2}s`,
+                  animation: `riseBubble ${1.2 + (i % 4) * 0.4}s ease-in-out infinite`,
+                  animationDelay: `${i * 0.15}s`,
                 }}
               />
             ))}
           </g>
 
-          {/* Foam */}
+          {/* Foam - more layered and realistic */}
           {stage >= 3 && (
-            <g style={{ animation: 'foamAppear 0.5s ease-out forwards' }}>
-              <ellipse cx="70" cy="42" rx="42" ry="12" fill="url(#foamGradient)" />
-              <ellipse cx="45" cy="38" rx="18" ry="10" fill="#FFFDF5" />
-              <ellipse cx="70" cy="35" rx="22" ry="12" fill="#FFFDF5" />
-              <ellipse cx="95" cy="38" rx="18" ry="10" fill="#FFFDF5" />
-              <ellipse cx="55" cy="32" rx="12" ry="8" fill="#FFFFFF" />
-              <ellipse cx="82" cy="32" rx="14" ry="9" fill="#FFFFFF" />
+            <g style={{ animation: 'foamAppear 0.6s ease-out forwards' }}>
+              {/* Base foam layer */}
+              <ellipse cx="80" cy="48" rx="48" ry="14" fill="#FFF8E7" />
+
+              {/* Foam bubbles - multiple layers */}
+              <ellipse cx="50" cy="44" rx="20" ry="12" fill="#FFFDF5" />
+              <ellipse cx="80" cy="40" rx="25" ry="14" fill="#FFFFFF" />
+              <ellipse cx="110" cy="44" rx="20" ry="12" fill="#FFFDF5" />
+              <ellipse cx="65" cy="36" rx="15" ry="10" fill="#FFFFFF" />
+              <ellipse cx="95" cy="36" rx="16" ry="10" fill="#FFFFFF" />
+              <ellipse cx="80" cy="32" rx="12" ry="8" fill="#FFFFFF" />
+
+              {/* Foam highlight bubbles */}
+              <circle cx="55" cy="38" r="6" fill="rgba(255,255,255,0.9)" />
+              <circle cx="75" cy="34" r="5" fill="rgba(255,255,255,0.9)" />
+              <circle cx="100" cy="38" r="7" fill="rgba(255,255,255,0.9)" />
+              <circle cx="85" cy="42" r="4" fill="rgba(255,255,255,0.8)" />
+
+              {/* Foam drips down the side */}
+              <ellipse cx="35" cy="55" rx="4" ry="8" fill="#FFFDF5" style={{ animation: 'foamDrip 2s ease-in forwards' }} />
+              <ellipse cx="125" cy="60" rx="3" ry="10" fill="#FFFDF5" style={{ animation: 'foamDrip 2s ease-in 0.3s forwards' }} />
+              <ellipse cx="38" cy="75" rx="3" ry="6" fill="#FFF8E7" style={{ animation: 'foamDrip 2s ease-in 0.5s forwards' }} />
             </g>
           )}
 
-          {/* Glass highlight */}
+          {/* Glass highlights - multiple for realism */}
           <path
-            d="M35 45 L38 155"
-            stroke="rgba(255,255,255,0.4)"
-            strokeWidth="3"
+            d="M42 50 L46 160"
+            stroke="rgba(255,255,255,0.5)"
+            strokeWidth="4"
+            strokeLinecap="round"
+          />
+          <path
+            d="M48 55 L51 155"
+            stroke="rgba(255,255,255,0.25)"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+          <path
+            d="M118 50 L114 160"
+            stroke="rgba(255,255,255,0.2)"
+            strokeWidth="2"
             strokeLinecap="round"
           />
 
-          {/* Handle */}
+          {/* Condensation droplets */}
+          {stage >= 2 && [...Array(8)].map((_, i) => (
+            <g key={i} style={{ animation: `condensationAppear 0.5s ease-out ${0.2 + i * 0.1}s forwards`, opacity: 0 }}>
+              <ellipse
+                cx={38 + (i % 2) * 80 + (i % 3) * 5}
+                cy={70 + i * 12}
+                rx={2 + (i % 2)}
+                ry={3 + (i % 2)}
+                fill="url(#dropletGradient)"
+              />
+            </g>
+          ))}
+
+          {/* Handle - more 3D */}
           <path
-            d="M115 55 C140 55 145 70 145 90 C145 110 140 125 115 125"
-            stroke="#D4A03E"
-            strokeWidth="8"
+            d="M128 60 C158 60 165 80 165 100 C165 120 158 140 128 140"
+            stroke="#3d3d3d"
+            strokeWidth="14"
             strokeLinecap="round"
             fill="none"
           />
           <path
-            d="M115 55 C140 55 145 70 145 90 C145 110 140 125 115 125"
-            stroke="#F5B041"
-            strokeWidth="4"
+            d="M128 60 C158 60 165 80 165 100 C165 120 158 140 128 140"
+            stroke="rgba(255,255,255,0.15)"
+            strokeWidth="10"
+            strokeLinecap="round"
+            fill="none"
+          />
+          <path
+            d="M130 65 C150 65 156 82 156 100 C156 118 150 135 130 135"
+            stroke="rgba(255,255,255,0.25)"
+            strokeWidth="3"
             strokeLinecap="round"
             fill="none"
           />
         </svg>
 
-        {/* Sparkles */}
+        {/* Sparkles - BrewedAt orange */}
         {stage >= 4 && (
           <>
-            <div style={{ ...celebrationStyles.sparkle, top: '10%', left: '10%', animationDelay: '0s' }}>✦</div>
-            <div style={{ ...celebrationStyles.sparkle, top: '20%', right: '5%', animationDelay: '0.2s' }}>✦</div>
-            <div style={{ ...celebrationStyles.sparkle, top: '5%', right: '20%', animationDelay: '0.4s' }}>✦</div>
-            <div style={{ ...celebrationStyles.sparkle, bottom: '30%', left: '5%', animationDelay: '0.3s' }}>✦</div>
-            <div style={{ ...celebrationStyles.sparkle, bottom: '40%', right: '0%', animationDelay: '0.5s' }}>✦</div>
+            <div style={{ ...celebrationStyles.sparkle, top: '5%', left: '5%', animationDelay: '0s', fontSize: 24 }}>✦</div>
+            <div style={{ ...celebrationStyles.sparkle, top: '15%', right: '0%', animationDelay: '0.2s', fontSize: 20 }}>✦</div>
+            <div style={{ ...celebrationStyles.sparkle, top: '0%', right: '25%', animationDelay: '0.4s', fontSize: 28 }}>✦</div>
+            <div style={{ ...celebrationStyles.sparkle, bottom: '35%', left: '0%', animationDelay: '0.3s', fontSize: 18 }}>✦</div>
+            <div style={{ ...celebrationStyles.sparkle, bottom: '45%', right: '-5%', animationDelay: '0.5s', fontSize: 22 }}>✦</div>
+            <div style={{ ...celebrationStyles.sparkle, top: '35%', left: '-10%', animationDelay: '0.6s', fontSize: 16 }}>✧</div>
+            <div style={{ ...celebrationStyles.sparkle, top: '25%', right: '-10%', animationDelay: '0.7s', fontSize: 16 }}>✧</div>
           </>
         )}
       </div>
 
-      {/* Cheers text */}
-      {stage >= 4 && (
-        <div style={celebrationStyles.cheersText}>Cheers! 🎉</div>
-      )}
     </div>
   );
 };
@@ -187,13 +369,50 @@ const celebrationStyles: Record<string, React.CSSProperties> = {
     width: '100%',
     height: 300,
     display: 'flex',
+    flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     overflow: 'hidden',
+    background: 'transparent',
+    paddingTop: 5,
+  },
+  gradientOverlay: {
+    position: 'absolute',
+    inset: 0,
+    background: 'radial-gradient(ellipse at 50% 40%, rgba(253, 85, 38, 0.1) 0%, transparent 60%)',
+    pointerEvents: 'none',
+  },
+  glowRings: {
+    position: 'absolute',
+    inset: 0,
+    pointerEvents: 'none',
+  },
+  tapWrapper: {
+    position: 'relative',
+    zIndex: 10,
+    marginBottom: -15,
+  },
+  pourStream: {
+    position: 'absolute',
+    top: 53,
+    left: '50%',
+    transform: 'translateX(-50%)',
+    width: 8,
+    height: 85,
+    overflow: 'visible',
+  },
+  pourStreamInner: {
+    width: '100%',
+    height: '100%',
+    background: 'linear-gradient(180deg, #F5A623 0%, #E8930C 50%, #F5B041 100%)',
+    borderRadius: 4,
+    animation: 'pourFlow 0.3s ease-in-out infinite',
+    boxShadow: '0 0 15px rgba(253, 85, 38, 0.6)',
   },
   glassWrapper: {
     position: 'relative',
     animation: 'glassAppear 0.6s ease-out',
+    zIndex: 5,
   },
   bubblesContainer: {
     position: 'absolute',
@@ -203,16 +422,17 @@ const celebrationStyles: Record<string, React.CSSProperties> = {
   },
   bgBubble: {
     position: 'absolute',
-    bottom: -20,
+    bottom: 60,
     borderRadius: '50%',
-    backgroundColor: 'rgba(212, 160, 62, 0.3)',
-    animation: 'floatUp 4s ease-in-out infinite',
+    backgroundColor: 'rgba(253, 85, 38, 0.4)',
+    animation: 'floatUp 5s ease-in-out infinite',
   },
   confettiContainer: {
     position: 'absolute',
     inset: 0,
     overflow: 'hidden',
     pointerEvents: 'none',
+    zIndex: 20,
   },
   confetti: {
     position: 'absolute',
@@ -225,16 +445,9 @@ const celebrationStyles: Record<string, React.CSSProperties> = {
   sparkle: {
     position: 'absolute',
     fontSize: 20,
-    color: '#F5B041',
+    color: '#fd5526',
     animation: 'sparkle 1s ease-in-out infinite',
-  },
-  cheersText: {
-    position: 'absolute',
-    bottom: 10,
-    fontSize: 18,
-    fontWeight: 700,
-    color: '#D4A03E',
-    animation: 'popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+    textShadow: '0 0 12px rgba(253, 85, 38, 0.8)',
   },
 };
 
@@ -525,25 +738,29 @@ export default function SubmitEventPage() {
           to { opacity: 1; transform: scale(1) translateY(0); }
         }
         @keyframes floatUp {
-          0%, 100% { transform: translateY(0) scale(1); opacity: 0.3; }
-          50% { transform: translateY(-100px) scale(0.8); opacity: 0.6; }
-          100% { transform: translateY(-200px) scale(0.5); opacity: 0; }
+          0% { transform: translateY(0) scale(1); opacity: 0.3; }
+          50% { transform: translateY(-120px) scale(0.7); opacity: 0.5; }
+          100% { transform: translateY(-250px) scale(0.4); opacity: 0; }
         }
         @keyframes riseBubble {
-          0% { transform: translateY(0); opacity: 0.4; }
-          100% { transform: translateY(-60px); opacity: 0; }
+          0% { transform: translateY(0); opacity: 0.5; }
+          100% { transform: translateY(-80px); opacity: 0; }
         }
         @keyframes foamAppear {
           from { opacity: 0; transform: translateY(10px) scaleY(0.5); }
           to { opacity: 1; transform: translateY(0) scaleY(1); }
         }
+        @keyframes foamDrip {
+          0% { transform: translateY(0); opacity: 1; }
+          100% { transform: translateY(15px); opacity: 0.6; }
+        }
         @keyframes confettiFall {
           0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-          100% { transform: translateY(350px) rotate(720deg); opacity: 0; }
+          100% { transform: translateY(400px) rotate(720deg); opacity: 0; }
         }
         @keyframes sparkle {
           0%, 100% { opacity: 0; transform: scale(0.5); }
-          50% { opacity: 1; transform: scale(1.2); }
+          50% { opacity: 1; transform: scale(1.3); }
         }
         @keyframes popIn {
           from { opacity: 0; transform: scale(0.5); }
@@ -553,6 +770,31 @@ export default function SubmitEventPage() {
           from { opacity: 0; transform: translateY(20px); }
           to { opacity: 1; transform: translateY(0); }
         }
+        @keyframes pourFlow {
+          0%, 100% { transform: scaleY(1) scaleX(1); }
+          50% { transform: scaleY(1.02) scaleX(0.95); }
+        }
+        @keyframes pourSplash {
+          0% { transform: translateY(0) scale(1); opacity: 0.7; }
+          100% { transform: translateY(-15px) scale(0.3); opacity: 0; }
+        }
+        @keyframes bokehFloat {
+          0%, 100% { transform: translateY(0) scale(1); opacity: 0.6; }
+          50% { transform: translateY(-10px) scale(1.1); opacity: 0.8; }
+        }
+        @keyframes beerWave {
+          0%, 100% { transform: scaleX(1); }
+          50% { transform: scaleX(1.02); }
+        }
+        @keyframes condensationAppear {
+          from { opacity: 0; transform: scale(0); }
+          to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes pulseRing {
+          0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.4; }
+          50% { opacity: 0.2; }
+          100% { transform: translate(-50%, -50%) scale(1.2); opacity: 0; }
+        }
 
         .slide-in-right { animation: slideInRight 0.35s ease-out; }
         .slide-in-left { animation: slideInLeft 0.35s ease-out; }
@@ -561,7 +803,7 @@ export default function SubmitEventPage() {
         .text-reveal { animation: textReveal 0.5s ease-out forwards; }
         .text-reveal-delay-1 { animation: textReveal 0.5s ease-out 0.3s forwards; opacity: 0; }
         .text-reveal-delay-2 { animation: textReveal 0.5s ease-out 0.5s forwards; opacity: 0; }
-        .text-reveal-delay-3 { animation: textReveal 0.5s ease-out 2.2s forwards; opacity: 0; }
+        .text-reveal-delay-3 { animation: textReveal 0.5s ease-out 3s forwards; opacity: 0; }
       `}</style>
 
       <div style={styles.container}>
@@ -570,7 +812,7 @@ export default function SubmitEventPage() {
           <p style={styles.headerSubtitle}>Share your craft beverage event with the BrewedAt community</p>
         </div>
 
-        <div style={styles.formContainer}>
+        <div style={submitted ? styles.formContainerSuccess : styles.formContainer}>
           {submitted ? (
             <div style={styles.success}>
               <BeerPourCelebration />
@@ -584,7 +826,7 @@ export default function SubmitEventPage() {
               <button
                 onClick={resetForm}
                 className="btn-primary text-reveal-delay-3"
-                style={{ ...styles.primaryButton, opacity: 0, animation: 'textReveal 0.5s ease-out 2.4s forwards', margin: '0 auto' }}
+                style={{ ...styles.primaryButton, opacity: 0, animation: 'textReveal 0.5s ease-out 3.2s forwards', margin: '0 auto' }}
               >
                 Submit Another Event
               </button>
@@ -1031,6 +1273,14 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: 20,
     boxShadow: '0 12px 40px rgba(0,0,0,0.25)',
   },
+  formContainerSuccess: {
+    background: 'linear-gradient(135deg, #1f3540 0%, #25303d 50%, #1a2a35 100%)',
+    padding: 0,
+    borderRadius: 20,
+    boxShadow: '0 12px 40px rgba(0,0,0,0.25)',
+    border: '2px solid rgba(253, 85, 38, 0.3)',
+    overflow: 'hidden',
+  },
 
   // Stepper
   stepper: {
@@ -1356,18 +1606,19 @@ const styles: Record<string, React.CSSProperties> = {
   // Success
   success: {
     textAlign: 'center',
-    padding: '32px 24px',
+    padding: '24px 24px 32px',
   },
   successTitle: {
     fontSize: 26,
     fontWeight: 700,
-    color: '#1f3540',
+    color: '#ffffff',
     marginBottom: 12,
     marginTop: 16,
+    textShadow: '0 2px 4px rgba(0,0,0,0.3)',
   },
   successText: {
     fontSize: 15,
-    color: '#5a6672',
+    color: 'rgba(255,255,255,0.8)',
     marginBottom: 28,
     maxWidth: 340,
     margin: '0 auto 28px',
